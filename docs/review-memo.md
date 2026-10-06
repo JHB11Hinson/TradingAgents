@@ -10,5 +10,5 @@
 - Why: the brief (section 5 / D8) requires `src/` and a split offline/live test layout
 - Covered by: the full inherited suite (`pytest -q`: 1262 passed, 1 skipped, 1 deselected,
   9.55 s) + `import tradingagents, cli.main` + a wheel containing both in-package resources
-- Records: ADR-001, ADR-002, change card in PR #<n>
+- Records: ADR-001, ADR-002, change card in PR #1
 - Rollback: `git revert <squash sha>`
