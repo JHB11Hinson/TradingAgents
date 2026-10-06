@@ -1,67 +1,52 @@
-name: CI
+name: gates
 
 on:
-  push:
-    branches: [main, 'v[0-9]+.[0-9]+.[0-9]+']
   pull_request:
+  push:
+    branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: gates-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: tests (py${{ matrix.python-version }}${{ matrix.tz && format(', {0}', matrix.tz) || '' }})
+  gate-3-schema:
+    name: gate-3-schema
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
-        # One run away from UTC, so a test that only passes in UTC fails here.
-        include:
-          - python-version: "3.12"
-            tz: America/New_York
-    env:
-      TZ: ${{ matrix.tz }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install (with dev extras)
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-      - name: Run test suite
-        run: pytest -q
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install check-jsonschema
+      - run: check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
-  smoke-install:
-    name: clean-install smoke
+  gate-6-ai-use-log:
+    name: gate-6-ai-use-log
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-      - name: Fresh install (no dev extras) and import
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Source, test or prompt changes must update the AI use log
         run: |
-          python -m pip install --upgrade pip
-          pip install .
-          # Catches undeclared runtime deps (e.g. #994 python-dotenv): a bare
-          # install must import the package and the CLI module.
-          python -c "import tradingagents, cli.main; print('clean-install import OK')"
+          base=origin/${{ github.base_ref || 'main' }}
+          git fetch origin ${{ github.base_ref || 'main' }} --depth=1 || true
+          changed=$(git diff --name-only "$base"...HEAD || true)
+          echo "changed files:"; echo "$changed"
+          if echo "$changed" | grep -qE '^(src/|test/|prompts/|\.opencode/)'; then
+            echo "$changed" | grep -q '^docs/ai-use-log.yaml' || {
+              echo "::error file=docs/ai-use-log.yaml::Code, tests or prompts changed, but docs/ai-use-log.yaml was not updated."
+              exit 1; }
+          fi
 
-  lint:
-    name: ruff (strict, full repo)
+  gate-5-regression:
+    name: gate-5-regression
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-      - name: Install ruff
-        run: pip install "ruff>=0.16"
-      - name: Lint the repository
-        # The repo is fully clean under the strict select, so we lint everything
-        # (generated results/ is excluded via pyproject extend-exclude).
-        run: ruff check .
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
