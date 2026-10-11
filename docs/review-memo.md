@@ -29,3 +29,17 @@
 - Notes: `.github/workflows/**` is human-only (developer manual 4.6 / admin manual 9.11.2); the
   workflow text is authored by JHB11Hinson; submitted on `ci/CHG-002-first-gates`
 - Rollback: `git revert <squash sha>` (restores the upstream workflow)
+
+### CHG-002 — branch protection v1 enabled (no PR possible)
+- Operator: JHB11Hinson
+- What changed: enabled branch protection on `main` with `enforce_admins: true`, one approving
+  review, stale reviews dismissed, and force pushes and deletions blocked. `required_status_checks`
+  was left `null` because the batch-1 gate names had not yet been registered.
+- Why: the rules must bind everyone, admins included (admin manual 9.2); the gates are made
+  blocking in their own admin node (9.4)
+- Applied at: 2026-10-08
+- Verification: `gh api repos/JHB11Hinson/TradingAgents/branches/main/protection --jq
+  '.enforce_admins.enabled'` prints `true`
+- Config copy: `docs/code-governance/protection.json` (this PR)
+- Rollback: `gh api --method PUT
+  repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261008.json`
