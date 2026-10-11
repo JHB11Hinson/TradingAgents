@@ -11,3 +11,5 @@ from dotenv import find_dotenv, load_dotenv
 # caller has already exported are never overridden.
 load_dotenv(find_dotenv(usecwd=True))
 load_dotenv(find_dotenv(".env.enterprise", usecwd=True), override=False)
+
+# deliberate-violation probe (throwaway branch)
