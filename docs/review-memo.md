@@ -43,3 +43,22 @@
 - Config copy: `docs/code-governance/protection.json` (this PR)
 - Rollback: `gh api --method PUT
   repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261008.json`
+
+### CHG-002 — gate batch 1 brought blocking (contexts + strict)
+- Operator: JHB11Hinson
+- What changed: `required_status_checks` set to `strict: true` with
+  `contexts = ["gate-3-schema", "gate-5-regression", "gate-6-ai-use-log"]`; the config copy in
+  `docs/code-governance/protection.json` updated to match
+- Why: the three batch-1 gates run green on `main`; making them blocking is the "online" half of
+  admin manual 9.4.1
+- Applied at: 2026-10-12
+- Verification: `gh api repos/JHB11Hinson/TradingAgents/branches/main/protection --jq
+  '.required_status_checks.contexts'` prints the three names; `check-runs` on `main` lists the
+  same names
+- Deliberate violations (admin manual 9.4.4): `gate-3-schema` failed on PR #4 (dropped
+  `fit_criterion`); `gate-6-ai-use-log` failed on PR #5 (changed `src/` without updating
+  `docs/ai-use-log.yaml`); `gate-5-regression` failed on PR #6 (broke an inherited assertion).
+  Each PR reported `mergeStateStatus: BLOCKED`, and all three were closed without merging and
+  their branches deleted.
+- Rollback: `gh api --method PUT
+  repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261012.json`
