@@ -62,3 +62,11 @@
   their branches deleted.
 - Rollback: `gh api --method PUT
   repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261012.json`
+### PR-3 — CHG-002-protection-baseline
+- Reviewer: zihao9462-creator
+- Specification: implements D1-REQ-GOV-001, within the change card scope
+- Architecture: follows ADR-001, does not cross the authoritative boundary
+- Code and tests: three-layer verification passed, one negative test, no skipped cases
+- Runtime metadata: none
+- Safety and efficiency:protection-baseline
+- Verdict: APPROVE
