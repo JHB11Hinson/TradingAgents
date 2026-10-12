@@ -29,3 +29,44 @@
 - Notes: `.github/workflows/**` is human-only (developer manual 4.6 / admin manual 9.11.2); the
   workflow text is authored by JHB11Hinson; submitted on `ci/CHG-002-first-gates`
 - Rollback: `git revert <squash sha>` (restores the upstream workflow)
+
+### CHG-002 — branch protection v1 enabled (no PR possible)
+- Operator: JHB11Hinson
+- What changed: enabled branch protection on `main` with `enforce_admins: true`, one approving
+  review, stale reviews dismissed, and force pushes and deletions blocked. `required_status_checks`
+  was left `null` because the batch-1 gate names had not yet been registered.
+- Why: the rules must bind everyone, admins included (admin manual 9.2); the gates are made
+  blocking in their own admin node (9.4)
+- Applied at: 2026-10-08
+- Verification: `gh api repos/JHB11Hinson/TradingAgents/branches/main/protection --jq
+  '.enforce_admins.enabled'` prints `true`
+- Config copy: `docs/code-governance/protection.json` (this PR)
+- Rollback: `gh api --method PUT
+  repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261008.json`
+
+### CHG-002 — gate batch 1 brought blocking (contexts + strict)
+- Operator: JHB11Hinson
+- What changed: `required_status_checks` set to `strict: true` with
+  `contexts = ["gate-3-schema", "gate-5-regression", "gate-6-ai-use-log"]`; the config copy in
+  `docs/code-governance/protection.json` updated to match
+- Why: the three batch-1 gates run green on `main`; making them blocking is the "online" half of
+  admin manual 9.4.1
+- Applied at: 2026-10-12
+- Verification: `gh api repos/JHB11Hinson/TradingAgents/branches/main/protection --jq
+  '.required_status_checks.contexts'` prints the three names; `check-runs` on `main` lists the
+  same names
+- Deliberate violations (admin manual 9.4.4): `gate-3-schema` failed on PR #4 (dropped
+  `fit_criterion`); `gate-6-ai-use-log` failed on PR #5 (changed `src/` without updating
+  `docs/ai-use-log.yaml`); `gate-5-regression` failed on PR #6 (broke an inherited assertion).
+  Each PR reported `mergeStateStatus: BLOCKED`, and all three were closed without merging and
+  their branches deleted.
+- Rollback: `gh api --method PUT
+  repos/JHB11Hinson/TradingAgents/branches/main/protection --input protection-backup-20261012.json`
+### PR-3 — CHG-002-protection-baseline
+- Reviewer: zihao9462-creator
+- Specification: implements D1-REQ-GOV-001, within the change card scope
+- Architecture: follows ADR-001, does not cross the authoritative boundary
+- Code and tests: three-layer verification passed, one negative test, no skipped cases
+- Runtime metadata: none
+- Safety and efficiency:protection-baseline
+- Verdict: APPROVE
