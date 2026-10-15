@@ -7,5 +7,5 @@
 - Inherited test suite: 86 files; measured before any change on Python 3.12.14 in a clean venv:
   1262 passed, 1 skipped (optional `langchain_aws`), 1 deselected (`-m "not integration"`), ~12 s.
 - Inherited CI: `.github/workflows/ci.yml` (upstream: test matrix, smoke install, full-repo ruff).
-  Replaced by our six blocking gates (see ADR-003 / CHG-002).
+  Replaced by our six blocking gates (see `docs/code-governance/protection.json` and CHG-002).
 - Decision to adopt this baseline: ADR-001. Layout alignment: ADR-002.
