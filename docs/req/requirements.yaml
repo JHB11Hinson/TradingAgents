@@ -1,3 +1,80 @@
+- id: D1-REQ-DEBATE-001
+  type: functional
+  statement: Every debate turn must emit a structured object (claim, evidence, rebuttal, confidence) instead of free prose.
+  fit_criterion: A schema validator accepts 100% of debate turns in the fixed set; a turn missing any of the four fields fails the run.
+  priority: must
+  tradeoff: Structured turns constrain the model's prose and can read less naturally than free-form debate.
+  source: project brief Assessment 3 (free-style sub-agent discussion); intro P20; agent-capability-inventory (local research notes) section 3
+- id: D1-REQ-DEBATE-004
+  type: functional
+  statement: Debate rounds must be configurable with a hard upper bound, and the debate must converge when the bound is reached.
+  fit_criterion: With max_debate_rounds=N, the debate never exceeds 2*N turns and ends at the bound.
+  priority: must
+  tradeoff: A low bound trades argument depth for cost and latency.
+  source: src/tradingagents/graph/conditional_logic.py (existing bound); D2 authority/limits
+- id: D1-REQ-TERM-001
+  type: invariant
+  statement: A loop must stop itself on oscillation, stalled progress, or budget exhaustion; it must never run unbounded.
+  fit_criterion: Constructed oscillation and stall cases terminate within the configured bounds; the negative test that removes the detector turns red.
+  priority: must
+  tradeoff: Aggressive termination can cut off a debate that was about to converge.
+  source: intro P17 (termination discipline); D2 invariant register
+- id: D1-REQ-CTX-001
+  type: invariant
+  statement: Every model call must be assembled from a layered context structure (identity, standing constraints, retrieved knowledge, history, resumable state, current task).
+  fit_criterion: The assembler emits all six layers for every agent call; a unit test asserts each layer's presence and source.
+  priority: must
+  tradeoff: A fixed layer structure costs tokens for agents that need only a subset.
+  source: D2 ADR requirement (layered context structure); agent-capability-inventory (local research notes) section 4/9
+- id: D1-REQ-CTX-003
+  type: invariant
+  statement: Assembled context must stay within the token budget, and critical constraints must be re-injected after compaction.
+  fit_criterion: A unit test asserts assembled_tokens <= budget and that the re-injected constraint block is byte-identical after compression.
+  priority: must
+  tradeoff: A hard budget forces compaction that may shorten useful history.
+  source: D2 ADR (token-budget cap, compaction threshold, re-injection policy)
+- id: D1-REQ-COST-001
+  type: cost
+  statement: A single-ticker analysis must spend no more than half of the baseline tokens and estimated cost.
+  fit_criterion: python -m eval.run over eval/fixed-set.json reports total_tokens <= 0.5 * baseline and est_cost <= 0.5 * baseline.
+  priority: must
+  tradeoff: Aggressive compaction can drop evidence the debaters rely on; quality must stay at or above baseline.
+  source: intro P20 (slow and token-burning); assessment table target (<600,000 tokens)
+- id: D1-REQ-COST-003
+  type: cost
+  statement: A single-ticker analysis must stay within the configured token budget (default 50000), triggering compaction and re-injecting the critical constraints when it would exceed it.
+  fit_criterion: test/offline/test_token_budget.py passes and the run log reports total_tokens <= the configured budget; with the budget set below the uncompacted size, compaction runs and assembled tokens stay <= the cap.
+  priority: must
+  tradeoff: A tight cap trades analysis depth for a hard cost ceiling.
+  source: src/tradingagents/graph/trading_graph.py (run entry; baseline about 120000 tokens per analysis); developer manual example 3.3
+- id: D1-REQ-EVAL-001
+  type: quality
+  statement: A fixed evaluation set with thresholds and a regression run must be runnable locally and judge pass/fail.
+  fit_criterion: python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml exits non-zero when a threshold fails and zero when it passes.
+  priority: must
+  tradeoff: Maintaining the fixed set and thresholds is ongoing work.
+  source: D7 gate 4 (semantic evaluation gate); promptfoo/DeepEval frontier
+- id: D1-REQ-SAFE-001
+  type: security
+  statement: External and retrieved text must be scrubbed of instructions before reaching the model; hostile samples must be blocked.
+  fit_criterion: A corpus of injection samples is blocked at 100% (zero tolerance); the negative test that disables scrubbing turns red.
+  priority: must
+  tradeoff: Scrubbing can strip legitimate text that resembles an instruction.
+  source: course safety boundary; NeMo Guardrails / Guardrails AI frontier
+- id: D1-REQ-SAFE-002
+  type: invariant
+  statement: A decision whose schema fails validation must be rejected and degraded, never emitted as a tradeable action.
+  fit_criterion: A malformed decision is rejected (rating REVIEW or equivalent) and no tradeable action is produced; negative test.
+  priority: must
+  tradeoff: Rejecting malformed output can lose a usable near-miss decision.
+  source: src/tradingagents/agents/rating.py (REVIEW sentinel); D2 invariant register
+- id: D1-REQ-SAFE-003
+  type: invariant
+  statement: Position size must pass a deterministic ceiling, and model output must never bypass deterministic code to take effect.
+  fit_criterion: A decision over the ceiling is clipped or rejected by deterministic code; a test asserts the model cannot bypass it.
+  priority: must
+  tradeoff: A hard ceiling can truncate a legitimately large position.
+  source: D2 authority boundary (advisory vs authoritative); course safety boundary
 - id: D1-REQ-GOV-001
   type: governance
   statement: The repository layout must satisfy the required structure before any feature work starts.
@@ -5,3 +82,66 @@
   priority: must
   tradeoff: One structural commit touches many paths, so file history shifts once.
   source: project brief section 5 and D8; intro slide "Assessment 3" (enhance an existing prototype)
+- id: D1-REQ-GOV-002
+  type: governance
+  statement: AGENTS.md must cover the six required sections (build target, artifact reading order, code baseline, readable/modifiable/frozen, module organization, integration contracts, verification requirements).
+  fit_criterion: A review checklist finds all six sections present and consistent with the repo.
+  priority: must
+  tradeoff: A longer AGENTS.md costs the agent context on every session.
+  source: D3 AGENTS.md
+- id: D1-REQ-GOV-003
+  type: governance
+  statement: All six blocking gates must be online in branch protection, each having failed on a deliberate violation.
+  fit_criterion: gh api .../branches/main/protection lists six contexts and matches ci.yml job names; each gate recorded red once.
+  priority: must
+  tradeoff: Six gates slow merges and can cause pending PRs if names drift.
+  source: D7 blocking gates; admin manual 9.4
+- id: D1-REQ-GOV-004
+  type: governance
+  statement: The trace matrix must map every requirement to its component, test/evidence and runtime monitor.
+  fit_criterion: trace-matrix.md has one row per REQ id with non-empty component, test and monitor; a check fails on a missing REQ.
+  priority: must
+  tradeoff: The matrix must be updated with every requirement change.
+  source: D2 trace matrix; D4 verification governance
+- id: D1-REQ-GOV-005
+  type: governance
+  statement: The tools the coding agent may call, and which roles may call them, must be documented in docs/code-governance/mcp-tool-manifest.md. The file states the MCP servers in use (or an explicit "none") and the coding agent's native tools, and agrees with the permission model.
+  fit_criterion: The manifest names every tool the coding agent can call with the roles allowed to call it, and states the MCP servers in use (or "none"); a check fails when a tool/role in the manifest disagrees with .opencode/permissions.jsonc or docs/architecture/permission-model.md.
+  priority: must
+  tradeoff: The manifest must be updated whenever a tool or role changes.
+  source: project brief D3 ("the tools the coding agent may call, and which roles may call them")
+- id: D1-REQ-GOV-006
+  type: governance
+  statement: A default-deny, per-path-whitelist permission model must exist in machine-readable form and agree across .opencode/permissions.jsonc, docs/architecture/permission-model.md and AGENTS.md.
+  fit_criterion: The three files list the same read/write whitelist and the default is deny; a check fails on any path present in one and absent in another.
+  priority: must
+  tradeoff: A strict whitelist blocks legitimate paths until they are added.
+  source: project brief D3 (permissions.jsonc, permission-model); admin manual 9.11.2
+- id: D1-REQ-GOV-008
+  type: governance
+  statement: docs/code-governance/verification-constraints.md and docs/architecture/invariants.md must map every requirement and invariant to its test and fallback, and every round must run all prior suites with zero regressions.
+  fit_criterion: Every fit_criterion has at least one test; every invariant has at least one test that fails when violated and a concrete fallback action; a check fails on a missing entry.
+  priority: must
+  tradeoff: Keeping the mapping current is ongoing work.
+  source: project brief D4 (verification-constraints); D2.3 invariants
+- id: D1-REQ-GOV-010
+  type: governance
+  statement: 'QA records must exist: docs/review-memo.md (one entry per pull request), docs/debt-register.md and docs/bug-diary.md.'
+  fit_criterion: A PR without a review-memo entry fails the check; debt-register.md and bug-diary.md exist and carry the required fields.
+  priority: must
+  tradeoff: Extra bookkeeping per change.
+  source: project brief D4 (review-memo, debt-register, bug-diary)
+- id: D1-REQ-GOV-011
+  type: governance
+  statement: The team must keep at least five annotated agent-session transcripts covering the six supervised-pipeline stages, and the AI-use log must be current.
+  fit_criterion: transcripts/ holds at least five files whose annotations collectively cover requirements classification, architecture candidate evaluation, plan approval before code, build, verification compliance and architecture revision; a change touching code or prompts without an ai-use-log entry fails gate-6.
+  priority: must
+  tradeoff: Recording and annotating sessions costs time.
+  source: project brief D5 and submission model (AI-use log mandatory); D7 gate 6
+- id: D1-REQ-GOV-013
+  type: governance
+  statement: The always-on behavioral rules (.opencode/rules.md) and the project covenant (.agent/rules.md) must exist and state abstraction limits, dependency constraints, test independence (at least one negative test per feature), the rule that safety-critical code needs an ADR and human approval, and context freshness within one sprint of a requirements change.
+  fit_criterion: Both files exist and are human-authored; a review checklist finds the five covenant clauses present and consistent with AGENTS.md.
+  priority: must
+  tradeoff: The covenant must be updated within one sprint of a requirements change.
+  source: project brief D3 (.opencode/rules.md, .agent/rules.md)
