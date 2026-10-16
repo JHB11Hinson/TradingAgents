@@ -80,3 +80,12 @@
 - Safety and efficiency: no new permissions; docs only
 - Verdict: APPROVE
 
+### PR-8 — CHG-004 register the must-priority requirements
+- Reviewer: zihao9462-creator
+- Specification: registers 20 must requirements plus the existing `D1-REQ-GOV-001`; 21 entries, all `priority: must`, all five required fields present; this PR is the registration, within change-card scope
+- Architecture: no architecture change; requirements are the D1 source of truth; no authoritative boundary crossed
+- Code and tests: no `src/`/`test/`; local `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml` -> `ok -- validation done`; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; gate-3 green
+- Runtime metadata: none
+- Safety and efficiency: no new permissions
+- Verdict: APPROVE
+
