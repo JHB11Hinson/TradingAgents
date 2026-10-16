@@ -23,3 +23,10 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-16-003
+  date: 2026-10-16
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: "CHG-008 deliberate-violation probe: an unused import in a src file, to watch gate-2 turn red."
+  human_interventions: []
+  transcript: transcripts/JHB11Hinson.md
