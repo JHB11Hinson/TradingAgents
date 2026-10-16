@@ -23,3 +23,20 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-003
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-009: narrow the gate-6-ai-use-log path trigger to the course floor (code or prompts) so it
+    no longer fires on governance-only changes, while the team keeps the participation policy for
+    writing the log.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Chose the participation policy for the AI-use log and the course's gate-6 wording (code or
+        prompts) over the team's earlier broader trigger.
+      why: >-
+        The gate should enforce the course floor; whether the log is written is decided by AI
+        involvement, not by the directory a change happens to live in.
+  transcript: transcripts/JHB11Hinson.md
