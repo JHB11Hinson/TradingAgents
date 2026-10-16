@@ -89,3 +89,12 @@
 - Safety and efficiency: no new permissions
 - Verdict: APPROVE
 
+### PR-9 — CHG-005 add the requirements trace matrix
+- Reviewer: zihao9462-creator
+- Specification: adds `docs/architecture/trace-matrix.md` (D2.4), the `fit_criterion` of `D1-REQ-GOV-004`; 40 rows / 40 unique ids / 21 `must`; all 21 ids from CHG-004 present; component/test/monitor columns non-empty; planned components marked
+- Architecture: traceability artifact, no architectural decision; consistent with ADR-001/002; no boundary crossed. Depends on CHG-004 (#8) for the `must` registry rows
+- Code and tests: no `src/`/`test/`; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; gates 3/5/6 green
+- Runtime metadata: none
+- Safety and efficiency: no new permissions
+- Verdict: APPROVE
+
