@@ -70,3 +70,13 @@
 - Runtime metadata: none
 - Safety and efficiency:protection-baseline
 - Verdict: APPROVE
+
+### PR-7 — CHG-003 fix the dangling gate reference
+- Reviewer: zihao9462-creator
+- Specification: documentation-only fix; removes the dangling `ADR-003` reference in `architecture-blueprint.md` and points at the existing `docs/code-governance/protection.json` and CHG-002; no requirement claimed (n/a)
+- Architecture: no architecture change; the referenced artifacts (ADR-001/002, protection.json, CHG-002) exist; no authoritative boundary crossed
+- Code and tests: no `src/`/`test/` change; local `pytest -q` = 1262 passed / 1 skipped / 1 deselected, `ruff check src` clean; gates 3/5/6 green
+- Runtime metadata: none
+- Safety and efficiency: no new permissions; docs only
+- Verdict: APPROVE
+
