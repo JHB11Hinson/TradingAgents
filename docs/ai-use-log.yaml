@@ -23,3 +23,28 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-005
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-011: add .opencode/rules.md (always-on behaviour: authority order, the three human gates,
+    standard sequence, the git/gh auto-ask-forbidden tiers, development discipline, records,
+    evidence-before-claims, stop-and-ask) and .agent/rules.md (the five-clause project covenant).
+  human_interventions:
+    - type: authorize
+      what: >-
+        Explicitly asked the agent to draft .opencode/rules.md, which the course marks as a
+        human-only file, and to base it on the workspace rules under .opencode/git-gh-rules/.
+      why: >-
+        The owner chose to delegate the draft; the file still lands through a reviewed pull request,
+        and this entry records that the human-only line was deliberately crossed for the draft.
+    - type: constrain
+      what: >-
+        Limited the committed rules to behaviour (process, development, git/gh tiers) and left the
+        machine-readable permission whitelist to GOV-006 (.opencode/permissions.jsonc and
+        docs/architecture/permission-model.md).
+      why: >-
+        Behavioural rules and enforceable permissions are different layers; keeping them separate
+        avoids a rules file that claims to be an enforcement mechanism.
+  transcript: transcripts/JHB11Hinson.md
