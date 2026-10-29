@@ -23,3 +23,28 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-004
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-010: draft Prompt.md, the static launch instruction for the coding agent (D9). It requires
+    an execution plan (traceability, interface contract, scope boundaries, testing strategy, steps),
+    a stop for human approval before any code, a staged build with human gates, and self-verification
+    before review.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Kept Prompt.md scoped to the coding agent and excluded every trading or analyst instruction;
+        those belong to prompts/ and src/.
+      why: >-
+        D9 is the launch instruction read after AGENTS.md; the product's runtime prompts are a
+        separate, versioned deliverable governed by gate-4.
+    - type: approve
+      what: >-
+        Approved drafting the file after first asking whether it targets the trading agent or the
+        coding agent.
+      why: >-
+        Confirms the scope before writing, because the two prompts have different owners and change
+        paths.
+  transcript: transcripts/JHB11Hinson.md
