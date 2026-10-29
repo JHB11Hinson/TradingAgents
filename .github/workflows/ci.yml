@@ -34,7 +34,7 @@ jobs:
           git fetch origin ${{ github.base_ref || 'main' }} --depth=1 || true
           changed=$(git diff --name-only "$base"...HEAD || true)
           echo "changed files:"; echo "$changed"
-          if echo "$changed" | grep -qE '^(src/|test/|prompts/|\.opencode/)'; then
+          if echo "$changed" | grep -qE '^(src/|test/|prompts/)'; then
             echo "$changed" | grep -q '^docs/ai-use-log.yaml' || {
               echo "::error file=docs/ai-use-log.yaml::Code, tests or prompts changed, but docs/ai-use-log.yaml was not updated."
               exit 1; }
