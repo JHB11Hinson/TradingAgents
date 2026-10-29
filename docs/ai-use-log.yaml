@@ -23,3 +23,28 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-006
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-012: add the default-deny permission model (GOV-006) — ADR-003, the machine-readable
+    .opencode/permissions.jsonc (roles plan/build/review, read/write whitelists, command tiers,
+    guard rules, enforcement), and the prose docs/architecture/permission-model.md, kept identical
+    to AGENTS.md section 13.
+  human_interventions:
+    - type: authorize
+      what: >-
+        Asked the agent to implement GOV-006 and open the pull request, which is a safety-critical
+        change because it defines the permission model.
+      why: >-
+        The owner chose to delegate the draft; ADR-003 and the pull request are the human-review
+        path this change requires.
+    - type: constrain
+      what: >-
+        Kept the model default-deny with deny > ask > allow, kept .opencode/rules.md human-only, and
+        limited enforcement claims to OpenCode settings plus the existing CI gates and protection.
+      why: >-
+        The permission model must be conservative and auditable; claiming runtime enforcement that
+        does not exist would make the model a fiction.
+  transcript: transcripts/JHB11Hinson.md
