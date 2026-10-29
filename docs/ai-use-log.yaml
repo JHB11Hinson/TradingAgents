@@ -23,3 +23,26 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-002
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-007: bring gate batch 2 online by adding gate-2-static-analysis to ci.yml (lint only the
+    src python files a pull request touches, plus a soft mypy pass) and adding mypy.ini, then
+    registering the gate in branch protection.
+  human_interventions:
+    - type: approve
+      what: >-
+        Authorized the agent to land the workflow change and to apply the branch-protection update,
+        asking for the manual's order and reversibility.
+      why: >-
+        The owner chose to delegate the admin steps. The guardrails kept: the gate name must appear
+        on GitHub before it enters contexts, and a deliberate-violation probe must precede
+        registration.
+    - type: constrain
+      what: >-
+        Kept the mypy step soft (mypy src || true) and limited linting to the files this PR touches.
+      why: >-
+        Linting the whole inherited tree would fail on upstream style and invite bypassing the gate.
+  transcript: transcripts/JHB11Hinson.md
