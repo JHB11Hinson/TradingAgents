@@ -222,5 +222,9 @@ __marimo__/
 .env.enterprise
 reports/
 
-# Local, non-English course manuals (kept out of the repository on purpose)
+# Workspace material kept out of the repository:
+# the Chinese course manuals and Chinese workspace documents, plus the agent task files.
 .opencode/manual/
+.opencode/功能需求表-讨论稿.md
+.opencode/研究-现有Agent功能盘点.md
+.opencode/tasks/
