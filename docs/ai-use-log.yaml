@@ -23,3 +23,20 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-008
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-014: scope .gitignore under .opencode/ to the Chinese workspace material (course manuals,
+    requirements draft, research inventory) and the agent task files, while the English rules,
+    permissions and Git/gh rules folder stay visible.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Asked for every Chinese workspace document to be ignored, after seeing which files would
+        otherwise surface as untracked.
+      why: >-
+        Committed repository files are English-only; Chinese workspace documents stay local. The
+        Git/gh rules folder was re-checked and is now English, so it stays visible.
+  transcript: transcripts/JHB11Hinson.md
