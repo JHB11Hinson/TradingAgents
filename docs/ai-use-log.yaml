@@ -23,3 +23,20 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-009
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-015: add docs/code-governance/structural-constraints.md (GOV-007) — one element to one
+    module, extend-never-replace, every module names the ADR and requirement it implements, and the
+    advisory/authoritative boundary with its known gap (the position ceiling is not implemented yet).
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required the document to state the unimplemented position ceiling as a known gap instead of
+        describing the authority boundary as fully enforced.
+      why: >-
+        A structural constraint that overstates enforcement is worse than one that names the gap;
+        the trace matrix already carries that gap.
+  transcript: transcripts/JHB11Hinson.md
