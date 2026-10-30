@@ -157,3 +157,20 @@
         The manifest is only useful if it matches the real tool surface; a fabricated server list
         would make the permission model unauditable.
   transcript: transcripts/JHB11Hinson.md
+- id: AI-2026-10-30-009
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-015: add docs/code-governance/structural-constraints.md (GOV-007) — one element to one
+    module, extend-never-replace, every module names the ADR and requirement it implements, and the
+    advisory/authoritative boundary with its known gap (the position ceiling is not implemented yet).
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required the document to state the unimplemented position ceiling as a known gap instead of
+        describing the authority boundary as fully enforced.
+      why: >-
+        A structural constraint that overstates enforcement is worse than one that names the gap;
+        the trace matrix already carries that gap.
+  transcript: transcripts/JHB11Hinson.md
