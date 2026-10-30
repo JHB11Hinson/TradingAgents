@@ -23,3 +23,20 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-007
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-013: add docs/code-governance/mcp-tool-manifest.md (GOV-005) — the MCP servers in use (none),
+    the agent's 16 native tools, the tool x role matrix for plan/build/review, and the consistency
+    rule that links it to .opencode/permissions.jsonc.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Kept the manifest to the tools that actually exist in this workspace and stated "none" for
+        MCP servers instead of inventing a server inventory.
+      why: >-
+        The manifest is only useful if it matches the real tool surface; a fabricated server list
+        would make the permission model unauditable.
+  transcript: transcripts/JHB11Hinson.md
