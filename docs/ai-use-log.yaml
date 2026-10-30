@@ -23,3 +23,21 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-011
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-017: add ADR-004, the layered context structure and assembly pipeline (CTX-004) — six layers
+    mapped to the inherited fields, dedupe/prioritize/budget/compact/assemble, a 50000-token budget
+    with an 80% compaction threshold, and a verbatim re-injection policy for the P0 block.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required the ADR to mark the assembler as not implemented and to map every layer to a real
+        field or module in the inherited code, instead of describing an imagined design.
+      why: >-
+        The ADR must be reviewable against the repository; a design that names no existing field
+        cannot be checked, and claiming an implementation that does not exist would corrupt the
+        trace evidence.
+  transcript: transcripts/JHB11Hinson.md
