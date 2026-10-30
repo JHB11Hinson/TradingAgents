@@ -23,3 +23,20 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-010
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-016: add docs/debt-register.md (all eight AI-era debt categories, seven open entries and two
+    watch entries) and docs/bug-diary.md (three entries with symptom, reproduction, classification,
+    root cause, fix and the invariant gap each exposed) for GOV-010.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required every debt entry to carry an owner and a trigger to revisit, and every bug entry to
+        name the invariant gap, including "none - environment" where that is the honest answer.
+      why: >-
+        A register without triggers becomes a wish list, and a bug diary that skips the invariant gap
+        loses the only part that feeds the verification work.
+  transcript: transcripts/JHB11Hinson.md
