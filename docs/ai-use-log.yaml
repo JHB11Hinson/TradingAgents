@@ -266,3 +266,20 @@
       why: >-
         Linting the whole inherited tree would fail on upstream style and invite bypassing the gate.
   transcript: transcripts/JHB11Hinson.md
+- id: AI-2026-11-13-002
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-019: register gate-2-static-analysis in docs/code-governance/protection.json, taking the
+    contexts from three to four blocking checks. Merge after CHG-007 (PR #11); the administrator
+    then applies the file with gh api.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Kept the change to the single contexts line and required it to merge only after the gate
+        name has appeared on main, so the new context cannot leave pull requests pending.
+      why: >-
+        A context that no check has ever produced makes every pull request wait forever; the order
+        is the guard.
+  transcript: transcripts/JHB11Hinson.md

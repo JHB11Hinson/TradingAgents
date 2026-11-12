@@ -1,7 +1,7 @@
 {
   "required_status_checks": {
     "strict": true,
-    "contexts": ["gate-3-schema", "gate-5-regression", "gate-6-ai-use-log"]
+    "contexts": ["gate-2-static-analysis", "gate-3-schema", "gate-5-regression", "gate-6-ai-use-log"]
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
