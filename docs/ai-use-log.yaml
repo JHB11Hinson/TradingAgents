@@ -48,3 +48,20 @@
         The draft over-claimed a course rule; the entry point must state the course's actual
         readable/modifiable/frozen classification plus the safety-critical review rule.
   transcript: transcripts/JHB11Hinson.md
+- id: AI-2026-11-13-001
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-018: register the 19 should/could requirements into docs/req/requirements.yaml (21 -> 40),
+    sync the trace-matrix note, and fix the two invalid YAML statements (GOV-009, GOV-010) in the
+    workspace requirements draft so future extraction is reproducible.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required the entries to be extracted from the requirements table and validated against
+        req-schema.json, not retyped by hand.
+      why: >-
+        Nineteen hand-copied entries would drift from the table; extraction plus a schema check is
+        the only reproducible way to claim the registry matches the draft.
+  transcript: transcripts/JHB11Hinson.md

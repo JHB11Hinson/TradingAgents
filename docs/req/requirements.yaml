@@ -145,3 +145,154 @@
   priority: must
   tradeoff: The covenant must be updated within one sprint of a requirements change.
   source: project brief D3 (.opencode/rules.md, .agent/rules.md)
+- id: D1-REQ-DEBATE-002
+  type: functional
+  statement: Each debate round must first diverge (every side states its own evidence) and then converge (name the conflict and settle it), following Osborn's method.
+  fit_criterion: Round output carries an explicit diverge section and a converge section; a round with no convergence statement fails validation.
+  priority: should
+  tradeoff: More structure per round costs tokens and can slow the debate.
+  source: intro P20 ("apply a technique in Requirement Engineering, e.g. Osborn's method")
+
+- id: D1-REQ-DEBATE-003
+  type: quality
+  statement: The debate's evidence-citation rate must be at least the measured baseline.
+  fit_criterion: python -m eval.run reports debate_evidence_citation_rate >= baseline on eval/fixed-set.json.
+  priority: should
+  tradeoff: Demanding cited evidence raises cost per round.
+  source: D4 behavioral tier (quality thresholds)
+
+- id: D1-REQ-TERM-002
+  type: functional
+  statement: The analyst tool loop must detect repeated identical tool calls and force the report instead of looping.
+  fit_criterion: A model repeating one tool with identical arguments hits wrap_up within max_tool_rounds; a test drives that path.
+  priority: should
+  tradeoff: Detection can stop a legitimate repeat that a different argument would have changed.
+  source: src/tradingagents/graph/setup.py (_analyst_graph); research/现有Agent功能盘点 §3
+
+- id: D1-REQ-CTX-002
+  type: functional
+  statement: The assembly pipeline must deduplicate, prioritize, budget, compact, and assemble the context before each call.
+  fit_criterion: A pipeline unit test shows each stage runs in order and drops only what the budget forces it to.
+  priority: should
+  tradeoff: Compaction can drop evidence a downstream agent relies on.
+  source: D2 ADR (assembly pipeline); research/现有Agent功能盘点 §4/§9
+
+- id: D1-REQ-CTX-004
+  type: governance
+  statement: The layered structure and assembly pipeline must be recorded in an ADR.
+  fit_criterion: docs/architecture/adr/00x-context-assembly.md exists, is reviewed, and matches the code.
+  priority: should
+  tradeoff: An extra ADR to maintain as the pipeline evolves.
+  source: D2 ADR requirement
+
+- id: D1-REQ-MEM-001
+  type: functional
+  statement: The system must keep a layered memory (working, episodic, semantic) that survives sessions, interruptions and versions.
+  fit_criterion: A unit test round-trips each layer across a simulated restart and version bump.
+  priority: should
+  tradeoff: More layers mean more storage and write-time cost.
+  source: D2 memory/state design; research/现有Agent功能盘点 §4
+
+- id: D1-REQ-MEM-002
+  type: functional
+  statement: Prior reflections relevant to the current task must be retrieved by semantic similarity (embeddings), not only by ticker and recency.
+  fit_criterion: A positive query returns the relevant past lesson and a negative query returns none; both cases are tested.
+  priority: should
+  tradeoff: Embeddings add a dependency, storage and per-run cost.
+  source: D2 memory/state design; D1-REQ-... (cross-entry learning); MemGPT/mem0 frontier
+
+- id: D1-REQ-MEM-003
+  type: security
+  statement: Every retrieved memory item must be source-attributable, and a historical run must not read outcomes unknown as of its analysis date.
+  fit_criterion: A backdated run excludes entries whose resolution date is after the run date; each injected item carries its source id.
+  priority: should
+  tradeoff: Strict point-in-time filtering shrinks the retrievable set.
+  source: src/tradingagents/memory/log.py#get_past_context (#1251); D2 memory design
+
+- id: D1-REQ-MEM-004
+  type: functional
+  statement: Memory retention, rotation and size caps must be configurable.
+  fit_criterion: With memory_log_max_entries=N, the log keeps at most N resolved entries and never prunes pending ones.
+  priority: could
+  tradeoff: Rotation can discard old lessons.
+  source: src/tradingagents/default_config.py (memory_log_max_entries); D2 memory design
+
+- id: D1-REQ-COST-002
+  type: cost
+  statement: Repeated or near-identical work must hit a semantic cache whose savings are quantified.
+  fit_criterion: A repeated run reports cache_hit_rate >= threshold and a measured saved-token ratio; a test drives a hit and a miss.
+  priority: should
+  tradeoff: A semantic cache risks serving a stale answer for a slightly different query.
+  source: GPTCache frontier; research/现有Agent功能盘点 §9
+
+- id: D1-REQ-PERF-001
+  type: performance
+  statement: A single-ticker analysis must finish within 60% of the measured baseline wall-clock time.
+  fit_criterion: python -m eval.run reports p50_wall_clock_s <= 0.6 * baseline_p50_wall_clock_s on eval/fixed-set.json.
+  priority: should
+  tradeoff: Parallelism raises peak token spend and API rate-limit pressure.
+  source: intro P20 (slow); assessment table target (<180s)
+
+- id: D1-REQ-OBS-001
+  type: functional
+  statement: A run must emit a machine-parsable trace of its steps (spans with phase, start/end and duration).
+  fit_criterion: A run writes a trace JSON that parses and contains one span per agent/tool step.
+  priority: should
+  tradeoff: Tracing adds a small per-step overhead and storage.
+  source: D2 observability; OTel GenAI / Langfuse frontier
+
+- id: D1-REQ-OBS-002
+  type: cost
+  statement: Token, cost and latency must be aggregated per phase in a run manifest.
+  fit_criterion: A manifest reports per-phase tokens, est_cost and wall-clock; a test parses it.
+  priority: should
+  tradeoff: Cost estimation depends on provider pricing that can drift.
+  source: D2 observability; research/现有Agent功能盘点 §7
+
+- id: D1-REQ-OBS-003
+  type: functional
+  statement: Agent/tool steps must publish structured events to an in-process seam; a failing subscriber must not block the run.
+  fit_criterion: With a subscriber that raises, the run completes and the failure is recorded as a telemetry warning.
+  priority: should
+  tradeoff: An event seam is extra indirection over direct logging.
+  source: D2 observability; chosen architecture (incremental + event seam)
+
+- id: D1-REQ-EVAL-002
+  type: quality
+  statement: A prompt or model change must trigger the semantic evaluation, and a failed threshold must block the merge.
+  fit_criterion: A prompt-only PR triggers gate-4 and is blocked when a threshold in eval/thresholds.yaml fails.
+  priority: should
+  tradeoff: The gate spends money on model calls and can false-positive on prompt-only docs edits.
+  source: D7 gate 4
+
+- id: D1-REQ-QUAL-001
+  type: quality
+  statement: Structured-output pass rate must be 100% on the fixed set, and the unparseable-rating (REVIEW) rate must not rise.
+  fit_criterion: python -m eval.run reports structured_output_pass_rate == 1.0 and review_rate <= baseline.
+  priority: should
+  tradeoff: Forcing structured output costs a retry on weak models.
+  source: D4 behavioral tier; src/tradingagents/agents/rating.py
+
+- id: D1-REQ-GOV-007
+  type: governance
+  statement: docs/code-governance/structural-constraints.md must state that each architectural element maps to exactly one module, that new work extends the baseline rather than replacing it, and that modules reference the ADR and invariant they implement.
+  fit_criterion: The file exists and is reviewed; its module list matches src/, and a structural test (imports/boundaries) fails on a violation.
+  priority: should
+  tradeoff: Boundary checks add a CI job and must be maintained.
+  source: project brief D3 (structural-constraints)
+
+- id: D1-REQ-GOV-009
+  type: governance
+  statement: 'The D2 architecture set must exist and stay consistent with the code: architecture-blueprint.md, adr/, memory-design.md, runtime-policy-catalog.md, evaluation-table.md, evaluation-logbook.md, risk-list.md, option-ledger.md.'
+  fit_criterion: Each listed file exists and is non-empty; every component named in the blueprint maps to a module; a check fails on a missing file.
+  priority: should
+  tradeoff: Eight artifacts must co-evolve with the code.
+  source: project brief D2 (11 artifact types)
+
+- id: D1-REQ-GOV-012
+  type: governance
+  statement: Runtime prompts must be versioned as files (prompts/prompt_vX.Y.yaml), and a change must add a version rather than edit an existing one in place.
+  fit_criterion: Each prompt change adds a new versioned file (e.g. prompts/prompt_v1.0.yaml becomes prompts/prompt_v1.1.yaml); a check fails when an existing prompt file is edited in place.
+  priority: should
+  tradeoff: Prompt versions accumulate over time.
+  source: project brief section 5 (prompts/); D7 gate 4
