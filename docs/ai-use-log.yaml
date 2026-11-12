@@ -266,3 +266,10 @@
       why: >-
         Linting the whole inherited tree would fail on upstream style and invite bypassing the gate.
   transcript: transcripts/JHB11Hinson.md
+- id: AI-2026-11-13-003
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: "CHG-020 deliberate-violation probe: an unused import in a src file, to watch gate-2 turn red."
+  human_interventions: []
+  transcript: transcripts/JHB11Hinson.md
