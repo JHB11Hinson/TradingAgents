@@ -23,3 +23,28 @@
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
   transcript: transcripts/JHB11Hinson.md#L16-L23
+- id: AI-2026-10-30-001
+  date: 2026-10-30
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-006: author AGENTS.md, the coding-agent governance entry point (D3). It declares the build
+    target, the artifact reading order, the code baseline, what is readable/modifiable/frozen, the
+    module organization, the integration contracts between modules, the verification requirements,
+    the one human-only file and the protected paths, in twelve fixed sections.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Scoped this change to AGENTS.md alone and to the first governance batch; excluded Prompt.md,
+        the CHG-006 task file and the .gitignore chore from the pull request.
+      why: >-
+        One pull request, one verifiable change, matching the Sprint 1 exit criterion that AGENTS.md
+        is ready.
+    - type: reject
+      what: >-
+        Rejected the first draft's blanket "human-only files" list after checking the course PDF,
+        which marks only .opencode/rules.md as human-only.
+      why: >-
+        The draft over-claimed a course rule; the entry point must state the course's actual
+        readable/modifiable/frozen classification plus the safety-critical review rule.
+  transcript: transcripts/JHB11Hinson.md
