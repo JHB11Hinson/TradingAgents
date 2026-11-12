@@ -3,9 +3,8 @@
 - **Why this file exists:** the brief requires a trace matrix that maps **every requirement** to its
   **executing component**, its **test / evidence** and its **runtime monitor**
   (deliverable D2.4; requirement `D1-REQ-GOV-004`).
-- **Requirement source of truth:** `docs/req/requirements.yaml` is the machine-readable registry
-  (it currently registers the `must` set). The `should` / `could` items are tracked here from the
-  team requirements draft ahead of their own registration change.
+- **Requirement source of truth:** `docs/req/requirements.yaml` is the machine-readable registry.
+  It registers all **40** requirements: 21 `must` (CHG-004) and 18 `should` + 1 `could` (CHG-018).
 - **How to read it:** one row per requirement id. `Executing component` is the module that will
   carry the behaviour; `Test / evidence` is the artifact that makes the `fit_criterion` machine
   checkable; `Runtime monitor` is what is watched once the code is live.
@@ -58,9 +57,9 @@
 
 ## Notes
 
-- **Registry vs matrix.** `docs/req/requirements.yaml` currently registers the 21 `must` requirements
-  (CHG-004). The `should` / `could` rows above are traced here ahead of their registration change, so
-  that no requirement is lost between the draft and the registry.
+- **Registry vs matrix.** `docs/req/requirements.yaml` registers all 40 requirements: the 21 `must`
+  (CHG-004) and the 18 `should` + 1 `could` (CHG-018). Every row above has a registry entry with the
+  same id.
 - **Planned components.** Rows whose component is marked *(planned)* have no module yet; their
   `fit_criterion` is not yet checkable, and their tests/monitors are the intended evidence once the
   owning change lands. This is recorded so the gap is visible rather than implied as done.
