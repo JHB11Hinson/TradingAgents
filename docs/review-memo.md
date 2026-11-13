@@ -244,7 +244,7 @@
 
 ### CHG-021 — promote gate-2 to a blocking scoped type check
 - Author: JHB11Hinson (agent-assisted)
-- PR: pending
+- PR: #27
 - Head reviewed: pending
 - Specification: changes `.github/workflows/ci.yml` so gate-2 installs the project, runs `pip check`, keeps `ruff` blocking on changed `src/**/*.py`, and type-checks changed `src` files with `mypy --follow-imports=silent`; adds `docs/code-governance/mypy-legacy.txt` (26 inherited modules, `DEBT-009`); records the missing safety-path and dependency-declaration halves as `DEBT-010`; no gate name or `contexts` change
 - Architecture: hardens an existing gate; follows the manual's "only the files this PR touches" rule and the PDF's D7 gate-2 requirement (lint, type-checking, dependency checks); new files are always checked, so the ratchet cannot hide new code
