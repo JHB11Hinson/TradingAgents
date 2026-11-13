@@ -248,7 +248,7 @@
 - Head reviewed: pending
 - Specification: changes `.github/workflows/ci.yml` so gate-2 installs the project, runs `pip check`, keeps `ruff` blocking on changed `src/**/*.py`, and type-checks changed `src` files with `mypy --follow-imports=silent`; adds `docs/code-governance/mypy-legacy.txt` (26 inherited modules, `DEBT-009`); records the missing safety-path and dependency-declaration halves as `DEBT-010`; no gate name or `contexts` change
 - Architecture: hardens an existing gate; follows the manual's "only the files this PR touches" rule and the PDF's D7 gate-2 requirement (lint, type-checking, dependency checks); new files are always checked, so the ratchet cannot hide new code
-- Code and tests: no `src/`/`test/` changes; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` ok; a local probe (`src/__mypy_probe.py`, removed) fails mypy as intended; gates 2/3/5/6 expected green on this PR
+- Code and tests: no `src/`/`test/` changes; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` ok; a local probe (`src/__mypy_probe.py`, removed) fails mypy as intended; **the GitHub checks did not run** because the fork's workflows are disabled (BUG-004), so the gate result is not yet observed — not green
 - Runtime metadata: pins mypy to 2.4.1 so the quarantine baseline is reproducible
 - Safety and efficiency: no permission or authority-boundary change; adds `pip install -e .` to gate-2, raising its wall time but keeping the 5-minute timeout
 - Requirement alignment (checklist item 6): `Refs: D7, D1-REQ-GOV-003, D1-REQ-GOV-007`; both requirement ids are registered in `docs/req/requirements.yaml`

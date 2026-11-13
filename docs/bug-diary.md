@@ -62,3 +62,22 @@ request, not here.
   (`unset http_proxy https_proxy`). Recorded here so the next person does not re-debug it.
 - **Invariant gap exposed:** none — environment only. It is recorded because it cost time and would
   otherwise be rediscovered.
+
+## BUG-004 — GitHub Actions stopped running on the fork
+
+- **Date:** 2026-11-13
+- **Symptom:** PR #27 (CHG-021) and a no-op diagnostic PR #28 produced **no check runs at all**.
+  `gh pr checks` was empty, `gh api .../actions/runs` showed no run after the last `main` push, and
+  the Actions tab displayed: "Workflows are not currently being run on this fork due to the scale
+  of GitHub Actions usage. A repository maintainer can choose to re-enable these."
+- **Reproduction:** push any branch and open a pull request; `gh pr checks <n>` reports no checks.
+  A no-op branch reproduced it, so the workflow file is not the cause; `actionlint` passes on
+  `.github/workflows/ci.yml`.
+- **Classification:** environment (GitHub platform policy)
+- **Root cause:** GitHub automatically disabled workflow runs on this fork under its scale policy
+  for forks. It is not a YAML error, a concurrency cancellation, or a missing runner.
+- **Fix:** a repository maintainer opens the **Actions** tab and uses the re-enable control, then
+  pushes a commit (or closes and re-opens the pull request) so the `pull_request` event fires.
+  This is an owner-only UI action; `gh workflow enable` does not clear the fork-level disable.
+- **Invariant gap exposed:** the gate pre-flight assumed Actions were running. Add "the Actions tab
+  shows no fork-disable banner" to the pre-flight checks before relying on `gh pr checks`.
