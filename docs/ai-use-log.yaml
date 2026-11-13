@@ -283,6 +283,33 @@
         A context that no check has ever produced makes every pull request wait forever; the order
         is the guard.
   transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
+- id: AI-2026-11-13-003
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-021: promote gate-2-static-analysis from a soft mypy pass to a blocking, scoped check.
+    The job now installs the project, runs pip check, lints changed src files, and type-checks
+    changed src files with mypy --follow-imports=silent. The 26 inherited modules that currently
+    fail (156 errors) are quarantined in docs/code-governance/mypy-legacy.txt as DEBT-009; new
+    files are always checked. The missing safety-path and dependency-declaration halves are
+    recorded as DEBT-010.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose route A (blocking type check on changed files with an inherited-module quarantine)
+        after the agent showed that a full blocking mypy run would make every pull request red.
+      why: >-
+        The course PDF requires type-checking in gate 2, but the inherited tree has 156 errors;
+        a ratchet keeps the gate real without freezing unrelated changes.
+    - type: constrain
+      what: >-
+        Required the agent to verify the course PDF before implementing, and skipped the
+        CHG-020 review-memo backfill as unnecessary.
+      why: >-
+        The gate design must follow the course's blocking-gate requirement, not only the manual's
+        sequence.
+  transcript: transcripts/CHG-021-gate-2-promotion.md
 - id: AI-2026-11-13-004
   date: 2026-11-13
   members: ["JHB11Hinson"]

@@ -241,3 +241,16 @@
 - Passed locally for all: `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; gates 3/5/6 green; no `src`/`test` change (items 2 and 3 not applicable).
 - No `gh pr review` verdict was issued; the approve / request-changes decision is deferred to the reviewer + team after the findings above are addressed.
 
+
+### CHG-021 — promote gate-2 to a blocking scoped type check
+- Author: JHB11Hinson (agent-assisted)
+- PR: pending
+- Head reviewed: pending
+- Specification: changes `.github/workflows/ci.yml` so gate-2 installs the project, runs `pip check`, keeps `ruff` blocking on changed `src/**/*.py`, and type-checks changed `src` files with `mypy --follow-imports=silent`; adds `docs/code-governance/mypy-legacy.txt` (26 inherited modules, `DEBT-009`); records the missing safety-path and dependency-declaration halves as `DEBT-010`; no gate name or `contexts` change
+- Architecture: hardens an existing gate; follows the manual's "only the files this PR touches" rule and the PDF's D7 gate-2 requirement (lint, type-checking, dependency checks); new files are always checked, so the ratchet cannot hide new code
+- Code and tests: no `src/`/`test/` changes; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` ok; a local probe (`src/__mypy_probe.py`, removed) fails mypy as intended; gates 2/3/5/6 expected green on this PR
+- Runtime metadata: pins mypy to 2.4.1 so the quarantine baseline is reproducible
+- Safety and efficiency: no permission or authority-boundary change; adds `pip install -e .` to gate-2, raising its wall time but keeping the 5-minute timeout
+- Requirement alignment (checklist item 6): `Refs: D7, D1-REQ-GOV-003, D1-REQ-GOV-007`; both requirement ids are registered in `docs/req/requirements.yaml`
+- Record truth (checklist item 5): `transcripts/CHG-021-gate-2-promotion.md` records this session; `AI-2026-11-13-003` cites it
+- Verdict: PENDING — awaiting reviewer

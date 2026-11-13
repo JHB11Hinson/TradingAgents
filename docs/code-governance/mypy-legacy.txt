@@ -1,0 +1,30 @@
+# Inherited modules quarantined from gate-2's blocking type check (DEBT-009).
+# Baseline: mypy 2.4.1 reported 156 errors across these 26 files on 2026-11-13.
+# gate-2 skips a changed file only while it is listed here; new files are always checked.
+# Remove a line once that module is type-clean, then lower the count in DEBT-009.
+src/cli/announcements.py
+src/cli/main.py
+src/cli/prefs.py
+src/cli/prompts.py
+src/cli/run.py
+src/tradingagents/agents/tools.py
+src/tradingagents/backtest.py
+src/tradingagents/dataflows/config.py
+src/tradingagents/dataflows/date_window.py
+src/tradingagents/dataflows/files.py
+src/tradingagents/dataflows/router.py
+src/tradingagents/dataflows/vendors/alpha_vantage/fundamentals.py
+src/tradingagents/dataflows/vendors/alpha_vantage/indicator.py
+src/tradingagents/dataflows/vendors/alpha_vantage/stock.py
+src/tradingagents/dataflows/vendors/reddit.py
+src/tradingagents/dataflows/vendors/sec_edgar.py
+src/tradingagents/dataflows/vendors/yahoo/fundamentals.py
+src/tradingagents/graph/checkpointer.py
+src/tradingagents/graph/setup.py
+src/tradingagents/graph/trading_graph.py
+src/tradingagents/llm_clients/anthropic_client.py
+src/tradingagents/llm_clients/azure_client.py
+src/tradingagents/llm_clients/google_client.py
+src/tradingagents/llm_clients/openai_client.py
+src/tradingagents/memory/log.py
+src/tradingagents/reporting.py
