@@ -241,3 +241,43 @@
 - Passed locally for all: `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; gates 3/5/6 green; no `src`/`test` change (items 2 and 3 not applicable).
 - No `gh pr review` verdict was issued; the approve / request-changes decision is deferred to the reviewer + team after the findings above are addressed.
 
+
+### PR-27 — CHG-021 promote gate-2 to a blocking scoped type check
+- Reviewer: SY1433
+- Specification: implements `D1-REQ-GOV-003` (six blocking gates) and `D1-REQ-GOV-007` (structural constraints) under D7 gate 2; changes only `.github/workflows/ci.yml` plus records, within the change-card scope. `gate-2-static-analysis` keeps its name and stays the fourth branch-protection context, so no `contexts` change is needed. Per-file scoping follows the manual rule "only the files this PR touches"; a whole-tree blocking run is not viable because mypy 2.4.1 reports 156 errors in 26 inherited modules.
+- Architecture: hardens an existing gate; no architectural decision and no authoritative boundary crossed. The quarantine list `docs/code-governance/mypy-legacy.txt` is documented as `DEBT-009` and the still-missing safety-path / dependency-declaration halves as `DEBT-010`, so the exemption is visible and shrinking. New files are never on the list, so new code is always type-checked (ratchet is one-way).
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `43bce72` in a separate worktree: `mypy src` -> "Found 156 errors in 26 files (checked 93 source files)", matching the PR claim; the 26 non-comment lines of `mypy-legacy.txt` equal the 26 erroring files exactly (no missing and no stale entry); all listed paths exist; a new `src/__mypy_probe.py` with `x: int = "..."` is selected by the filter and fails mypy (exit 123), then removed; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml` -> `ok -- validation done`. Gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: pins `mypy==2.4.1` so the quarantine baseline is reproducible; adds `pip install -e .` and `pip check` to gate-2. No gate name change.
+- Safety and efficiency: no permission change and no relaxation of any existing check; the previous soft `mypy src || true` becomes blocking for unquarantined files. Cost: gate-2 wall time rises to about 40 s, still inside the job timeout.
+- Non-blocking follow-ups: (1) the `CHG-021` memo above this entry still says the checks "did not run" and are "not green"; the `gates` workflow now runs and passes on `43bce72`, so that paragraph is stale and should be corrected in a later docs PR; (2) `grep -vFf docs/code-governance/mypy-legacy.txt` treats the file's comment lines as substring patterns — `grep -vxF` after stripping comments would be tighter (no path currently matches a comment, so the filter is correct today).
+- Verdict: APPROVE
+
+### PR-29 — CHG-025 rebuild the transcript under the course naming convention
+- Reviewer: SY1433
+- Specification: documentation and records only; addresses `D1-REQ-GOV-010` (QA records) and D5 (agent-session transcripts), within the change-card scope. Renames `transcripts/JHB11Hinson.md` to `transcripts/60198818-HaobinJiang.md` (the course `<student-id>-<student-name>.md` convention) and repoints the `docs/ai-use-log.yaml` citations.
+- Architecture: no architecture change; consistent with ADR-001/002. The transcript is the D5 evidence artifact, not a design document.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `1b5aa9f`: the old file is removed and the new one has 30543 lines; all 15 `transcript:` citations resolve to `transcripts/60198818-HaobinJiang.md#L<a>-L<b>` and every range is inside the file (no out-of-range reference, `a <= b`); the only surviving `transcripts/JHB11Hinson.md` string is in prose that describes the rename; no API token, private key or `sk-` secret is present in the transcript; 10 `## Session` sections with a D5 coverage map and per-session human-intervention tables; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; schema `ok`. Gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: none.
+- Safety and efficiency: no new permissions; docs only.
+- Non-blocking follow-ups: (1) thirteen AI-use-log entries cite the same range `L15391-L25677` (Session 06, the governance batch) because those changes came from one session; the citations are true but coarse, and narrowing them to the relevant sub-section would make item-5 auditing faster; (2) the standalone `transcripts/CHG-021-gate-2-promotion.md` on PR #27 still points at its own file — after both merge, cross-reference it or repoint it. Merge order: this PR must land before #30, whose `AI-2026-11-13-005` cites this file.
+- Verdict: APPROVE
+
+### PR-30 — CHG-026 remove the inactive collaborator from the team records
+- Reviewer: SY1433
+- Specification: implements `D1-REQ-GOV-002` (coding governance) under D3/D7; removes `@zihao9462-creator` from `.github/CODEOWNERS` and updates the ownership paragraph in `AGENTS.md` from four to three active members, within the change-card scope.
+- Architecture: no architecture change. `AGENTS.md` is the agent's governance entry point and changes only through a reviewed PR, which this is; the repository-side roster update does not touch the authority boundary. The GitHub collaborator deletion is correctly left as an administrator API action outside the agent's permission envelope and is documented in the PR body.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `c007b16`: the wildcard line lists exactly `@JHB11Hinson @AKAScarlett @SY1433`; `AGENTS.md` says "three active members" in every ownership sentence and matches `CODEOWNERS`; historical records (`docs/review-memo.md`, `transcripts/`, the CHG-026 summary) still name the member and were deliberately left untouched, which is correct because they are evidence; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; schema `ok`. Gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: none.
+- Safety and efficiency: no new permissions and no widened write path; removing a reviewer handle narrows the review surface as intended. The active-reviewer count stays at three, so the CODEOWNERS note "every path needs at least two owners" still holds.
+- Non-blocking follow-ups: (1) the fit criterion says no active tracked governance file names the member, but the four ADRs (`001`-`004`) still read "Deciders: the four team members" — they name a count, not the handle, so the criterion is met literally, yet updating them to "the three active members" would keep the record consistent; (2) `AI-2026-11-13-005` cites `transcripts/60198818-HaobinJiang.md`, which does not exist until PR #29 merges — merge #29 first (as the PR body states), otherwise the citation dangles.
+- Verdict: APPROVE
+
+### PR-31 — CHG-027 ignore the workspace Git/gh rules folder
+- Reviewer: SY1433
+- Specification: repository hygiene under `D1-REQ-GOV-002` and D3; adds `.opencode/git-gh-rules/` to `.gitignore` and extends the adjacent comment, within the change-card scope. The folder's own README declares it workspace-only, so the rule was missing rather than new policy.
+- Architecture: no architecture change; no governance or contract file touched.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `68dca40`: `git check-ignore -v .opencode/git-gh-rules/README.md` prints `.gitignore:<line>:.opencode/git-gh-rules/`, matching the fit criterion; the rule sits beside the existing `.opencode/manual/`, `.opencode/tasks/` entries under the same comment, so the workspace-material block stays coherent; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; schema `ok`. Gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: none.
+- Safety and efficiency: no new permissions and no change to tracked files' visibility; prevents accidental `git add -A` commits of local Git/gh automation notes.
+- Non-blocking follow-ups: none. No AI-use-log entry is required because gate-6 fires only on `src/`, `test/` or `prompts/` changes, and this PR touches none.
+- Verdict: APPROVE
