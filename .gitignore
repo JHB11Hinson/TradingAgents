@@ -223,8 +223,10 @@ __marimo__/
 reports/
 
 # Workspace material kept out of the repository:
-# the Chinese course manuals and Chinese workspace documents, plus the agent task files.
+# the Chinese course manuals and Chinese workspace documents, the agent task files,
+# and the local Git/gh automation rules.
 .opencode/manual/
 .opencode/功能需求表-讨论稿.md
 .opencode/研究-现有Agent功能盘点.md
 .opencode/tasks/
+.opencode/git-gh-rules/
