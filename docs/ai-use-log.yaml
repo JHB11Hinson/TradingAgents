@@ -335,3 +335,55 @@
       why: >-
         The transcript is a course deliverable and must read as an engineering record.
   transcript: transcripts/60198818-HaobinJiang.md#L1-L30543
+- id: AI-2026-11-13-005
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-026: remove the inactive collaborator @zihao9462-creator from the repository team
+    records (`.github/CODEOWNERS` and `AGENTS.md`), because the member stopped the course. The
+    GitHub collaborator access itself remains an administrator API action outside the agent's
+    permission envelope.
+  human_interventions:
+    - type: approve
+      what: >-
+        Directed the removal of the inactive collaborator from the repository governance files.
+      why: >-
+        The member stopped the course and can no longer review; keeping the handle in CODEOWNERS
+        would send review requests to an inactive account.
+    - type: constrain
+      what: >-
+        Kept the change to the roster references; historical review records and transcripts were
+        left untouched.
+      why: >-
+        Review memos and transcripts are historical evidence; removing a name from them would
+        falsify the record.
+  transcript: transcripts/60198818-HaobinJiang.md#L1-L30543
+
+- id: AI-2026-11-15-001
+  date: 2026-11-15
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-028: add docs/code-governance/merge-train.md, a serial integration runbook that keeps the
+    strict branch protection while avoiding avoidable re-approvals. The runbook records the observed
+    GitHub behaviour (merging main into a conflict-free behind branch preserves the approval; a
+    conflict resolution dismisses it), puts each review record on the pull request's branch, retires
+    the batch-record pull request pattern, and provides a read-only preflight for mergeability,
+    approvals and gates.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved option A (serial merge train) plus option B (this runbook) and asked for the
+        remaining open pull requests to be landed.
+      why: >-
+        The team is close to the deadline and each rebase after approval was costing another
+        reviewer round trip.
+    - type: constrain
+      what: >-
+        Asked the agent to merge the pull requests and to consider temporarily loosening branch
+        protection; the agent kept merging human-only and kept the protection unchanged.
+      why: >-
+        The merge and the protection baseline are the graded D7 evidence; a temporary bypass would
+        leave a permanent audit trail and invalidate it.
+  transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
