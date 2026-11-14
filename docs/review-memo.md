@@ -301,3 +301,14 @@
 - Safety and efficiency: no new permissions and no change to any gate, workflow or protection setting; the runbook reduces re-approval churn by making the "one approval in flight" lock explicit.
 - Record truth: `AI-2026-11-15-001` cites `transcripts/60198818-HaobinJiang.md#L30547-L30569`; Session 11 exists at that range (file has 30569 lines after this PR's append) and matches the described merge-train work. The correction that the batch review-record PR pattern (#32) conflicts with the PRs it records is accurate: #32 appended to the same `docs/review-memo.md` region as PR-27.
 - Verdict: APPROVE
+
+### PR-30 — CHG-026 remove the inactive collaborator from the team records (re-review at `0d4d621`)
+- Reviewer: SY1433
+- Specification: implements `D1-REQ-GOV-002` (coding governance) under D3/D7; removes `@zihao9462-creator` from `.github/CODEOWNERS` and updates the ownership wording in `AGENTS.md` from four to three active members, within the change-card scope. This re-review covers the head after `origin/main` was merged in, which dismissed the previous approval (runbook §1, second row).
+- Architecture: no architecture change. `AGENTS.md` changes only through a reviewed PR, which this is; the GitHub collaborator deletion stays an administrator API action outside the agent's permission envelope. No authoritative boundary crossed.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `0d4d621`: the merge of `origin/main` touched only `docs/ai-use-log.yaml` and the conflict there was a pure append at the file tail — both entries (`AI-2026-11-13-005` and the already-merged `AI-2026-11-15-001`) are kept, the YAML parses to 17 entries and the schema check prints `ok -- validation done`; `CODEOWNERS` lists exactly `@JHB11Hinson @AKAScarlett @SY1433`; `AGENTS.md` says "three active members" and agrees; all 16 transcript citations are inside the 30569-line file; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: none.
+- Safety and efficiency: no new permissions and no widened write path; the review surface narrows as intended and three active reviewers still satisfy the "at least two owners" note.
+- Record truth: `AI-2026-11-13-005` now cites a transcript file that exists on this branch because PR #29 has merged. Historical `review-memo.md` entries and the transcript still name the member and were correctly left untouched as evidence.
+- Non-blocking follow-up: ADR-001..004 still read "Deciders: the four team members" (a count, not the handle); the fit criterion is met literally, but updating them to "the three active members" would keep the record consistent.
+- Verdict: APPROVE

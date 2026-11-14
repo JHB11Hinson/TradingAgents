@@ -308,6 +308,31 @@
       why: >-
         The transcript is a course deliverable and must read as an engineering record.
   transcript: transcripts/60198818-HaobinJiang.md#L1-L30543
+- id: AI-2026-11-13-005
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-026: remove the inactive collaborator @zihao9462-creator from the repository team
+    records (`.github/CODEOWNERS` and `AGENTS.md`), because the member stopped the course. The
+    GitHub collaborator access itself remains an administrator API action outside the agent's
+    permission envelope.
+  human_interventions:
+    - type: approve
+      what: >-
+        Directed the removal of the inactive collaborator from the repository governance files.
+      why: >-
+        The member stopped the course and can no longer review; keeping the handle in CODEOWNERS
+        would send review requests to an inactive account.
+    - type: constrain
+      what: >-
+        Kept the change to the roster references; historical review records and transcripts were
+        left untouched.
+      why: >-
+        Review memos and transcripts are historical evidence; removing a name from them would
+        falsify the record.
+  transcript: transcripts/60198818-HaobinJiang.md#L1-L30543
+
 - id: AI-2026-11-15-001
   date: 2026-11-15
   members: ["JHB11Hinson"]

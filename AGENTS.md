@@ -2,7 +2,7 @@
 
 **Repository:** `JHB11Hinson/TradingAgents` (a graded fork of `TauricResearch/TradingAgents`, Apache-2.0).
 **Deliverable:** D3 — coding governance. **Requirement:** `D1-REQ-GOV-002`.
-**Owner:** `@JHB11Hinson`. **Reviewers:** any of the four team members (`*` in `CODEOWNERS`).
+**Owner:** `@JHB11Hinson`. **Reviewers:** any of the three active team members (`*` in `CODEOWNERS`).
 
 ---
 
@@ -14,9 +14,9 @@ then the artifacts in the order given in §3.
 - **Language.** Every repository file is English: code, comments, docs, YAML/JSON, prompts, gate
   names, commit messages, branch names, PR titles. The Chinese course manuals and the requirements
   draft are local and untracked.
-- **Ownership.** Four members share every path (`.github/CODEOWNERS`): `@JHB11Hinson`,
-  `@AKAScarlett`, `@zihao9462-creator`, `@SY1433`. GitHub does not allow self-approval, so every
-  change needs an approving review from someone other than its author.
+- **Ownership.** Three active members share every path (`.github/CODEOWNERS`): `@JHB11Hinson`,
+  `@AKAScarlett`, `@SY1433`. GitHub does not allow self-approval, so every change needs an
+  approving review from someone other than its author.
 - **Protected path.** This file is the agent's single entry point; like every repository path it
   changes only through a reviewed pull request. The one file the course marks human-only is
   `.opencode/rules.md` (see §11).
