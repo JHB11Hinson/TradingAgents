@@ -22,7 +22,7 @@
       why: >-
         The task text did not match the checkout; ignoring the actual manual directory is what
         keeps the non-English manuals out of the repository.
-  transcript: transcripts/JHB11Hinson.md#L16-L23
+  transcript: transcripts/60198818-HaobinJiang.md#L30-L2433
 - id: AI-2026-10-30-001
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -47,7 +47,7 @@
       why: >-
         The draft over-claimed a course rule; the entry point must state the course's actual
         readable/modifiable/frozen classification plus the safety-critical review rule.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-11-13-001
   date: 2026-11-13
   members: ["JHB11Hinson"]
@@ -64,7 +64,7 @@
       why: >-
         Nineteen hand-copied entries would drift from the table; extraction plus a schema check is
         the only reproducible way to claim the registry matches the draft.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-005
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -89,7 +89,7 @@
       why: >-
         Behavioural rules and enforceable permissions are different layers; keeping them separate
         avoids a rules file that claims to be an enforcement mechanism.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-004
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -114,7 +114,7 @@
       why: >-
         Confirms the scope before writing, because the two prompts have different owners and change
         paths.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-006
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -139,7 +139,7 @@
       why: >-
         The permission model must be conservative and auditable; claiming runtime enforcement that
         does not exist would make the model a fiction.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-007
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -156,7 +156,7 @@
       why: >-
         The manifest is only useful if it matches the real tool surface; a fabricated server list
         would make the permission model unauditable.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-009
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -173,7 +173,7 @@
       why: >-
         A structural constraint that overstates enforcement is worse than one that names the gap;
         the trace matrix already carries that gap.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-011
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -191,7 +191,7 @@
         The ADR must be reviewable against the repository; a design that names no existing field
         cannot be checked, and claiming an implementation that does not exist would corrupt the
         trace evidence.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-010
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -208,7 +208,7 @@
       why: >-
         A register without triggers becomes a wish list, and a bug diary that skips the invariant gap
         loses the only part that feeds the verification work.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-003
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -225,7 +225,7 @@
       why: >-
         The gate should enforce the course floor; whether the log is written is decided by AI
         involvement, not by the directory a change happens to live in.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-008
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -242,7 +242,7 @@
       why: >-
         Committed repository files are English-only; Chinese workspace documents stay local. The
         Git/gh rules folder was re-checked and is now English, so it stays visible.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-10-30-002
   date: 2026-10-30
   members: ["JHB11Hinson"]
@@ -265,7 +265,7 @@
         Kept the mypy step soft (mypy src || true) and limited linting to the files this PR touches.
       why: >-
         Linting the whole inherited tree would fail on upstream style and invite bypassing the gate.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
 - id: AI-2026-11-13-002
   date: 2026-11-13
   members: ["JHB11Hinson"]
@@ -282,7 +282,32 @@
       why: >-
         A context that no check has ever produced makes every pull request wait forever; the order
         is the guard.
-  transcript: transcripts/JHB11Hinson.md
+  transcript: transcripts/60198818-HaobinJiang.md#L15391-L25677
+- id: AI-2026-11-13-004
+  date: 2026-11-13
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-025: replace transcripts/JHB11Hinson.md with the course-conformant
+    transcripts/60198818-HaobinJiang.md, rebuilt from ten local OpenCode session exports
+    (2026-10-06 to 2026-11-13), and repoint the AI-use log to the new file. The transcript keeps
+    the substantive human decisions, the agent's visible output and the tool actions, and covers
+    the six D5 stages.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the rebuild, the new filename <student-id>-<student-name>.md, and the inclusion
+        of all ten sessions.
+      why: >-
+        The reviewer found that the old file had no session for CHG-014 or later, so the
+        AI-use-log citations could not be backed by the transcript.
+    - type: constrain
+      what: >-
+        Required personal remarks and non-substantive operational chatter to be removed from the
+        transcript, while keeping the substantive decisions.
+      why: >-
+        The transcript is a course deliverable and must read as an engineering record.
+  transcript: transcripts/60198818-HaobinJiang.md#L1-L30543
 - id: AI-2026-11-13-005
   date: 2026-11-13
   members: ["JHB11Hinson"]
