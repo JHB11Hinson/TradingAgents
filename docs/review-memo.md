@@ -324,3 +324,14 @@
 - Record truth: `AI-2026-11-13-005` now cites a transcript file that exists on this branch because PR #29 has merged. Historical `review-memo.md` entries and the transcript still name the member and were correctly left untouched as evidence.
 - Non-blocking follow-up: ADR-001..004 still read "Deciders: the four team members" (a count, not the handle); the fit criterion is met literally, but updating them to "the three active members" would keep the record consistent.
 - Verdict: APPROVE
+
+### PR-27 — CHG-021 gate-2 promotion (re-review at `af1cc5f`)
+- Reviewer: SY1433
+- Specification: re-review of the head after `origin/main` was merged in (the conflict resolution dismissed the earlier approval). Still implements `D1-REQ-GOV-003` and `D1-REQ-GOV-007` under D7 gate 2; still changes no gate name and no branch-protection context.
+- Architecture: unchanged in substance. The merge into `origin/main` resolved a single conflict in `docs/review-memo.md`; the author's `CHG-021` memo and the reviewer's `PR-27` record are both kept, and the stale "checks did not run / not green" sentence in the author's memo was corrected to say the gates now pass (BUG-004 is fixed). The author's `Verdict: PENDING` line now points at the reviewer entry, because the author does not set the verdict.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Re-verified locally on the merged tree `af1cc5f`: `mypy src` -> "Found 156 errors in 26 files (checked 93 source files)"; the 26 non-comment lines of `docs/code-governance/mypy-legacy.txt` still equal the 26 erroring files exactly, with no missing and no stale entry; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` -> `ok -- validation done`. Gates 2/3/5/6 all `pass` on the head SHA, and gate-2 now runs the new blocking step rather than a soft `|| true`.
+- Runtime metadata: `mypy==2.4.1` pin and the `pip check` step are intact after the merge.
+- Safety and efficiency: no permission change and no relaxation of an existing check; the ratchet remains one-way (new files are never quarantined).
+- Record truth: `transcripts/CHG-021-gate-2-promotion.md` and `AI-2026-11-13-003` still describe this change.
+- Non-blocking follow-up (carried from the first review): `grep -vFf docs/code-governance/mypy-legacy.txt` treats the file's comment lines as substring patterns; `grep -vxF` after stripping comments would be tighter. No path matches a comment today, so the filter is correct as written.
+- Verdict: APPROVE
