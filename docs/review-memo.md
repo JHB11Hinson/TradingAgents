@@ -281,3 +281,13 @@
 - Safety and efficiency: no new permissions and no change to tracked files' visibility; prevents accidental `git add -A` commits of local Git/gh automation notes.
 - Non-blocking follow-ups: none. No AI-use-log entry is required because gate-6 fires only on `src/`, `test/` or `prompts/` changes, and this PR touches none.
 - Verdict: APPROVE
+
+### PR-32 — batch-2 review records (PR-27, 29, 30, 31)
+- Reviewer: JHB11Hinson
+- Specification: adds D4 review records for PR-27, PR-29, PR-30 and PR-31; touches `docs/review-memo.md` only, within the change-card scope.
+- Architecture: records only; no architecture change and no authority-boundary change.
+- Code and tests: no code. Verified the four records against the PR bodies and the current heads: PR-29 and PR-31 are merged (`5e819a7`, `5dad1c0`); PR-27 is now at `3e116e0` and PR-30 at `c274e3f`. Their records cite the heads actually reviewed on 2026-11-13 (`43bce72`, `c007b16`); they are historical and do not replace the fresh approval required for the current heads. Gates 2/3/5/6 pass on the current heads.
+- Runtime metadata: none.
+- Safety and efficiency: docs only; no permission change.
+- Record truth: the PR-29 and PR-31 entries match the merged content. The PR-27 and PR-30 entries are accurate for the heads they name; the current heads need a fresh review before merge.
+- Verdict: APPROVE (as historical records; the current PR-27 and PR-30 heads still need a fresh approval)
