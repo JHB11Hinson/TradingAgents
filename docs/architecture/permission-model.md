@@ -78,7 +78,7 @@ decision whose schema fails validation is rejected and degraded to `REVIEW` rath
 | Layer | Mechanism |
 |---|---|
 | Runtime | OpenCode permission settings derived from `.opencode/permissions.jsonc` (edit / bash / webfetch) |
-| CI | `gate-2-static-analysis`, `gate-3-schema`, `gate-5-regression`, `gate-6-ai-use-log`; `gate-1` and `gate-4` as they come online |
+| CI | `gate-1-test-approval`, `gate-2-static-analysis`, `gate-3-schema`, `gate-5-regression`, `gate-6-ai-use-log`; `gate-4` as it comes online |
 | Repository | branch protection on `main`: 1 approval, strict, `enforce_admins`, no force push, no deletion |
 | Human | every pull request is reviewed; safety-critical changes need an ADR |
 
