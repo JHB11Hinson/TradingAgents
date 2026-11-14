@@ -291,3 +291,13 @@
 - Safety and efficiency: docs only; no permission change.
 - Record truth: the PR-29 and PR-31 entries match the merged content. The PR-27 and PR-30 entries are accurate for the heads they name; the current heads need a fresh review before merge.
 - Verdict: APPROVE (as historical records; the current PR-27 and PR-30 heads still need a fresh approval)
+
+### PR-33 — CHG-028 add the merge-train runbook
+- Reviewer: SY1433
+- Specification: adds `docs/code-governance/merge-train.md` and registers it under `D1-REQ-GOV-002` (coding governance) and `D1-REQ-GOV-010` (per-PR records), within the change-card scope. The runbook codifies the serial-integration procedure observed on 2026-11-14: a clean `git merge main` on a behind branch preserves the approval (PR #31), while a conflict resolution introduces new content and dismisses it (PR #27).
+- Architecture: documentation only; no architecture element, module boundary or frozen contract changes. The runbook explicitly refuses to weaken branch protection (`dismiss_stale_reviews`, approval count, admin bypass) and instead orders work before the approval, which is consistent with ADR-001 and the grader's D7 evidence requirement.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Verified locally on `a3a6871`: `pytest -q` 1262 passed / 1 skipped / 1 deselected; `ruff check src` clean; `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml` -> `ok -- validation done`; the runbook's §6 preflight is read-only and its commands match the repository (`gh pr list`, `git merge-tree`, `gh pr checks`); gates 2/3/5/6 all `pass` on the head SHA.
+- Runtime metadata: none.
+- Safety and efficiency: no new permissions and no change to any gate, workflow or protection setting; the runbook reduces re-approval churn by making the "one approval in flight" lock explicit.
+- Record truth: `AI-2026-11-15-001` cites `transcripts/60198818-HaobinJiang.md#L30547-L30569`; Session 11 exists at that range (file has 30569 lines after this PR's append) and matches the described merge-train work. The correction that the batch review-record PR pattern (#32) conflicts with the PRs it records is accurate: #32 appended to the same `docs/review-memo.md` region as PR-27.
+- Verdict: APPROVE
