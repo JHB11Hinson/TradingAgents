@@ -42,6 +42,24 @@ not as a bug.
    `|| true`.
 5. **After a merge, sync `main` and re-run the preflight** before touching the next PR.
 
+## 2.1 The merge lock — one approval in flight
+
+The only way an approval is never invalidated is for the pull request not to change between the
+approval and the merge. Enforce that by allowing **one approved pull request at a time**:
+
+1. Before requesting the final approval, confirm the pull request is `MERGEABLE`, up to date and
+   conflict-free, and that **no other open pull request is already approved and waiting to merge**.
+2. The reviewer approves only when the merger is available for the next few minutes.
+3. The merger merges immediately after the approval. The lock is released only when the merge is
+   complete.
+4. No other pull request merges while an approval is in flight. If one does, treat the approval as
+   stale: sync `main`, update the branch, re-run the gates and re-check the approval.
+5. A conflict may still exist; it must be resolved **before** the lock is taken. Resolving it after
+   the approval is the only avoidable re-approval left.
+
+The lock is a queue discipline, not a GitHub setting. It is what turns "resolve conflicts before
+approval" from advice into a guarantee.
+
 ## 3. Classify the queue
 
 Run the preflight (§6) and put every open PR in one of four buckets:
@@ -119,7 +137,16 @@ for n in $(gh pr list --state open --limit 50 --json number --jq '.[].number'); 
   gh pr checks "$n" 2>/dev/null | awk '{print $2}' | sort -u | tr '\n' ' '
   echo
 done
+
+# 4. The merge lock: this must print zero or one PR
+gh pr list --state open --limit 50 --json number,reviewDecision \
+  --jq '.[] | select(.reviewDecision=="APPROVED") | .number'
 ```
+
+Interpretation of step 4: an empty result means the lock is free. One number means that PR is the
+only one allowed to be approved/merged now. More than one number means the queue is already in the
+state that causes stale approvals; merge the oldest approved PR first and do not request another
+approval until the lock is released.
 
 Interpretation:
 
