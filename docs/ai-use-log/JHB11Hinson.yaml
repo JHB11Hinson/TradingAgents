@@ -25,3 +25,27 @@
       why: >-
         Review and AI-use records are evidence and must not be rewritten.
   transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
+
+- id: AI-2026-11-15-003
+  date: 2026-11-15
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-030: add gate-1-test-approval. The checker reads the Test-Approval trailer, requires the
+    record to exist before the first src commit, requires Verdict: APPROVE and a Tests line with
+    existing test paths, and rejects a commit that mixes test and src changes.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the strict history check and the decision to allow inherited tests named in the
+        review record.
+      why: >-
+        The course requires tests to be approved before implementation; inherited tests are
+        legitimate coverage for brownfield changes.
+    - type: constrain
+      what: >-
+        Kept the checker under .github/scripts and its tests under test/offline rather than adding a
+        runtime module.
+      why: >-
+        The checker is CI glue, not product behavior.
+  transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569

@@ -10,6 +10,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  gate-1-test-approval:
+    name: gate-1-test-approval
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Tests must be approved before the implementation
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "not a pull request; nothing to approve"
+            exit 0
+          fi
+          base_ref="${{ github.base_ref || 'main' }}"
+          git fetch origin "$base_ref"
+          python .github/scripts/gate1_check.py \
+            --base "origin/$base_ref" --head HEAD --pr-body "$PR_BODY"
+
   gate-2-static-analysis:
     name: gate-2-static-analysis
     runs-on: ubuntu-latest

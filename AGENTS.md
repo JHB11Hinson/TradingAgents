@@ -200,7 +200,7 @@ branch-protection `contexts` **character for character**.
 
 | Gate | Checks | State |
 |---|---|---|
-| `gate-1-test-approval` | the change is covered by tests committed before the implementation, pointed at by `Test-Approval:` | planned |
+| `gate-1-test-approval` | the change is covered by tests committed before the implementation, pointed at by `Test-Approval:` | **online** |
 | `gate-2-static-analysis` | `ruff` and scoped `mypy` on the `src/**/*.py` files this PR touches; inherited errors stay quarantined in `mypy-legacy.txt` | **online** |
 | `gate-3-schema` | `requirements.yaml` validates against `req-schema.json` | **online** |
 | `gate-4-semantic-eval` | prompt/model changes run the semantic evaluation | planned |
