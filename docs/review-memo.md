@@ -242,6 +242,18 @@
 - No `gh pr review` verdict was issued; the approve / request-changes decision is deferred to the reviewer + team after the findings above are addressed.
 
 
+### CHG-021 — promote gate-2 to a blocking scoped type check
+- Author: JHB11Hinson (agent-assisted)
+- PR: #27
+- Head reviewed: pending
+- Specification: changes `.github/workflows/ci.yml` so gate-2 installs the project, runs `pip check`, keeps `ruff` blocking on changed `src/**/*.py`, and type-checks changed `src` files with `mypy --follow-imports=silent`; adds `docs/code-governance/mypy-legacy.txt` (26 inherited modules, `DEBT-009`); records the missing safety-path and dependency-declaration halves as `DEBT-010`; no gate name or `contexts` change
+- Architecture: hardens an existing gate; follows the manual's "only the files this PR touches" rule and the PDF's D7 gate-2 requirement (lint, type-checking, dependency checks); new files are always checked, so the ratchet cannot hide new code
+- Code and tests: no `src/`/`test/` changes; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` ok; a local probe (`src/__mypy_probe.py`, removed) fails mypy as intended; the GitHub checks initially did not run because the fork's workflows were disabled (BUG-004, since re-enabled); gates 2/3/5/6 now pass on the head SHA
+- Runtime metadata: pins mypy to 2.4.1 so the quarantine baseline is reproducible
+- Safety and efficiency: no permission or authority-boundary change; adds `pip install -e .` to gate-2, raising its wall time but keeping the 5-minute timeout
+- Requirement alignment (checklist item 6): `Refs: D7, D1-REQ-GOV-003, D1-REQ-GOV-007`; both requirement ids are registered in `docs/req/requirements.yaml`
+- Record truth (checklist item 5): `transcripts/CHG-021-gate-2-promotion.md` records this session; `AI-2026-11-13-003` cites it
+- Verdict: see the reviewer entry below (PR-27); the author does not set the verdict
 ### PR-27 — CHG-021 promote gate-2 to a blocking scoped type check
 - Reviewer: SY1433
 - Specification: implements `D1-REQ-GOV-003` (six blocking gates) and `D1-REQ-GOV-007` (structural constraints) under D7 gate 2; changes only `.github/workflows/ci.yml` plus records, within the change-card scope. `gate-2-static-analysis` keeps its name and stays the fourth branch-protection context, so no `contexts` change is needed. Per-file scoping follows the manual rule "only the files this PR touches"; a whole-tree blocking run is not viable because mypy 2.4.1 reports 156 errors in 26 inherited modules.
@@ -311,4 +323,15 @@
 - Safety and efficiency: no new permissions and no widened write path; the review surface narrows as intended and three active reviewers still satisfy the "at least two owners" note.
 - Record truth: `AI-2026-11-13-005` now cites a transcript file that exists on this branch because PR #29 has merged. Historical `review-memo.md` entries and the transcript still name the member and were correctly left untouched as evidence.
 - Non-blocking follow-up: ADR-001..004 still read "Deciders: the four team members" (a count, not the handle); the fit criterion is met literally, but updating them to "the three active members" would keep the record consistent.
+- Verdict: APPROVE
+
+### PR-27 — CHG-021 gate-2 promotion (re-review at `af1cc5f`)
+- Reviewer: SY1433
+- Specification: re-review of the head after `origin/main` was merged in (the conflict resolution dismissed the earlier approval). Still implements `D1-REQ-GOV-003` and `D1-REQ-GOV-007` under D7 gate 2; still changes no gate name and no branch-protection context.
+- Architecture: unchanged in substance. The merge into `origin/main` resolved a single conflict in `docs/review-memo.md`; the author's `CHG-021` memo and the reviewer's `PR-27` record are both kept, and the stale "checks did not run / not green" sentence in the author's memo was corrected to say the gates now pass (BUG-004 is fixed). The author's `Verdict: PENDING` line now points at the reviewer entry, because the author does not set the verdict.
+- Code and tests: no `src/`, `test/` or `prompts/` change (items 2, 3 and 4 not applicable). Re-verified locally on the merged tree `af1cc5f`: `mypy src` -> "Found 156 errors in 26 files (checked 93 source files)"; the 26 non-comment lines of `docs/code-governance/mypy-legacy.txt` still equal the 26 erroring files exactly, with no missing and no stale entry; `ruff check src` clean; `pytest -q` 1262 passed / 1 skipped / 1 deselected; `check-jsonschema` -> `ok -- validation done`. Gates 2/3/5/6 all `pass` on the head SHA, and gate-2 now runs the new blocking step rather than a soft `|| true`.
+- Runtime metadata: `mypy==2.4.1` pin and the `pip check` step are intact after the merge.
+- Safety and efficiency: no permission change and no relaxation of an existing check; the ratchet remains one-way (new files are never quarantined).
+- Record truth: `transcripts/CHG-021-gate-2-promotion.md` and `AI-2026-11-13-003` still describe this change.
+- Non-blocking follow-up (carried from the first review): `grep -vFf docs/code-governance/mypy-legacy.txt` treats the file's comment lines as substring patterns; `grep -vxF` after stripping comments would be tighter. No path matches a comment today, so the filter is correct as written.
 - Verdict: APPROVE

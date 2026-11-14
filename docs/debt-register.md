@@ -115,3 +115,34 @@ inventing a ninth.
 - **Owner:** reviewer of the affected pull request.
 - **Linked requirement:** `D1-REQ-GOV-010`.
 - **Status:** none observed
+
+## DEBT-009 — Twenty-six inherited modules are quarantined from gate-2's type check
+
+- **Category:** 7. Guardrail debt
+- **What:** `mypy 2.4.1` reports **156 errors across 26 inherited modules** (mostly
+  `llm_clients/` and `dataflows/`). Blocking on the whole `src/` tree would red every pull
+  request, so `gate-2-static-analysis` skips a changed file only while it is listed in
+  `docs/code-governance/mypy-legacy.txt`; new files and unlisted files are type-checked.
+- **Impact:** a type regression inside a quarantined module is not caught by CI. The list is
+  visible and shrinkable, but it is an exemption until each module is cleaned.
+- **Owner:** the module owner who next changes a quarantined file.
+- **Trigger to revisit:** any change to a quarantined module; clean and de-list at least one
+  module per sprint; report the remaining count before the freeze review.
+- **Linked requirement:** `D1-REQ-GOV-003`, `D1-REQ-GOV-007`.
+- **Status:** open
+
+## DEBT-010 — Gate 2 still lacks the safety-path and dependency-declaration halves
+
+- **Category:** 7. Guardrail debt
+- **What:** gate 2 now runs lint, type-checking and `pip check` (installed-metadata
+  consistency). The course's gate-2 second half — contract, security, API-surface and permission
+  checks on pull requests touching safety-relevant paths — and a dependency-**declaration** check
+  are not implemented.
+- **Impact:** a change to a safety-critical path (for example `agents/schemas.py`,
+  `default_config.py`, `dataflows/router.py` or the permission files) still relies on human review
+  alone for those checks.
+- **Owner:** Member 3 (safety) with the administrator.
+- **Trigger to revisit:** before the first change to a safety-critical path and before Sprint 3
+  safety work; do not describe gate 2 as fully implementing the course gate until then.
+- **Linked requirement:** `D1-REQ-GOV-003`, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`.
+- **Status:** open

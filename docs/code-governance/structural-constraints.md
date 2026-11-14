@@ -86,7 +86,8 @@ enforced.
 | Constraint | How it is checked |
 |---|---|
 | Vendor libraries are imported only by the data layer | `test/offline/test_layering.py` (inherited structural test; fails on a violation) |
-| Changed `src/**/*.py` stay lint- and type-clean | `gate-2-static-analysis` (batch 2, PR #11) |
+| Changed `src/**/*.py` stay lint-clean and type-clean | `gate-2-static-analysis`: `ruff` plus `mypy --follow-imports=silent` on the changed files; inherited modules still listed in `docs/code-governance/mypy-legacy.txt` are quarantined under `DEBT-009` (new files are always checked) |
+| Dependencies stay mutually consistent | `gate-2-static-analysis`: `pip check` after `pip install -e .`; declaration and safety-path checks remain `DEBT-010` |
 | No inherited test is weakened, skipped or renamed | review; `gate-5-regression` |
 | Module list matches `src/` | the check below, run at review |
 | Authority boundary is not bypassed | review; `SAFE-002`/`SAFE-003` tests once they land |
