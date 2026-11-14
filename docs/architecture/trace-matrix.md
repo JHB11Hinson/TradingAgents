@@ -50,8 +50,8 @@
 | D1-REQ-GOV-007 | should | `structural-constraints.md`: element <-> module, extend not replace | `docs/code-governance/structural-constraints.md` | Structural (import/boundary) test | gate-2-static-analysis / structural test |
 | D1-REQ-GOV-008 | must | `verification-constraints.md` + `invariants.md`: every rule has a test and fallback | `docs/code-governance/verification-constraints.md`, `docs/architecture/invariants.md` | Missing-entry check | Sprint review checklist |
 | D1-REQ-GOV-009 | should | D2 architecture artifact set complete and consistent | `docs/architecture`, repo root | File-existence + blueprint-to-module mapping | Sprint review checklist |
-| D1-REQ-GOV-010 | must | QA records: `review-memo.md` per PR, `debt-register.md`, `bug-diary.md` | `docs/` | Missing-entry check | Per-PR + weekly check (manual 8.1/8.2) |
-| D1-REQ-GOV-011 | must | >=5 annotated transcripts over six stages; AI-use log current | `transcripts/`, `docs/ai-use-log.yaml` | gate-6 + coverage check | gate-6-ai-use-log + weekly check |
+| D1-REQ-GOV-010 | must | QA records: `docs/review-memo/PR-<n>.md` per PR, `debt-register.md`, `bug-diary.md` | `docs/` | Missing-entry check | Per-PR + weekly check (manual 8.1/8.2) |
+| D1-REQ-GOV-011 | must | >=5 annotated transcripts over six stages; AI-use log current | `transcripts/`, `docs/ai-use-log/<member>.yaml` | gate-6 + coverage check | gate-6-ai-use-log + weekly check |
 | D1-REQ-GOV-012 | should | Runtime prompts versioned as files, no in-place edits | `prompts/` | Versioned-file existence | Review checklist |
 | D1-REQ-GOV-013 | must | Always-on rules + project covenant exist and agree | `.opencode/`, `.agent/` | File-existence + five covenant clauses | Sprint covenant check |
 
