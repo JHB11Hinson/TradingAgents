@@ -63,7 +63,7 @@ Read in this order. The machine-readable source of truth wins over prose when th
 | 6 | `docs/architecture/trace-matrix.md` | requirement → component → test → runtime monitor |
 | 7 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
 | 8 | `.github/workflows/ci.yml` | the real gate names and their steps |
-| 9 | `docs/review-memo.md`, `docs/ai-use-log.yaml` | per-PR review records and the AI-use log |
+| 9 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
 
 > Other `docs/architecture/**` and `docs/code-governance/**` artifacts are planned but not written
 > yet; when they exist they slot in after #6.
@@ -184,8 +184,9 @@ Generated code must satisfy all of the following before it is offered for review
   fails when violated **and** a concrete fallback action; every test names the requirement or
   invariant it covers.
 - **AI-use log.** The gate enforces the course floor: a PR that changes code or prompts (`src/`,
-  `test/`, `prompts/`) without updating `docs/ai-use-log.yaml` is blocked. By team policy the log is
-  updated whenever the AI materially contributed to a change, including governance documents.
+  `test/`, `prompts/`) without updating the AI-use log (`docs/ai-use-log/<member>.yaml`, or the
+  legacy `docs/ai-use-log.yaml` archive) is blocked. By team policy the log is updated whenever the
+  AI materially contributed to a change, including governance documents.
 - **Three-tier verification:** structural (imports, module boundaries, permissions, architectural
   functions) / regression / behavioral (quality thresholds, zero safety escapes).
 - **Secrets.** No API key or secret may enter any commit.
@@ -200,7 +201,7 @@ branch-protection `contexts` **character for character**.
 | Gate | Checks | State |
 |---|---|---|
 | `gate-1-test-approval` | the change is covered by tests committed before the implementation, pointed at by `Test-Approval:` | planned |
-| `gate-2-static-analysis` | `ruff` on the `src/**/*.py` files this PR touches (plus `mypy src`, soft) | planned |
+| `gate-2-static-analysis` | `ruff` and scoped `mypy` on the `src/**/*.py` files this PR touches; inherited errors stay quarantined in `mypy-legacy.txt` | **online** |
 | `gate-3-schema` | `requirements.yaml` validates against `req-schema.json` | **online** |
 | `gate-4-semantic-eval` | prompt/model changes run the semantic evaluation | planned |
 | `gate-5-regression` | full inherited + new suite, `pytest -q` | **online** |
@@ -243,9 +244,11 @@ cites the requirement it serves, the test that covers it, and the review that ap
   commits before it is split or rebuilt.
 - **Commit trailers** (one per line, after a blank line):
   `Refs:` (deliverables / requirement ids), `Agent-Session:` (transcript file + line range),
-  `AI-Use-Log:` (`docs/ai-use-log.yaml`), `Test-Approval:` (`docs/review-memo.md#<change id>`).
-- **Records.** Every PR gets one `docs/review-memo.md` entry; the author appends one
-  `docs/ai-use-log.yaml` entry whenever the AI materially contributed to the change (any path,
+  `AI-Use-Log:` (`docs/ai-use-log/<member>.yaml`), `Test-Approval:` (`docs/review-memo/PR-<n>.md`;
+  the legacy `docs/review-memo.md#<change id>` form is still accepted during the transition).
+- **Records.** Every PR gets one `docs/review-memo/PR-<n>.md` entry (the legacy
+  `docs/review-memo.md` is a historical archive); the author appends one entry to their own
+  `docs/ai-use-log/<member>.yaml` whenever the AI materially contributed to the change (any path,
   governance included); annotated session transcripts live in `transcripts/` (append-only).
 - **Merge.** `gh pr merge <n> --squash --delete-branch`, then `git switch main && git pull --ff-only`
   and delete the local branch. Only after an approving review.

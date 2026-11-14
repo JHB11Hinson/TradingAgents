@@ -10,7 +10,11 @@
 - [ ] gate-3-schema: requirements.yaml is well formed
 - [ ] gate-4-semantic-eval: no prompt change / the evaluation has been run
 - [ ] gate-5-regression: all tests pass
-- [ ] gate-6-ai-use-log: docs/ai-use-log.yaml is up to date
+- [ ] gate-6-ai-use-log: docs/ai-use-log/<member>.yaml is up to date (or the legacy archive)
+
+## Test approval (required when `src/` changes)
+- Test-Approval: docs/review-memo/PR-<n>.md
+- Tests: test/offline/...
 
 ## Agent session and human intervention
 - Transcript: transcripts/<student-id>-<name>.md#L???-L???
