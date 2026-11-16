@@ -180,7 +180,9 @@ Generated code must satisfy all of the following before it is offered for review
   the inherited suite is the baseline. Integration tests run with `pytest -m integration`.
 - **Schema.** `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml`
   must pass whenever requirements change.
-- **Traceability.** Every `fit_criterion` has at least one test; every invariant has a test that
+- **Traceability.** Every `fit_criterion` of an in-scope requirement has at least one test; a
+  requirement whose `priority` is `wont` is out of the delivery, carries a `deferred_reason` in the
+  registry instead of evidence, and is not counted as a gap. Every invariant has a test that
   fails when violated **and** a concrete fallback action; every test names the requirement or
   invariant it covers.
 - **AI-use log.** The gate enforces the course floor: a PR that changes code or prompts (`src/`,

@@ -25,3 +25,31 @@
       why: >-
         Review and AI-use records are evidence and must not be rewritten.
   transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
+
+- id: AI-2026-11-17-003
+  date: 2026-11-17
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-032: defer six low-value requirements to `wont` (DEBATE-003, MEM-001, MEM-002, COST-002,
+    PERF-001, EVAL-002), each with a `deferred_reason`; make that reason mandatory in
+    `req-schema.json`; fold CTX-002, DEBATE-002 and OBS-003 into their owning requirements in the
+    trace matrix; and exempt `wont` entries from the fit-criterion coverage rule in AGENTS.md §9.
+    All 21 `must` requirements and every safety invariant stay in scope.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose the cut list eight days before delivery, after the per-requirement cost estimate, and
+        picked a recorded static evidence page over a live web UI for the demo video.
+      why: >-
+        The remaining time fits the must-scope plus a small evidence page; parallelising for
+        PERF-001, an embeddings store, a semantic cache and gate-4 would spend the buffer for
+        ungraded behaviour.
+    - type: constrain
+      what: >-
+        Kept every requirement id and fit_criterion untouched (ids are frozen) and left all must
+        requirements in scope.
+      why: >-
+        A deferred requirement must stay auditable; deleting or rewording it would erase the
+        decision that the course grades.
+  transcript: transcripts/60198818-HaobinJiang.md

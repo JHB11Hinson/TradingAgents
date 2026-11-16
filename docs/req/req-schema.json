@@ -12,8 +12,16 @@
       "statement":     { "type": "string" },
       "fit_criterion": { "type": "string" },
       "priority":      { "type": "string", "enum": ["must","should","could","wont"] },
+      "deferred_reason": { "type": "string",
+                         "description": "Required when priority is wont: why the requirement is out of the delivery." },
       "tradeoff":      { "type": "string" },
       "source":        { "type": "string" }
-    }
+    },
+    "allOf": [
+      {
+        "if":   { "properties": { "priority": { "const": "wont" } }, "required": ["priority"] },
+        "then": { "required": ["deferred_reason"] }
+      }
+    ]
   }
 }
