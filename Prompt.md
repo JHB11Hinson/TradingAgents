@@ -55,8 +55,10 @@ Run the verification in `AGENTS.md` §9 and put the evidence in the pull request
 - `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml` when the
   requirements change;
 - a note on every gate in `AGENTS.md` §10 that is not online yet, and how a human covered it;
-- one `docs/ai-use-log.yaml` entry (team policy: whenever the AI materially contributed);
-- one `docs/review-memo.md` entry per pull request, written by the reviewer.
+- one entry in your own `docs/ai-use-log/<member>.yaml` (team policy: whenever the AI materially
+  contributed; the legacy `docs/ai-use-log.yaml` is a historical archive);
+- one `docs/review-memo/PR-<n>.md` entry per pull request, written by the reviewer (the legacy
+  `docs/review-memo.md` is a historical archive).
 
 Report each command's result honestly. A red command is a finding to report, not something to
 explain away or to make green by weakening a test.

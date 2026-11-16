@@ -81,8 +81,8 @@ jobs:
           changed=$(git diff --name-only "$base"...HEAD || true)
           echo "changed files:"; echo "$changed"
           if echo "$changed" | grep -qE '^(src/|test/|prompts/)'; then
-            echo "$changed" | grep -q '^docs/ai-use-log.yaml' || {
-              echo "::error file=docs/ai-use-log.yaml::Code, tests or prompts changed, but docs/ai-use-log.yaml was not updated."
+            echo "$changed" | grep -qE '^(docs/ai-use-log\.yaml|docs/ai-use-log/)' || {
+              echo "::error file=docs/ai-use-log/README.md::Code, tests or prompts changed, but the AI-use log was not updated (docs/ai-use-log/<member>.yaml)."
               exit 1; }
           fi
 

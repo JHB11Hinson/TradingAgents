@@ -126,15 +126,15 @@
   source: project brief D4 (verification-constraints); D2.3 invariants
 - id: D1-REQ-GOV-010
   type: governance
-  statement: 'QA records must exist: docs/review-memo.md (one entry per pull request), docs/debt-register.md and docs/bug-diary.md.'
-  fit_criterion: A PR without a review-memo entry fails the check; debt-register.md and bug-diary.md exist and carry the required fields.
+  statement: 'QA records must exist: docs/review-memo/PR-<n>.md (one entry per pull request; the legacy docs/review-memo.md is a historical archive), docs/debt-register.md and docs/bug-diary.md.'
+  fit_criterion: A PR without a review-memo entry (docs/review-memo/PR-<n>.md or the legacy archive) fails the check; debt-register.md and bug-diary.md exist and carry the required fields.
   priority: must
   tradeoff: Extra bookkeeping per change.
   source: project brief D4 (review-memo, debt-register, bug-diary)
 - id: D1-REQ-GOV-011
   type: governance
   statement: The team must keep at least five annotated agent-session transcripts covering the six supervised-pipeline stages, and the AI-use log must be current.
-  fit_criterion: transcripts/ holds at least five files whose annotations collectively cover requirements classification, architecture candidate evaluation, plan approval before code, build, verification compliance and architecture revision; a change touching code or prompts without an ai-use-log entry fails gate-6.
+  fit_criterion: transcripts/ holds at least five files whose annotations collectively cover requirements classification, architecture candidate evaluation, plan approval before code, build, verification compliance and architecture revision; a change touching code or prompts without an entry in docs/ai-use-log/<member>.yaml (or the legacy archive) fails gate-6.
   priority: must
   tradeoff: Recording and annotating sessions costs time.
   source: project brief D5 and submission model (AI-use log mandatory); D7 gate 6

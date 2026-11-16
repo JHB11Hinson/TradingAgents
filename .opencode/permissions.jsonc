@@ -164,7 +164,7 @@
 
   "enforcement": {
     "runtime": "OpenCode permission settings derived from this file (edit / bash / webfetch)",
-    "ci": "gate-3-schema, gate-5-regression, gate-6-ai-use-log; further gates as they come online",
+    "ci": "gate-2-static-analysis, gate-3-schema, gate-5-regression, gate-6-ai-use-log; gate-1 and gate-4 as they come online",
     "repository": "branch protection on main: 1 approval, strict, enforce_admins, no force push, no deletion",
     "human": "every pull request is reviewed; safety-critical changes need an ADR",
     "onViolation": "stop, report to the human, record the incident in docs/bug-diary.md"

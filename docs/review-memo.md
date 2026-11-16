@@ -1,5 +1,8 @@
 # Review memos
 
+> **Historical archive through 2026-11-15.** New review records go to
+> [`docs/review-memo/PR-<n>.md`](review-memo/README.md). Do not append here.
+
 ### CHG-001 — src layout alignment
 - Operator: JHB11Hinson
 - Requirement: D1-REQ-GOV-001

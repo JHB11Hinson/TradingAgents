@@ -33,8 +33,8 @@ not as a bug.
 1. **Never push after the approval you intend to merge on.** If you must push, the approval is gone;
    request a fresh one.
 2. **Write the review record on the pull request's own branch**, before the reviewer approves
-   (`docs/review-memo.md`, manual 7.5/7.6). Do not open a separate "batch of review records" pull
-   request: it appends to the same file as the PRs it records and conflicts by construction.
+   (`docs/review-memo/PR-<n>.md`, manual 7.5/7.6). Do not open a separate "batch of review records"
+   pull request: it appends to the same file as the PRs it records and conflicts by construction.
 3. **One approval per pull request, from someone other than its author.** Never disable
    `dismiss_stale_reviews`, lower the approval count, add an admin bypass, or merge without review.
    That evidence is graded (D7).
@@ -42,23 +42,25 @@ not as a bug.
    `|| true`.
 5. **After a merge, sync `main` and re-run the preflight** before touching the next PR.
 
-## 2.1 The merge lock — one approval in flight
+## 2.1 The merge lock — one conflicting approval in flight
 
-The only way an approval is never invalidated is for the pull request not to change between the
-approval and the merge. Enforce that by allowing **one approved pull request at a time**:
+The append-only records are sharded by member (`docs/ai-use-log/<member>.yaml`) and by PR
+(`docs/review-memo/PR-<n>.md`), so a pull request that is behind `main` can be updated with
+`git merge main` without a conflict. A conflict-free update normally preserves the approval.
 
-1. Before requesting the final approval, confirm the pull request is `MERGEABLE`, up to date and
-   conflict-free, and that **no other open pull request is already approved and waiting to merge**.
-2. The reviewer approves only when the merger is available for the next few minutes.
-3. The merger merges immediately after the approval. The lock is released only when the merge is
-   complete.
-4. No other pull request merges while an approval is in flight. If one does, treat the approval as
-   stale: sync `main`, update the branch, re-run the gates and re-check the approval.
-5. A conflict may still exist; it must be resolved **before** the lock is taken. Resolving it after
-   the approval is the only avoidable re-approval left.
+The lock is therefore narrower than "one approval total":
+
+1. **Clean pull requests may be batch-approved.** After each merge, update the rest with
+   `git merge main` and check `reviewDecision` still says `APPROVED`.
+2. **A pull request whose update conflicts must be resolved and approved again.** Serialize only
+   those: one conflicting approval in flight.
+3. The reviewer approves only when the merger is available for the next few minutes.
+4. The merger merges immediately after the approval, then releases the lock.
+5. If an update is not conflict-free, treat the approval as gone and request a fresh one. Do not
+   merge on the old approval.
 
 The lock is a queue discipline, not a GitHub setting. It is what turns "resolve conflicts before
-approval" from advice into a guarantee.
+approval" from advice into a guarantee without forcing a single approval at a time.
 
 ## 3. Classify the queue
 
@@ -143,10 +145,10 @@ gh pr list --state open --limit 50 --json number,reviewDecision \
   --jq '.[] | select(.reviewDecision=="APPROVED") | .number'
 ```
 
-Interpretation of step 4: an empty result means the lock is free. One number means that PR is the
-only one allowed to be approved/merged now. More than one number means the queue is already in the
-state that causes stale approvals; merge the oldest approved PR first and do not request another
-approval until the lock is released.
+Interpretation of step 4: an empty result means no approval is waiting. One or more numbers are
+allowed when their updates are conflict-free: merge them in order, updating each with
+`git merge main` and checking `reviewDecision` after every update. A conflicting approved PR must
+be resolved and re-approved; do not batch those.
 
 Interpretation:
 
@@ -157,7 +159,7 @@ Interpretation:
 
 ## 7. Review record shape
 
-The reviewer writes one entry per PR in `docs/review-memo.md`:
+The reviewer creates one file per PR, `docs/review-memo/PR-<n>.md`:
 
 ```text
 ### PR-<n> — <CHG-id> <title>
@@ -168,6 +170,7 @@ The reviewer writes one entry per PR in `docs/review-memo.md`:
 - Runtime metadata: ...
 - Safety and efficiency: ...
 - Record truth: ...
+- Tests: test/offline/test_foo.py, test/offline/test_bar.py
 - Verdict: APPROVE | CHANGES REQUIRED | REJECT
 ```
 
@@ -175,8 +178,9 @@ Recommended command sequence for the reviewer:
 
 ```bash
 gh pr checkout <n>
-# append the record to docs/review-memo.md
-git add docs/review-memo.md
+mkdir -p docs/review-memo
+# create docs/review-memo/PR-<n>.md with the record above
+git add docs/review-memo/PR-<n>.md
 git commit -m "docs: record the review of PR #<n> under CHG-<id>"
 git push
 gh pr review <n> --approve --body "Review record pushed; gates green."
@@ -201,7 +205,8 @@ Record the train run where it can be audited:
 
 - the pull request body states the order and the dependencies;
 - the review memo carries the per-PR verdict and the head SHA;
-- `docs/ai-use-log.yaml` records the agent's contribution;
+- `docs/ai-use-log/<member>.yaml` records the agent's contribution (the legacy
+  `docs/ai-use-log.yaml` is an archive);
 - the session transcript is append-only.
 
 This runbook is itself a change: it follows the same branch, PR, review and merge rules it

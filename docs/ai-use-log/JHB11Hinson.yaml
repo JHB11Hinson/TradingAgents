@@ -1,0 +1,27 @@
+# AI use log for @JHB11Hinson.
+# Append new entries below. The legacy docs/ai-use-log.yaml is a historical archive.
+
+- id: AI-2026-11-15-002
+  date: 2026-11-15
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-029: shard the append-only records. Each member writes their own
+    docs/ai-use-log/<member>.yaml and each PR gets docs/review-memo/PR-<n>.md; the legacy files stay
+    as historical archives. Gate-6 accepts either the legacy path or a file under
+    docs/ai-use-log/.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved splitting review-memo by PR, allowing the D1-REQ-GOV-010 wording change, and
+        keeping the legacy files as archives.
+      why: >-
+        Parallel append-only PRs kept conflicting at the end of the single files, and each conflict
+        resolution dismissed an approval that had already been given.
+    - type: constrain
+      what: >-
+        Kept every historical entry untouched; only a header note marks the legacy files as
+        archives.
+      why: >-
+        Review and AI-use records are evidence and must not be rewritten.
+  transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
