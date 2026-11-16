@@ -33,8 +33,10 @@ not as a bug.
 1. **Never push after the approval you intend to merge on.** If you must push, the approval is gone;
    request a fresh one.
 2. **Write the review record on the pull request's own branch**, before the reviewer approves
-   (`docs/review-memo/PR-<n>.md`, manual 7.5/7.6). Do not open a separate "batch of review records"
-   pull request: it appends to the same file as the PRs it records and conflicts by construction.
+   (`docs/review-memo/PR-<n>.md`, manual 7.5/7.6). For a change that touches `src/`, the record must
+   land **before the first `src/` commit**: `gate-1-test-approval` reads it at that parent commit.
+   Do not open a separate "batch of review records" pull request: it appends to the same file as
+   the PRs it records and conflicts by construction.
 3. **One approval per pull request, from someone other than its author.** Never disable
    `dismiss_stale_reviews`, lower the approval count, add an admin bypass, or merge without review.
    That evidence is graded (D7).

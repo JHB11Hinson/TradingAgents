@@ -7,6 +7,12 @@
 This file, `.opencode/permissions.jsonc` and `AGENTS.md` §13 list the **same** whitelist. If any path
 appears in one and not the others, the consistency check fails and the change is rejected.
 
+**Document precedence.** The course PDFs are the final requirement. Next come `AGENTS.md` and the
+live repository state (`docs/code-governance/protection.json`, `.github/workflows/ci.yml`,
+`.github/CODEOWNERS`); when they disagree, the live state is the fact for what is online and
+`AGENTS.md` must be corrected. The team manuals are process reference only. This file implements
+`AGENTS.md` §13.
+
 ---
 
 ## 1. Default and precedence
