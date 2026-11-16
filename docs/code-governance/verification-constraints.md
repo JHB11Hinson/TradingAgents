@@ -92,7 +92,7 @@ is as of 2026-11-17.
 | Requirement | Evidence today | Status |
 |---|---|---|
 | `DEBATE-001` structured turns | schema validator on a fixed set | **planned** — no debate schema/eval yet |
-| `DEBATE-004` round bound | `graph/conditional_logic.py` bound + a dedicated case | **partial** — bound exists; confirm the case |
+| `DEBATE-004` round bound | `graph/conditional_logic.py` bound; `test/offline/test_risk_router_path_map.py` reaches the terminal at the bound | **done** (existing bound + router case) |
 | `TERM-001` self-termination | oscillation/stall cases + detector-removal negative test | **partial** — round bounds exist; detectors planned (INV-01) |
 | `CTX-001` six layers | assembler unit test | **planned** (INV-02) |
 | `CTX-003` budget + re-injection | budget and byte-identical re-injection tests | **planned** (INV-03) |
