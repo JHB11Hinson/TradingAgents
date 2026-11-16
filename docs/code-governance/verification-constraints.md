@@ -43,7 +43,7 @@ A new test names the `D1-REQ-…` id or `INV-…` id in its module docstring or 
 """Verifies D1-REQ-TERM-001: a stalled loop terminates within the bound."""
 ```
 
-**Inherited-test exception.** The inherited suite (85 test modules / 86 Python files at the
+**Inherited-test exception.** The inherited suite (84 test modules / 86 Python files at the
 baseline) predates the requirement registry and is **frozen** by `AGENTS.md` §5: it must not be
 weakened, skipped or renamed without an ADR and human approval. Those tests are mapped to
 requirements in `docs/architecture/trace-matrix.md`; the map is the reference. A change that
@@ -108,7 +108,7 @@ is as of 2026-11-17.
 | `GOV-004` trace matrix | 40 rows for 40 requirements | **done** |
 | `GOV-005` tool manifest | manifest vs permission model | **done** (review check) |
 | `GOV-006` three-source whitelist | three-way comparison | **partial** — read paths/commands still need alignment (P1-07) |
-| `GOV-008` verification + invariants | this file + `docs/architecture/invariants.md` | **done** by CHG-031 |
+| `GOV-008` verification + invariants | this file + `docs/architecture/invariants.md` | **partial** — both files exist; the negative tests for the planned invariants and a missing-entry check are still to land |
 | `GOV-010` QA records | `docs/review-memo/PR-<n>.md`, `debt-register.md`, `bug-diary.md` | **partial** — per-PR records continue |
 | `GOV-011` five transcripts | `transcripts/` coverage check | **partial** — 2 files today (P0-05) |
 | `GOV-013` rules + covenant | file presence + five clauses | **done** |
