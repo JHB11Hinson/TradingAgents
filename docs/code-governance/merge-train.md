@@ -47,8 +47,14 @@ not as a bug.
 ## 2.1 The merge lock — one conflicting approval in flight
 
 The append-only records are sharded by member (`docs/ai-use-log/<member>.yaml`) and by PR
-(`docs/review-memo/PR-<n>.md`), so a pull request that is behind `main` can be updated with
-`git merge main` without a conflict. A conflict-free update normally preserves the approval.
+(`docs/review-memo/PR-<n>.md`). That removes the **cross-member** conflict: a pull request by a
+different member can usually be updated with `git merge main` without a conflict, and a
+conflict-free update normally preserves the approval.
+
+It does **not** remove the same-member conflict. Two parallel branches by the same member append to
+the same `docs/ai-use-log/<member>.yaml` and can still conflict at the tail. Treat those as
+conflicting pull requests: serialize them, or resolve the tail by keeping both entries as a union;
+the resolving push dismisses the approval, so the reviewer approves again.
 
 The lock is therefore narrower than "one approval total":
 
