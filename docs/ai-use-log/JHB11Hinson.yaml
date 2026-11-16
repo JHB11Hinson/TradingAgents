@@ -25,3 +25,31 @@
       why: >-
         Review and AI-use records are evidence and must not be rewritten.
   transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
+
+- id: AI-2026-11-17-002
+  date: 2026-11-17
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-031 P0 artifacts: reset README.md to the team project (purpose, architecture, file
+    organization, test commands, gates, documentation map), rewrite architecture-blueprint.md as the
+    D2.1 master constraint document, add docs/architecture/invariants.md and
+    docs/code-governance/verification-constraints.md, and point the reading order, trace matrix and
+    structural constraints at them.
+  human_interventions:
+    - type: approve
+      what: >-
+        Ordered the P0 fix sequence and asked for the README to be reset from scratch, removing the
+        upstream marketing content.
+      why: >-
+        The README was still the upstream page; the course requires the team purpose, file
+        organization, test commands, repository link and gate design.
+    - type: constrain
+      what: >-
+        Kept the invariant register honest: SAFE-001/002/003 and the context assembler are marked
+        partial or planned rather than claimed as enforced.
+      why: >-
+        The code does not implement them yet; a register that overclaims would fail the D2.3 review
+        and hide the debt.
+  # Range to be added when this session is exported; the session is not yet in the transcript file.
+  transcript: transcripts/60198818-HaobinJiang.md
