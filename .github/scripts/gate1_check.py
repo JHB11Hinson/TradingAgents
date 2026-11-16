@@ -20,7 +20,8 @@ import argparse
 import re
 import subprocess
 import sys
-from typing import Callable, Protocol
+from collections.abc import Callable
+from typing import Protocol
 
 TRAILER = re.compile(r"(?m)^Test-Approval:\s*(\S+)\s*$")
 VERDICT = re.compile(r"(?im)^\s*(?:-\s*)?Verdict:\s*(.+?)\s*$")
