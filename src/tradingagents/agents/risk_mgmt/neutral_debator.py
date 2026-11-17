@@ -5,6 +5,16 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.context import assemble_context, make_layers
+from tradingagents.context.agent_layers import (
+    constraints_block,
+    history_block,
+    identity_block,
+    portfolio_block,
+    resumable_block,
+    retrieved_block,
+    task_block,
+)
 
 
 def create_neutral_debator(llm):
@@ -29,23 +39,64 @@ def create_neutral_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
-        prompt = f"""As the Neutral Risk Analyst, your role is to provide a balanced perspective, weighing both the potential benefits and risks of the trader's decision or plan. You prioritize a well-rounded approach, evaluating the upsides and downsides while factoring in broader market trends, potential economic shifts, and diversification strategies.Here is the trader's decision:
+        role = f"""As the Neutral Risk Analyst, your role is to provide a balanced perspective, weighing both the potential benefits and risks of the trader's decision or plan. You prioritize a well-rounded approach, evaluating the upsides and downsides while factoring in broader market trends, potential economic shifts, and diversification strategies.Here is the trader's decision:
 
 {trader_decision}
 
-Your task is to challenge both the Aggressive and Conservative Analysts, pointing out where each perspective may be overly optimistic or overly cautious. Use insights from the following data sources to support a moderate, sustainable strategy to adjust the trader's decision:
+Your task is to challenge both the Aggressive and Conservative Analysts, pointing out where each perspective may be overly optimistic or overly cautious. Use insights from the following data sources to support a moderate, sustainable strategy to adjust the trader's decision:"""
 
-{instrument_context}
-{portfolio_context}
-Market Research Report: {market_research_report}
-Social Media Sentiment Report: {sentiment_report}
-Latest World Affairs Report: {news_report}
-Company Fundamentals Report: {fundamentals_report}
-Here is the current conversation history: {history} Here is the last response from the aggressive analyst: {current_aggressive_response} Here is the last response from the conservative analyst: {current_conservative_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
+        history_text = (
+            f"Here is the current conversation history: {history} Here is the last response from "
+            f"the aggressive analyst: {current_aggressive_response} Here is the last response "
+            f"from the conservative analyst: {current_conservative_response}. If there are no "
+            "responses from the other viewpoints yet, present your own argument based on the "
+            "available data."
+        )
+        task_text = (
+            "Engage actively by analyzing both sides critically, addressing weaknesses in the "
+            "aggressive and conservative arguments to advocate for a more balanced approach. "
+            "Challenge each of their points to illustrate why a moderate risk strategy might "
+            "offer the best of both worlds, providing growth potential while safeguarding against "
+            "extreme volatility. Focus on debating rather than simply presenting data, aiming to "
+            "show that a balanced view can lead to the most reliable outcomes. Output "
+            "conversationally as if you are speaking without any special formatting."
+        ) + get_language_instruction()
 
-Engage actively by analyzing both sides critically, addressing weaknesses in the aggressive and conservative arguments to advocate for a more balanced approach. Challenge each of their points to illustrate why a moderate risk strategy might offer the best of both worlds, providing growth potential while safeguarding against extreme volatility. Focus on debating rather than simply presenting data, aiming to show that a balanced view can lead to the most reliable outcomes. Output conversationally as if you are speaking without any special formatting.""" + get_language_instruction()
+        original = (
+            role
+            + f"\n\n{instrument_context}\n{portfolio_context}\n"
+            f"Market Research Report: {market_research_report}\n"
+            f"Social Media Sentiment Report: {sentiment_report}\n"
+            f"Latest World Affairs Report: {news_report}\n"
+            f"Company Fundamentals Report: {fundamentals_report}\n"
+            f"{history_text}\n\n{task_text}"
+        )
+        layers = make_layers(
+            identity=[identity_block(instrument_context), portfolio_block(portfolio_context)],
+            constraints=[constraints_block(role)],
+            retrieved=[
+                retrieved_block(
+                    "state.market_report", f"Market Research Report: {market_research_report}"
+                ),
+                retrieved_block(
+                    "state.sentiment_report",
+                    f"Social Media Sentiment Report: {sentiment_report}",
+                ),
+                retrieved_block(
+                    "state.news_report", f"Latest World Affairs Report: {news_report}"
+                ),
+                retrieved_block(
+                    "state.fundamentals_report",
+                    f"Company Fundamentals Report: {fundamentals_report}",
+                ),
+            ],
+            history=[history_block(text=history_text, source="state.risk_debate_state.history")],
+            resumable=[resumable_block(state)],
+            task=[task_block(task_text)],
+        )
+        assembled = assemble_context(layers, original=original, agent="Neutral Analyst")
 
-        response = llm.invoke(prompt)
+        response = llm.invoke(assembled.text)
 
         argument = f"Neutral Analyst: {response.content}"
 

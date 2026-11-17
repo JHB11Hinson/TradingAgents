@@ -10,6 +10,7 @@ from typing import Any
 import tradingagents
 from tradingagents.agents.context import build_instrument_context, resolve_instrument_identity
 from tradingagents.agents.rating import run_rating
+from tradingagents.context import current_budget, run_budget_scope
 from tradingagents.dataflows.config import run_config, run_config_context, set_config
 from tradingagents.dataflows.date_window import get_current_date, is_historical
 from tradingagents.dataflows.symbols import safe_ticker_component
@@ -107,6 +108,8 @@ class TradingAgentsGraph:
 
         # Graph-shape-affecting run choices, kept for the checkpoint signature.
         self.selected_analysts = tuple(selected_analysts)
+        # The run budget snapshot, written to the state log (COST-003).
+        self._context_usage: dict[str, Any] = {}
 
         # Set up the graph: keep the workflow for recompilation with a checkpointer.
         self.workflow = self.graph_setup.setup_graph(selected_analysts, memory_node=self._memory_step)
@@ -269,6 +272,9 @@ class TradingAgentsGraph:
             "analysts": list(self.selected_analysts),
             "max_debate_rounds": cfg.get("max_debate_rounds"),
             "max_risk_discuss_rounds": cfg.get("max_risk_discuss_rounds"),
+            "context_budget_tokens": cfg.get("context_budget_tokens"),
+            "context_call_budget_tokens": cfg.get("context_call_budget_tokens"),
+            "context_compaction_threshold": cfg.get("context_compaction_threshold"),
             "output_language": cfg.get("output_language"),
             "data_vendors": dict(cfg.get("data_vendors") or {}),
             "tool_vendors": dict(cfg.get("tool_vendors") or {}),
@@ -372,36 +378,40 @@ class TradingAgentsGraph:
     def _run_graph(self, company_name, trade_date, asset_type: str = "stock",
                    checkpoint_thread_id: str | None = None, portfolio=None):
         """Execute the graph and write the resulting state to disk and memory log."""
-        init_agent_state = self.create_run_state(company_name, trade_date, asset_type, portfolio)
-        args = self.propagator.get_graph_args()
+        with run_budget_scope(self.config):
+            init_agent_state = self.create_run_state(
+                company_name, trade_date, asset_type, portfolio
+            )
+            args = self.propagator.get_graph_args()
 
-        # Inject the checkpoint thread_id (from checkpoint_scope) so the same
-        # ticker+date+graph-shape resumes; a different one starts fresh (#1089).
-        if checkpoint_thread_id is not None:
-            args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_thread_id
+            # Inject the checkpoint thread_id (from checkpoint_scope) so the same
+            # ticker+date+graph-shape resumes; a different one starts fresh (#1089).
+            if checkpoint_thread_id is not None:
+                args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_thread_id
 
-        # None resumes an existing checkpoint; init_agent_state starts fresh (#1249).
-        graph_input = self.checkpoint_input(init_agent_state)
-        if self.debug:
-            # A state repeats the messages before it, so each prints once (#1027).
-            final_state, printed = {}, set()
-            for messages, state in self.stream_run(graph_input, **args):
-                for msg in messages:
-                    key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
-                    if key not in printed:
-                        printed.add(key)
-                        msg.pretty_print()
-                if state is not None:
-                    final_state.update(state)
-        else:
-            final_state = self.graph.invoke(graph_input, **args)
+            # None resumes an existing checkpoint; init_agent_state starts fresh (#1249).
+            graph_input = self.checkpoint_input(init_agent_state)
+            if self.debug:
+                # A state repeats the messages before it, so each prints once (#1027).
+                final_state, printed = {}, set()
+                for messages, state in self.stream_run(graph_input, **args):
+                    for msg in messages:
+                        key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
+                        if key not in printed:
+                            printed.add(key)
+                            msg.pretty_print()
+                    if state is not None:
+                        final_state.update(state)
+            else:
+                final_state = self.graph.invoke(graph_input, **args)
 
-        self.record_decision(company_name, trade_date, final_state)
+            self._record_context_usage()
+            self.record_decision(company_name, trade_date, final_state)
 
-        # Clear checkpoint on successful completion to avoid stale state.
-        self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
+            # Clear checkpoint on successful completion to avoid stale state.
+            self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
 
-        return final_state, run_rating(final_state)
+            return final_state, run_rating(final_state)
 
     def stream_run(self, graph_input, **args):
         """Stream a run as ``(messages, state)`` pairs.
@@ -413,7 +423,18 @@ class TradingAgentsGraph:
         Each analyst works in a graph of its own, and the run's state takes the
         analysts' reports only when the slowest has finished, so their messages
         and reports come from their own finished steps ("tasks") as they happen.
+
+        A caller outside ``propagate`` (the CLI stream path) gets a run budget
+        here, so every call site shares one cap (COST-003).
         """
+        if current_budget() is None:
+            with run_budget_scope(self.config):
+                yield from self._stream_run(graph_input, **args)
+                self._record_context_usage()
+        else:
+            yield from self._stream_run(graph_input, **args)
+
+    def _stream_run(self, graph_input, **args):
         args = {**args, "stream_mode": ["values", "tasks"]}
         # The graph's own config serves every tool call, as in propagate(), even
         # when the process-wide config has changed since. Each step runs in the
@@ -433,6 +454,11 @@ class TradingAgentsGraph:
                     yield chunk.get("messages", []), chunk
         finally:
             context.run(stream.close)
+
+    def _record_context_usage(self) -> None:
+        """Snapshot the run's token ledger for the state log (COST-003)."""
+        budget = current_budget()
+        self._context_usage = budget.snapshot() if budget is not None else {}
 
     def _log_state(self, trade_date, final_state):
         """Write a run's final state to JSON under the run's own ticker."""
@@ -461,6 +487,7 @@ class TradingAgentsGraph:
             "investment_plan": final_state["investment_plan"],
             "final_trade_decision": final_state["final_trade_decision"],
             "final_rating": run_rating(final_state),
+            "context_usage": getattr(self, "_context_usage", {}),
             "run_settings": self.run_settings(),
         }
 

@@ -31,6 +31,16 @@ from tradingagents.agents.structured import (
     invoke_structured_or_freetext,
 )
 from tradingagents.agents.tools import get_news
+from tradingagents.context import Layer, assemble_context, make_layers
+from tradingagents.context.agent_layers import (
+    constraints_block,
+    history_block,
+    identity_block,
+    resumable_block,
+    retrieved_block,
+    task_block,
+    trim_messages,
+)
 from tradingagents.dataflows.vendors.reddit import (
     CRYPTO_SUBREDDITS,
     DEFAULT_SUBREDDITS,
@@ -38,6 +48,15 @@ from tradingagents.dataflows.vendors.reddit import (
     subreddits_for,
 )
 from tradingagents.dataflows.vendors.stocktwits import fetch_stocktwits_messages
+
+_PREAMBLE = (
+    "You are a helpful AI assistant, collaborating with other assistants."
+    " Report what your tools support; another agent decides the trade."
+    # No tool-calling here: the data is pre-fetched into the prompt, so
+    # tool-range wording would only invite a hallucinated tool call (#1130).
+    " Today's date is {current_date}; treat it as 'now' for all analysis. {instrument_context}"
+    " " + NO_EXTERNAL_TOOLS
+)
 
 
 def _seven_days_back(trade_date: str) -> str:
@@ -89,27 +108,54 @@ def create_sentiment_analyst(llm):
             [
                 (
                     "system",
-                    "You are a helpful AI assistant, collaborating with other assistants."
-                    " Report what your tools support; another agent decides the trade."
-                    # No tool-calling here: the data is pre-fetched into the
-                    # prompt, so tool-range wording would only invite a
-                    # hallucinated tool call (#1130).
-                    " Today's date is {current_date}; treat it as 'now' for all analysis. {instrument_context}"
-                    " " + NO_EXTERNAL_TOOLS +
-                    "\n{system_message}",
+                    _PREAMBLE + "\n{system_message}",
                 ),
                 MessagesPlaceholder(variable_name="messages"),
             ]
         )
 
-        prompt = prompt.partial(system_message=system_message)
+        original = _PREAMBLE.format(
+            current_date=end_date,
+            instrument_context=instrument_context,
+        ) + "\n" + system_message
+        layers = make_layers(
+            identity=[identity_block(instrument_context)],
+            constraints=[constraints_block(system_message)],
+            retrieved=[
+                retrieved_block(
+                    "state.market_data",
+                    "News, StockTwits and Reddit blocks are embedded in the role prompt.",
+                    render=False,
+                )
+            ],
+            history=[history_block(state["messages"], render=False)],
+            resumable=[resumable_block(state)],
+            task=[
+                task_block(
+                    "Produce the sentiment report with the overall band, score, "
+                    "confidence and narrative fields."
+                )
+            ],
+        )
+        assembled = assemble_context(
+            layers, original=original, agent="Sentiment Analyst"
+        )
+        messages = (
+            trim_messages(state["messages"], assembled.layer_tokens[Layer.HISTORY])
+            if assembled.compacted
+            else state["messages"]
+        )
+
+        prompt = prompt.partial(
+            system_message=assembled.text if assembled.compacted else system_message
+        )
         prompt = prompt.partial(current_date=end_date)
         prompt = prompt.partial(instrument_context=instrument_context)
 
         # Format the template into a concrete message list so the structured
         # and free-text paths receive the same input. No bind_tools — the
         # data is already in the prompt.
-        formatted_messages = prompt.format_messages(messages=state["messages"])
+        formatted_messages = prompt.format_messages(messages=messages)
 
         report_text = invoke_structured_or_freetext(
             structured_llm,

@@ -15,6 +15,16 @@ from tradingagents.agents.structured import (
     bind_structured,
     invoke_structured_or_freetext,
 )
+from tradingagents.context import assemble_context, make_layers
+from tradingagents.context.agent_layers import (
+    constraints_block,
+    history_block,
+    identity_block,
+    portfolio_block,
+    resumable_block,
+    retrieved_block,
+    task_block,
+)
 
 
 def create_trader(llm):
@@ -43,44 +53,69 @@ def create_trader(llm):
             grounding = ""
             report_section = ""
 
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "You are a trading agent analyzing market data to make investment decisions. "
-                    "Based on your analysis, provide a specific recommendation to buy, sell, or hold. "
-                    + grounding
-                    # Entry/stop are numeric price fields. Asking for concrete
-                    # levels invites a percentage ("15%"), which is not a price
-                    # and fails the structured parse (#1288).
-                    + "State entry price and stop-loss as absolute price levels in the "
-                    "instrument's quote currency (for example 189.5), never a percentage "
-                    "or a range; convert a percentage distance to the price level it "
-                    "implies, or omit the field if you cannot state a number. "
-                    + NO_EXTERNAL_TOOLS
-                    + get_language_instruction()
+        role = (
+            "You are a trading agent analyzing market data to make investment decisions. "
+            "Based on your analysis, provide a specific recommendation to buy, sell, or hold. "
+            + grounding
+            # Entry/stop are numeric price fields. Asking for concrete
+            # levels invites a percentage ("15%"), which is not a price
+            # and fails the structured parse (#1288).
+            + "State entry price and stop-loss as absolute price levels in the "
+            "instrument's quote currency (for example 189.5), never a percentage "
+            "or a range; convert a percentage distance to the price level it "
+            "implies, or omit the field if you cannot state a number. "
+            + NO_EXTERNAL_TOOLS
+            + get_language_instruction()
+        )
+        task_text = (
+            f"Here is the research team's investment plan for {company_name}. "
+            f"{instrument_context}\n\n"
+            f"{report_section}"
+            f"{portfolio_context}\n\n"
+            f"Proposed Investment Plan:\n{investment_plan}\n\n"
+            "Make an informed, strategic trading decision.\n\n"
+            "## Output\n\n"
+            "Write these sections, in this order, starting with the action "
+            "on its own line:\n\n"
+            "- **Action**: exactly one of Buy / Hold / Sell. A research "
+            "recommendation of Overweight is a Buy and Underweight is a Sell, "
+            "sized by how strong the case is; conflict alone is not a Hold.\n"
+            "- **Reasoning**: why, against the plan and the price structure\n"
+            "- **Entry Price**, **Stop Loss**, **Position Sizing**: when you can state them"
+        )
+        original = role + "\n\n" + task_text
+
+        layers = make_layers(
+            identity=[
+                identity_block(instrument_context),
+                portfolio_block(portfolio_context),
+            ],
+            constraints=[constraints_block(role)],
+            retrieved=[
+                retrieved_block(
+                    "state.market_report",
+                    report_section.strip() or "(No technical market report in this run.)",
+                    render=bool(report_section),
                 ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Here is the research team's investment plan for {company_name}. "
-                    f"{instrument_context}\n\n"
-                    f"{report_section}"
-                    f"{portfolio_context}\n\n"
-                    f"Proposed Investment Plan:\n{investment_plan}\n\n"
-                    "Make an informed, strategic trading decision.\n\n"
-                    "## Output\n\n"
-                    "Write these sections, in this order, starting with the action "
-                    "on its own line:\n\n"
-                    "- **Action**: exactly one of Buy / Hold / Sell. A research "
-                    "recommendation of Overweight is a Buy and Underweight is a Sell, "
-                    "sized by how strong the case is; conflict alone is not a Hold.\n"
-                    "- **Reasoning**: why, against the plan and the price structure\n"
-                    "- **Entry Price**, **Stop Loss**, **Position Sizing**: when you can state them"
+                retrieved_block(
+                    "state.investment_plan", f"Proposed Investment Plan:\n{investment_plan}"
                 ),
-            },
-        ]
+            ],
+            history=[
+                history_block(state.get("messages", ()), render=False)
+            ],
+            resumable=[resumable_block(state)],
+            task=[task_block(task_text)],
+        )
+        assembled = assemble_context(layers, original=original, agent="Trader")
+
+        if assembled.compacted:
+            messages = [{"role": "system", "content": assembled.text}]
+        else:
+            messages = [
+                {"role": "system", "content": role},
+                {"role": "user", "content": task_text},
+            ]
 
         trader_plan = invoke_structured_or_freetext(
             structured_llm,

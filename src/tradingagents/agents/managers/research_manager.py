@@ -9,6 +9,15 @@ from tradingagents.agents.structured import (
     bind_structured,
     invoke_structured_or_freetext,
 )
+from tradingagents.context import assemble_context, make_layers
+from tradingagents.context.agent_layers import (
+    constraints_block,
+    history_block,
+    identity_block,
+    resumable_block,
+    retrieved_block,
+    task_block,
+)
 
 
 def create_research_manager(llm):
@@ -20,9 +29,7 @@ def create_research_manager(llm):
 
         investment_debate_state = state["investment_debate_state"]
 
-        prompt = f"""As the Research Manager and debate facilitator, your role is to critically evaluate this round of debate and deliver a clear, actionable investment plan for the trader.
-
-{instrument_context}
+        role = """As the Research Manager and debate facilitator, your role is to critically evaluate this round of debate and deliver a clear, actionable investment plan for the trader.
 
 ---
 
@@ -35,12 +42,10 @@ def create_research_manager(llm):
 
 The debate always contains conflicting arguments; deciding which side is stronger is the job, so conflict alone is not a reason to Hold. Commit to the side with the stronger case, sized by how decisively it wins. Choose Hold only when the evidence is still balanced after that weighing, or too thin to support a call; do not manufacture a direction to appear decisive. Weigh the bull and bear cases on their merits, independent of which side spoke first or last.
 
----
+---"""
 
-**Debate History:**
-{history}
-
-## Output
+        history_text = f"**Debate History:**\n{history}"
+        task_text = """## Output
 
 Write these sections, in this order, starting with the recommendation on its own line:
 
@@ -48,12 +53,40 @@ Write these sections, in this order, starting with the recommendation on its own
 - **Rationale**: which arguments decided it
 - **Strategic Actions**: concrete steps for the trader, sized against a standard allocation
 
-{NO_EXTERNAL_TOOLS}""" + get_language_instruction()
+""" + NO_EXTERNAL_TOOLS + get_language_instruction()
+
+        original = (
+            role
+            + f"\n\n{instrument_context}\n\n"
+            + history_text
+            + f"\n\n{task_text}"
+        )
+        layers = make_layers(
+            identity=[identity_block(instrument_context)],
+            constraints=[constraints_block(role)],
+            retrieved=[
+                retrieved_block(
+                    "state.investment_debate_state",
+                    "Research digest: the bull/bear debate below.",
+                    render=False,
+                )
+            ],
+            history=[
+                history_block(
+                    text=history_text, source="state.investment_debate_state.history"
+                )
+            ],
+            resumable=[resumable_block(state)],
+            task=[task_block(task_text)],
+        )
+        assembled = assemble_context(
+            layers, original=original, agent="Research Manager"
+        )
 
         investment_plan = invoke_structured_or_freetext(
             structured_llm,
             llm,
-            prompt,
+            assembled.text,
             render_research_plan,
             "Research Manager",
         )
