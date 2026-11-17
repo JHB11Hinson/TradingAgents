@@ -51,7 +51,21 @@ protection), D8 (`src/` and `test/`), D9 (`Prompt.md`).
 
 ## 3. Artifact reading order
 
-Read in this order. The machine-readable source of truth wins over prose when they disagree.
+Read in this order.
+
+**Precedence when documents disagree** (2026-11-17 decision):
+
+1. The course PDFs (`cs5351-2026-2027-introduction.pdf` and `CS5351-2026-2027-project.pdf`) are the
+   final requirement.
+2. This repository contract (`AGENTS.md`) and the live repository state
+   (`docs/code-governance/protection.json`, `.github/workflows/ci.yml`, `.github/CODEOWNERS`) come
+   next and must agree. When this file and the live state disagree, the live state is the fact for
+   **what is online**, and this file is the bug to fix.
+3. The team process manuals (`.opencode/manual/**`) and workspace rules
+   (`.opencode/git-gh-rules/**`) are process reference; they never override 1 or 2.
+
+The machine-readable registry (`docs/req/requirements.yaml` + `req-schema.json`) is the source of
+truth for requirement content; prose must not invent a requirement that is not in it.
 
 | # | Artifact | What it holds |
 |---|---|---|
@@ -61,12 +75,14 @@ Read in this order. The machine-readable source of truth wins over prose when th
 | 4 | `docs/req/requirements.yaml` + `docs/req/req-schema.json` | requirements registry and its schema (D1) |
 | 5 | `docs/architecture/adr/` | architecture decisions (ADR-001 baseline, ADR-002 src layout) |
 | 6 | `docs/architecture/trace-matrix.md` | requirement → component → test → runtime monitor |
-| 7 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
-| 8 | `.github/workflows/ci.yml` | the real gate names and their steps |
-| 9 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
+| 7 | `docs/architecture/invariants.md` | invariant statements, enforcers, verification and fallbacks |
+| 8 | `docs/code-governance/verification-constraints.md` | fit-criterion coverage, negative tests, regression rules |
+| 9 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
+| 10 | `.github/workflows/ci.yml` | the real gate names and their steps |
+| 11 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
 
-> Other `docs/architecture/**` and `docs/code-governance/**` artifacts are planned but not written
-> yet; when they exist they slot in after #6.
+> The remaining D2 artifacts (memory design, runtime policy catalog, evaluation table) are planned;
+> when they exist they slot in after #8.
 
 ---
 
@@ -90,7 +106,7 @@ Read in this order. The machine-readable source of truth wins over prose when th
 
 | Class | Paths | Rule |
 |---|---|---|
-| **Readable** | everything in the repository | reading is always allowed |
+| **Readable** | the read whitelist in §13 | only whitelisted paths are readable; everything else is denied by default, including `.env*`, keys and the home-directory secrets |
 | **Modifiable via PR** | `src/**`, `test/**`, `docs/**`, `README.md`, `architecture-blueprint.md` | change on a branch, open a PR, get a review |
 | **Versioned-only** | `prompts/` | add a new `prompt_vX.Y.yaml`; **never edit an existing prompt file in place** (`D1-REQ-GOV-012`) |
 | **Frozen** | the public entry points and contracts in §8; the inherited tests; the `[tool.ruff]` block in `pyproject.toml`; requirement `id`s; the gate names in branch protection | do not change without an ADR and human approval; never weaken, skip or rename an inherited test; never create a `ruff.toml` |
@@ -117,7 +133,7 @@ test/
 └── live/             # API-dependent
 ```
 
-**Rules** (to be expanded in `docs/code-governance/structural-constraints.md`, not yet written):
+**Rules** (expanded in `docs/code-governance/structural-constraints.md`):
 
 - each architectural element maps to **exactly one module**;
 - new work **extends** the existing baseline, it never replaces it;
@@ -184,7 +200,8 @@ Generated code must satisfy all of the following before it is offered for review
   requirement whose `priority` is `wont` is out of the delivery, carries a `deferred_reason` in the
   registry instead of evidence, and is not counted as a gap. Every invariant has a test that
   fails when violated **and** a concrete fallback action; every test names the requirement or
-  invariant it covers.
+  invariant it covers. The rules are in `docs/code-governance/verification-constraints.md`; the
+  invariant register is `docs/architecture/invariants.md`.
 - **AI-use log.** The gate enforces the course floor: a PR that changes code or prompts (`src/`,
   `test/`, `prompts/`) without updating the AI-use log (`docs/ai-use-log/<member>.yaml`, or the
   legacy `docs/ai-use-log.yaml` archive) is blocked. By team policy the log is updated whenever the
@@ -202,7 +219,7 @@ branch-protection `contexts` **character for character**.
 
 | Gate | Checks | State |
 |---|---|---|
-| `gate-1-test-approval` | the change is covered by tests committed before the implementation, pointed at by `Test-Approval:` | planned |
+| `gate-1-test-approval` | the change is covered by tests committed before the implementation; `Test-Approval:` points at a review record with `Verdict: APPROVE` and a `Tests:` line of existing paths, and that record exists before the first `src/` commit; test and `src/` changes must not share a commit | **online** |
 | `gate-2-static-analysis` | `ruff` and scoped `mypy` on the `src/**/*.py` files this PR touches; inherited errors stay quarantined in `mypy-legacy.txt` | **online** |
 | `gate-3-schema` | `requirements.yaml` validates against `req-schema.json` | **online** |
 | `gate-4-semantic-eval` | prompt/model changes run the semantic evaluation | planned |
@@ -222,7 +239,7 @@ The course marks exactly **one** repository file as human-only (D3):
 - `.opencode/rules.md` — "the project-level always-on behavioral rules for the coding agent.
   **Human-only file.**" The agent must not write it.
 
-Every other path is governed by two rules, not by a human-only label:
+Every other path is governed by the permission model in §13, not by a human-only label:
 
 - **Protected paths** — change them only through a reviewed pull request, like any other path:
   `AGENTS.md`, `Prompt.md`, `.opencode/**`, `.agent/**`, `.github/**`, `docs/**`.
@@ -230,6 +247,9 @@ Every other path is governed by two rules, not by a human-only label:
   decision record (D7: "changes to safety-critical paths must require human review with an
   accompanying architecture decision"; the `.agent/rules.md` covenant says the same). This covers the
   module contracts in §8, the permission model, and the safety guardrails.
+- **Write-denied paths** — the agent must not write them at all: `.opencode/rules.md`,
+  `.opencode/tasks/**`, `.opencode/git-gh-rules/**`, `.env`, `.env.*`, keys and secrets, `.git/**`,
+  `.venv/**` (§13).
 
 The agent is expected to write code (§2, §7). What these rules protect is traceability: every change
 cites the requirement it serves, the test that covers it, and the review that approved it.
@@ -269,7 +289,7 @@ whitelist and must agree.** Precedence: **deny > ask > allow**; an unknown path 
 | **Read — deny** | `.env`, `.env.*`, `*.key`, `*.pem`, `*.p12`, `~/.ssh/**`, `~/.aws/**`, `~/.config/gh/**` |
 | **Write — allow** | `src/**`, `test/**`, `docs/**`, `transcripts/**` (append-only), `prompts/**` (new versioned files only), `README.md`, `architecture-blueprint.md` |
 | **Write — ask** | `AGENTS.md`, `Prompt.md`, `.github/**`, `.agent/**`, `.opencode/**`, `pyproject.toml`, `requirements.txt`, `docs/req/req-schema.json`, `docs/code-governance/**`, `docs/architecture/permission-model.md` |
-| **Write — deny** | `.opencode/rules.md`, `.opencode/tasks/**`, `.opencode/git-gh-rules/**`, `.env*`, `*.key`, `*.pem`, `.git/**`, `.venv/**` |
+| **Write — deny** | `.opencode/rules.md`, `.opencode/tasks/**`, `.opencode/git-gh-rules/**`, `.env`, `.env.*`, `*.key`, `*.pem`, `.git/**`, `.venv/**` |
 
 Commands follow the same three tiers: read-only commands and work on your own branch are allowed;
 history changes, `gh pr review` / `gh pr comment`, tags and `--force` require asking; pushes to

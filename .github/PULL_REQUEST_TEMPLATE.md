@@ -5,7 +5,7 @@
 - Requirement IDs: D1-REQ-???
 
 ## Gate self-check
-- [ ] gate-1-test-approval: tests were committed before the implementation
+- [ ] gate-1-test-approval: tests were committed before the implementation; the pre-implementation review record has `Verdict: APPROVE` and a `Tests:` line, and `Test-Approval:` points at it
 - [ ] gate-2-static-analysis: ran locally
 - [ ] gate-3-schema: requirements.yaml is well formed
 - [ ] gate-4-semantic-eval: no prompt change / the evaluation has been run

@@ -13,8 +13,13 @@ docs/ai-use-log/SY1433.yaml
 
 The old single list was append-only, so two pull requests that both added an entry conflicted at
 the same end of the file. Resolving that conflict created a new commit, which dismissed an existing
-approval. One file per member removes the cross-member conflict: each PR adds to its author's file,
-and `git merge main` stays conflict-free.
+approval. One file per member removes the **cross-member** conflict: each PR adds to its author's
+file, and `git merge main` is usually conflict-free.
+
+It does **not** remove the same-member conflict. Two parallel branches by the same member append to
+the same file and can still conflict at the tail. The merge train serializes those ("one conflicting
+approval in flight") or resolves them by keeping both entries as a union; a push that resolves the
+conflict dismisses the approval, so the reviewer approves again. That is the intended cost.
 
 ## Rules
 
