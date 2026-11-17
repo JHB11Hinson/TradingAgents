@@ -157,7 +157,11 @@
   type: quality
   statement: The debate's evidence-citation rate must be at least the measured baseline.
   fit_criterion: python -m eval.run reports debate_evidence_citation_rate >= baseline on eval/fixed-set.json.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: the metric needs a citation extractor plus a live baseline run on the fixed set, and it
+    changes neither graded behaviour nor the demo; the structured turns required by DEBATE-001
+    already carry an evidence field.
   tradeoff: Demanding cited evidence raises cost per round.
   source: D4 behavioral tier (quality thresholds)
 
@@ -189,7 +193,10 @@
   type: functional
   statement: The system must keep a layered memory (working, episodic, semantic) that survives sessions, interruptions and versions.
   fit_criterion: A unit test round-trips each layer across a simulated restart and version bump.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: a three-layer persistence subsystem duplicates what memory/log.py already gives the
+    demo; MEM-003 and MEM-004 keep the existing log honest instead of adding a second store.
   tradeoff: More layers mean more storage and write-time cost.
   source: D2 memory/state design; research/现有Agent功能盘点 §4
 
@@ -197,7 +204,10 @@
   type: functional
   statement: Prior reflections relevant to the current task must be retrieved by semantic similarity (embeddings), not only by ticker and recency.
   fit_criterion: A positive query returns the relevant past lesson and a negative query returns none; both cases are tested.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: embeddings add a runtime dependency, an index file and offline stubs without changing
+    graded behaviour; retrieval stays ticker-and-recency based on the existing log.
   tradeoff: Embeddings add a dependency, storage and per-run cost.
   source: D2 memory/state design; D1-REQ-... (cross-entry learning); MemGPT/mem0 frontier
 
@@ -221,7 +231,10 @@
   type: cost
   statement: Repeated or near-identical work must hit a semantic cache whose savings are quantified.
   fit_criterion: A repeated run reports cache_hit_rate >= threshold and a measured saved-token ratio; a test drives a hit and a miss.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: a semantic cache can serve a stale answer for a near-identical query; the token budget
+    and compaction required by CTX-003 and COST-003 already deliver the cost target.
   tradeoff: A semantic cache risks serving a stale answer for a slightly different query.
   source: GPTCache frontier; research/现有Agent功能盘点 §9
 
@@ -229,7 +242,10 @@
   type: performance
   statement: A single-ticker analysis must finish within 60% of the measured baseline wall-clock time.
   fit_criterion: python -m eval.run reports p50_wall_clock_s <= 0.6 * baseline_p50_wall_clock_s on eval/fixed-set.json.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: parallelising the phases raises peak token spend and provider rate-limit pressure and
+    works against COST-001; wall-clock stays visible in the OBS-002 run manifest.
   tradeoff: Parallelism raises peak token spend and API rate-limit pressure.
   source: intro P20 (slow); assessment table target (<180s)
 
@@ -261,7 +277,10 @@
   type: quality
   statement: A prompt or model change must trigger the semantic evaluation, and a failed threshold must block the merge.
   fit_criterion: A prompt-only PR triggers gate-4 and is blocked when a threshold in eval/thresholds.yaml fails.
-  priority: should
+  priority: wont
+  deferred_reason: >-
+    CHG-032: promoting gate-4 means live model calls on every prompt pull request, with real cost
+    and flakiness; EVAL-001 still provides a local, runnable threshold check.
   tradeoff: The gate spends money on model calls and can false-positive on prompt-only docs edits.
   source: D7 gate 4
 

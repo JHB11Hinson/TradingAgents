@@ -4,7 +4,8 @@
   **executing component**, its **test / evidence** and its **runtime monitor**
   (deliverable D2.4; requirement `D1-REQ-GOV-004`).
 - **Requirement source of truth:** `docs/req/requirements.yaml` is the machine-readable registry.
-  It registers all **40** requirements: 21 `must` (CHG-004) and 18 `should` + 1 `could` (CHG-018).
+  It registers all **40** requirements: 21 `must` (CHG-004), 12 `should` + 1 `could` (CHG-018), and
+  6 `should` entries deferred to `wont` by CHG-032.
 - **How to read it:** one row per requirement id. `Executing component` is the module that will
   carry the behaviour; `Test / evidence` is the artifact that makes the `fit_criterion` machine
   checkable; `Runtime monitor` is what is watched once the code is live.
@@ -15,28 +16,28 @@
 | REQ ID | Prio | Requirement (short) | Executing component | Test / evidence | Runtime monitor |
 |---|---|---|---|---|---|
 | D1-REQ-DEBATE-001 | must | Structured debate turns: claim, evidence, rebuttal, confidence | `src/tradingagents/agents/researchers`, `src/tradingagents/agents/schemas` | Schema-validator pass rate is 100% on the fixed set | `debate.turn` span + invalid-turn counter *(via OBS-001)* |
-| D1-REQ-DEBATE-002 | should | Osborn-style diverge-then-converge per round | `src/tradingagents/agents/researchers` | Structural fields present + a round case | `debate.round` span with diverge/converge flags *(via OBS-001)* |
-| D1-REQ-DEBATE-003 | should | Debate evidence-citation rate >= baseline | `src/tradingagents/agents/researchers` | `eval.run` summary metric | Evaluation logbook, per run |
+| D1-REQ-DEBATE-002 | should | Osborn-style diverge-then-converge per round | `src/tradingagents/agents/researchers` *(planned; round fields shared with DEBATE-001)* | Structural fields present + a round case | `debate.round` span with diverge/converge flags *(via OBS-001)* |
+| D1-REQ-DEBATE-003 | wont | Debate evidence-citation rate >= baseline | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-DEBATE-004 | must | Rounds configurable with a hard upper bound; converge at the bound | `src/tradingagents/graph/conditional_logic` | Round upper-bound case | Round counter vs `max_debate_rounds` *(via OBS-001)* |
 | D1-REQ-TERM-001 | must | Loop self-stops on oscillation, stall or budget exhaustion | `src/tradingagents/graph/conditional_logic` | Oscillation/stall cases self-terminate; detector-removal negative test turns red | Termination reason event; alert on unbounded loop |
 | D1-REQ-TERM-002 | should | Analyst tool loop detects repeated identical calls | `src/tradingagents/graph/setup` | Repeated-tool-call case | `tool.repeat` counter *(via OBS-001)* |
 | D1-REQ-CTX-001 | must | Layered context assembly (six layers) for every model call | `src/tradingagents/agents/context` *(planned assembler)* | Assembler unit test asserts each layer's presence and source | `context.assemble` span with layer-presence flags *(via OBS-001)* |
-| D1-REQ-CTX-002 | should | Assembly pipeline dedupe -> prioritize -> budget -> compact -> assemble | `context/` module *(planned)* | Pipeline unit test shows stage order and drops | `context.pipeline` span per stage *(via OBS-001)* |
+| D1-REQ-CTX-002 | should | Assembly pipeline dedupe -> prioritize -> budget -> compact -> assemble | `src/tradingagents/agents/context` *(planned; implemented inside CTX-001/CTX-003)* | Pipeline unit test shows stage order and drops | `context.pipeline` span per stage *(via OBS-001)* |
 | D1-REQ-CTX-003 | must | Assembled context <= budget; constraints re-injected after compaction | `context/` module *(planned)* | Unit test asserts `assembled_tokens <= budget` and byte-identical re-injection | Budget-ceiling breach event + alert |
 | D1-REQ-CTX-004 | should | Layered structure and pipeline recorded in an ADR | `docs/architecture/adr` | ADR review | Review checklist per ADR |
-| D1-REQ-MEM-001 | should | Layered memory (working/episodic/semantic) survives sessions/versions | `src/tradingagents/memory` | Unit test round-trips each layer across restart and version bump | `memory.read`/`memory.write` spans *(via OBS-001)* |
-| D1-REQ-MEM-002 | should | Prior reflections retrieved by semantic similarity | `src/tradingagents/memory` *(planned retrieval)* | Positive and negative retrieval cases | `memory.retrieve` span + hit ratio *(via OBS-001)* |
+| D1-REQ-MEM-001 | wont | Layered memory (working/episodic/semantic) survives sessions/versions | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
+| D1-REQ-MEM-002 | wont | Prior reflections retrieved by semantic similarity | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-MEM-003 | should | Memory items source-attributable; no future leakage | `src/tradingagents/memory/log`, `date_window` | Point-in-time case | Future-dated item blocked event |
 | D1-REQ-MEM-004 | could | Retention / rotation / size caps configurable | `src/tradingagents/memory/log` | Rotation case | Memory entry count vs cap *(via OBS-001)* |
 | D1-REQ-COST-001 | must | Single analysis <= 50% of baseline tokens and cost | `context/`, `src/tradingagents/graph` *(planned)* | `eval.run` fixed-set totals <= 0.5 * baseline | Run manifest total_tokens / est_cost vs baseline |
-| D1-REQ-COST-002 | should | Semantic cache with quantified savings | `cache/` *(planned)* | Cache hit and miss cases | Run manifest `cache_hit_rate` |
+| D1-REQ-COST-002 | wont | Semantic cache with quantified savings | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-COST-003 | must | Single analysis <= configured token budget (default 50000), else compaction | `src/tradingagents/default_config`, `context/` | Over-budget triggers compaction case (`test_token_budget.py`) | Run manifest total_tokens <= budget; compaction event |
-| D1-REQ-PERF-001 | should | Wall-clock <= 60% of baseline | `src/tradingagents/graph`, `src/tradingagents/dataflows` | `eval.run` p50 wall-clock <= 0.6 * baseline | Run manifest p50 wall-clock |
+| D1-REQ-PERF-001 | wont | Wall-clock <= 60% of baseline | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-OBS-001 | should | Machine-parsable run trace (span / phase / duration) | `telemetry/` *(planned event seam)* | Trace parses; one span per step | The trace file itself |
 | D1-REQ-OBS-002 | should | Token / cost / latency aggregated per phase (run manifest) | `telemetry/` *(planned)* | Manifest parse case | The manifest file itself |
-| D1-REQ-OBS-003 | should | Structured step events; a failing subscriber must not block the run | `telemetry/` *(planned)* | Subscriber-raises case still completes | Telemetry warning count |
+| D1-REQ-OBS-003 | should | Structured step events; a failing subscriber must not block the run | `telemetry/` *(planned; same seam as OBS-001)* | Subscriber-raises case still completes | Telemetry warning count |
 | D1-REQ-EVAL-001 | must | Fixed set + thresholds + regression runnable locally | `eval/` *(planned)* | Local run + threshold pass/fail | Evaluation logbook |
-| D1-REQ-EVAL-002 | should | Prompt/model change triggers evaluation; failure blocks | `.github`, `eval/` *(planned)* | gate-4 case | gate-4 status in branch protection |
+| D1-REQ-EVAL-002 | wont | Prompt/model change triggers evaluation; failure blocks | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-SAFE-001 | must | External/retrieved text scrubbed; hostile samples blocked | `guardrails/` *(planned)* | Injection corpus blocked 100%; scrubbing-off negative test turns red | Blocked-injection event + alert |
 | D1-REQ-SAFE-002 | must | Invalid-schema decision rejected and degraded | `src/tradingagents/agents/structured`, `guardrails/` | Malformed-decision negative test | REVIEW/degrade event |
 | D1-REQ-SAFE-003 | must | Deterministic position ceiling; model cannot bypass it | `guardrails/`, `src/tradingagents/agents/managers` | Bypass-attempt negative test | Ceiling-clip event |
@@ -58,8 +59,13 @@
 ## Notes
 
 - **Registry vs matrix.** `docs/req/requirements.yaml` registers all 40 requirements: the 21 `must`
-  (CHG-004) and the 18 `should` + 1 `could` (CHG-018). Every row above has a registry entry with the
-  same id.
+  (CHG-004), the 12 `should` + 1 `could` (CHG-018) still in scope, and the 6 `should` entries
+  deferred to `wont` by CHG-032. Every row above has a registry entry with the same id.
+- **Deferred requirements.** A row whose `Prio` is `wont` is out of this delivery. The requirement id
+  and its `fit_criterion` stay in the registry (ids are frozen); the registry carries the
+  `deferred_reason` and the schema rejects a `wont` entry without one. Deferred rows say
+  `none — deferred` in the component and monitor columns and point at the registry reason instead of
+  a test, so they are not counted as gaps.
 - **Planned components.** Rows whose component is marked *(planned)* have no module yet; their
   `fit_criterion` is not yet checkable, and their tests/monitors are the intended evidence once the
   owning change lands. This is recorded so the gap is visible rather than implied as done.
