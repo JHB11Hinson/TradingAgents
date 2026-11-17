@@ -68,4 +68,7 @@ explain away or to make green by weakening a test.
 - **Not a runtime prompt.** Trading strategy, analyst instructions and model behaviour do not belong
   here; they belong in `prompts/` and `src/`.
 - **Not an autopilot.** The agent never runs from plan to merge without a human gate.
-- **Not a substitute for `AGENTS.md`.** If the two disagree, `AGENTS.md` wins.
+- **Not a substitute for `AGENTS.md`.** The course PDFs are above both this prompt and `AGENTS.md`;
+  `AGENTS.md` is above this prompt. The live repository state (`protection.json`, `ci.yml`,
+  `CODEOWNERS`) is the fact for what is online; if `AGENTS.md` and that state disagree, the state is
+  right and `AGENTS.md` must be fixed.

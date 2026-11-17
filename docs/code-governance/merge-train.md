@@ -33,8 +33,10 @@ not as a bug.
 1. **Never push after the approval you intend to merge on.** If you must push, the approval is gone;
    request a fresh one.
 2. **Write the review record on the pull request's own branch**, before the reviewer approves
-   (`docs/review-memo/PR-<n>.md`, manual 7.5/7.6). Do not open a separate "batch of review records"
-   pull request: it appends to the same file as the PRs it records and conflicts by construction.
+   (`docs/review-memo/PR-<n>.md`, manual 7.5/7.6). For a change that touches `src/`, the record must
+   land **before the first `src/` commit**: `gate-1-test-approval` reads it at that parent commit.
+   Do not open a separate "batch of review records" pull request: it appends to the same file as
+   the PRs it records and conflicts by construction.
 3. **One approval per pull request, from someone other than its author.** Never disable
    `dismiss_stale_reviews`, lower the approval count, add an admin bypass, or merge without review.
    That evidence is graded (D7).
@@ -45,8 +47,14 @@ not as a bug.
 ## 2.1 The merge lock — one conflicting approval in flight
 
 The append-only records are sharded by member (`docs/ai-use-log/<member>.yaml`) and by PR
-(`docs/review-memo/PR-<n>.md`), so a pull request that is behind `main` can be updated with
-`git merge main` without a conflict. A conflict-free update normally preserves the approval.
+(`docs/review-memo/PR-<n>.md`). That removes the **cross-member** conflict: a pull request by a
+different member can usually be updated with `git merge main` without a conflict, and a
+conflict-free update normally preserves the approval.
+
+It does **not** remove the same-member conflict. Two parallel branches by the same member append to
+the same `docs/ai-use-log/<member>.yaml` and can still conflict at the tail. Treat those as
+conflicting pull requests: serialize them, or resolve the tail by keeping both entries as a union;
+the resolving push dismisses the approval, so the reviewer approves again.
 
 The lock is therefore narrower than "one approval total":
 

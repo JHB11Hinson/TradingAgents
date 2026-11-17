@@ -40,12 +40,27 @@ stays conflict-free when it is updated to the latest `main`.
 - Verdict: APPROVE
 ```
 
+## Two approvals, one record
+
+A change that touches `src/` has two human gates, and `docs/review-memo/PR-<n>.md` serves both:
+
+1. **Test approval** — after the tests-only commit and before the first `src/` commit. The reviewer
+   creates the file on the branch with `Verdict: APPROVE` and a `Tests:` line, pushes it, and
+   approves. `gate-1-test-approval` reads this pre-implementation version at the parent of the first
+   `src/` commit.
+2. **PR approval** — after the implementation and the gates. The author pushes nothing after this
+   approval; the reviewer approves the final head. Because `dismiss_stale_reviews` is on, the
+   implementation push dismissed the test approval, so this is a second decision on the same file.
+
+Do not move the record after the implementation: gate-1 reads it before the first `src/` commit.
+
 ## Review order
 
 1. `gh pr checkout <n>`
-2. create `docs/review-memo/PR-<n>.md`
+2. create `docs/review-memo/PR-<n>.md` (at the test-approval stage when `src/` is touched)
 3. commit and push it to the PR branch
-4. run the six-item review and post the verdict
+4. run the six-item review and post the verdict (test approval first, final approval after the
+   implementation)
 
-The author must not push after the approval. If they do, the approval is stale and the reviewer
-must decide again.
+The author must not push after the approval they intend to merge on. If they do, the approval is
+stale and the reviewer must decide again.
