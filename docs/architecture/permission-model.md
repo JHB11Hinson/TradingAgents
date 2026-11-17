@@ -7,6 +7,12 @@
 This file, `.opencode/permissions.jsonc` and `AGENTS.md` §13 list the **same** whitelist. If any path
 appears in one and not the others, the consistency check fails and the change is rejected.
 
+**Document precedence.** The course PDFs are the final requirement. Next come `AGENTS.md` and the
+live repository state (`docs/code-governance/protection.json`, `.github/workflows/ci.yml`,
+`.github/CODEOWNERS`); when they disagree, the live state is the fact for what is online and
+`AGENTS.md` must be corrected. The team manuals are process reference only. This file implements
+`AGENTS.md` §13.
+
 ---
 
 ## 1. Default and precedence
@@ -78,7 +84,7 @@ decision whose schema fails validation is rejected and degraded to `REVIEW` rath
 | Layer | Mechanism |
 |---|---|
 | Runtime | OpenCode permission settings derived from `.opencode/permissions.jsonc` (edit / bash / webfetch) |
-| CI | `gate-2-static-analysis`, `gate-3-schema`, `gate-5-regression`, `gate-6-ai-use-log`; `gate-1` and `gate-4` as they come online |
+| CI | `gate-1-test-approval`, `gate-2-static-analysis`, `gate-3-schema`, `gate-5-regression`, `gate-6-ai-use-log`; `gate-4` as it comes online |
 | Repository | branch protection on `main`: 1 approval, strict, `enforce_admins`, no force push, no deletion |
 | Human | every pull request is reviewed; safety-critical changes need an ADR |
 
