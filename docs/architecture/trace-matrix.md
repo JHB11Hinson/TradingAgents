@@ -64,5 +64,7 @@
   `fit_criterion` is not yet checkable, and their tests/monitors are the intended evidence once the
   owning change lands. This is recorded so the gap is visible rather than implied as done.
 - **Invariant fallbacks** (the "what to do when violated" action for `TERM-001`, `CTX-003`,
-  `SAFE-001/002/003`) live in `docs/architecture/invariants.md` (to be written under
-  `D1-REQ-GOV-008`).
+  `SAFE-001/002/003`) live in `docs/architecture/invariants.md`.
+- **Verification rules** (fit-criterion coverage, negative tests, test-to-requirement references,
+  zero-regression rounds, three-tier verification) live in
+  `docs/code-governance/verification-constraints.md`.

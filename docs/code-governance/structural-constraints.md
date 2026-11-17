@@ -62,8 +62,8 @@ same pull request.
 | `default_config.py`, `cli/` | ADR-001, ADR-002 | `GOV-001` (layout), configuration surface |
 
 The **authoritative** requirement-to-component mapping is `docs/architecture/trace-matrix.md`; this
-table is the structural view. `docs/architecture/invariants.md` (GOV-008) will hold the invariant
-statements and fallbacks; until it exists, the requirement ids above are the reference.
+table is the structural view. `docs/architecture/invariants.md` holds the invariant statements,
+enforcers and concrete fallbacks; the requirement ids above are the structural reference.
 
 ## 4. Authority boundary: advisory model output, authoritative deterministic code
 

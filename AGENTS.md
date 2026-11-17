@@ -75,12 +75,14 @@ truth for requirement content; prose must not invent a requirement that is not i
 | 4 | `docs/req/requirements.yaml` + `docs/req/req-schema.json` | requirements registry and its schema (D1) |
 | 5 | `docs/architecture/adr/` | architecture decisions (ADR-001 baseline, ADR-002 src layout) |
 | 6 | `docs/architecture/trace-matrix.md` | requirement → component → test → runtime monitor |
-| 7 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
-| 8 | `.github/workflows/ci.yml` | the real gate names and their steps |
-| 9 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
+| 7 | `docs/architecture/invariants.md` | invariant statements, enforcers, verification and fallbacks |
+| 8 | `docs/code-governance/verification-constraints.md` | fit-criterion coverage, negative tests, regression rules |
+| 9 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
+| 10 | `.github/workflows/ci.yml` | the real gate names and their steps |
+| 11 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
 
-> Other `docs/architecture/**` and `docs/code-governance/**` artifacts are planned but not written
-> yet; when they exist they slot in after #6.
+> The remaining D2 artifacts (memory design, runtime policy catalog, evaluation table) are planned;
+> when they exist they slot in after #8.
 
 ---
 
@@ -131,7 +133,7 @@ test/
 └── live/             # API-dependent
 ```
 
-**Rules** (to be expanded in `docs/code-governance/structural-constraints.md`, not yet written):
+**Rules** (expanded in `docs/code-governance/structural-constraints.md`):
 
 - each architectural element maps to **exactly one module**;
 - new work **extends** the existing baseline, it never replaces it;
@@ -196,7 +198,8 @@ Generated code must satisfy all of the following before it is offered for review
   must pass whenever requirements change.
 - **Traceability.** Every `fit_criterion` has at least one test; every invariant has a test that
   fails when violated **and** a concrete fallback action; every test names the requirement or
-  invariant it covers.
+  invariant it covers. The rules are in `docs/code-governance/verification-constraints.md`; the
+  invariant register is `docs/architecture/invariants.md`.
 - **AI-use log.** The gate enforces the course floor: a PR that changes code or prompts (`src/`,
   `test/`, `prompts/`) without updating the AI-use log (`docs/ai-use-log/<member>.yaml`, or the
   legacy `docs/ai-use-log.yaml` archive) is blocked. By team policy the log is updated whenever the
