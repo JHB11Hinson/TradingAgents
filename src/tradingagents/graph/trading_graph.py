@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,14 @@ from tradingagents.llm_clients import create_tier_client, tier_provider
 from tradingagents.memory import TradingMemoryLog, settlement
 from tradingagents.memory.reflection import Reflector
 from tradingagents.reporting import write_report_tree
+from tradingagents.telemetry import (
+    Telemetry,
+    TelemetryCallback,
+    load_trace,
+    run_output_dir,
+    telemetry_scope,
+    write_run_telemetry,
+)
 
 from .checkpointer import checkpoint_step, clear_checkpoint, get_checkpointer, thread_id
 from .conditional_logic import ConditionalLogic
@@ -26,6 +35,10 @@ from .propagation import Propagator
 from .setup import GraphSetup
 
 logger = logging.getLogger(__name__)
+
+# True while _run_graph owns the run. A debug run calls stream_run from inside
+# it; only the outer method writes the trace and manifest.
+_RUN_ACTIVE: ContextVar[bool] = ContextVar("tradingagents_run_active", default=False)
 
 
 def _validate_trade_date(trade_date) -> str:
@@ -69,7 +82,11 @@ class TradingAgentsGraph:
         """
         self.debug = debug
         self.config = config or DEFAULT_CONFIG
-        self.callbacks = callbacks or []
+        self.callbacks = list(callbacks or [])
+        if self.config.get("telemetry_enabled", True):
+            # The callback finds its span through a context variable, so it is
+            # shared by every run of this graph (OBS-002).
+            self.callbacks.append(TelemetryCallback())
 
         set_config(self.config)
 
@@ -275,6 +292,7 @@ class TradingAgentsGraph:
             "context_budget_tokens": cfg.get("context_budget_tokens"),
             "context_call_budget_tokens": cfg.get("context_call_budget_tokens"),
             "context_compaction_threshold": cfg.get("context_compaction_threshold"),
+            "telemetry_enabled": cfg.get("telemetry_enabled"),
             "output_language": cfg.get("output_language"),
             "data_vendors": dict(cfg.get("data_vendors") or {}),
             "tool_vendors": dict(cfg.get("tool_vendors") or {}),
@@ -378,40 +396,51 @@ class TradingAgentsGraph:
     def _run_graph(self, company_name, trade_date, asset_type: str = "stock",
                    checkpoint_thread_id: str | None = None, portfolio=None):
         """Execute the graph and write the resulting state to disk and memory log."""
-        with run_budget_scope(self.config):
-            init_agent_state = self.create_run_state(
-                company_name, trade_date, asset_type, portfolio
-            )
-            args = self.propagator.get_graph_args()
+        hub: Telemetry | None = None
+        status = "failed"
+        token = _RUN_ACTIVE.set(True)
+        try:
+            with run_budget_scope(self.config), telemetry_scope(self.config) as hub:
+                init_agent_state = self.create_run_state(
+                    company_name, trade_date, asset_type, portfolio
+                )
+                args = self.propagator.get_graph_args()
 
-            # Inject the checkpoint thread_id (from checkpoint_scope) so the same
-            # ticker+date+graph-shape resumes; a different one starts fresh (#1089).
-            if checkpoint_thread_id is not None:
-                args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_thread_id
+                # Inject the checkpoint thread_id (from checkpoint_scope) so the same
+                # ticker+date+graph-shape resumes; a different one starts fresh (#1089).
+                if checkpoint_thread_id is not None:
+                    args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_thread_id
 
-            # None resumes an existing checkpoint; init_agent_state starts fresh (#1249).
-            graph_input = self.checkpoint_input(init_agent_state)
-            if self.debug:
-                # A state repeats the messages before it, so each prints once (#1027).
-                final_state, printed = {}, set()
-                for messages, state in self.stream_run(graph_input, **args):
-                    for msg in messages:
-                        key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
-                        if key not in printed:
-                            printed.add(key)
-                            msg.pretty_print()
-                    if state is not None:
-                        final_state.update(state)
-            else:
-                final_state = self.graph.invoke(graph_input, **args)
+                # None resumes an existing checkpoint; init_agent_state starts fresh (#1249).
+                graph_input = self.checkpoint_input(init_agent_state)
+                if self.debug:
+                    # A state repeats the messages before it, so each prints once (#1027).
+                    final_state, printed = {}, set()
+                    for messages, state in self.stream_run(graph_input, **args):
+                        for msg in messages:
+                            key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
+                            if key not in printed:
+                                printed.add(key)
+                                msg.pretty_print()
+                        if state is not None:
+                            final_state.update(state)
+                else:
+                    final_state = self.graph.invoke(graph_input, **args)
 
-            self._record_context_usage()
-            self.record_decision(company_name, trade_date, final_state)
+                self._record_context_usage()
+                self.record_decision(company_name, trade_date, final_state)
 
-            # Clear checkpoint on successful completion to avoid stale state.
-            self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
+                # Clear checkpoint on successful completion to avoid stale state.
+                self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
 
-            return final_state, run_rating(final_state)
+                status = "complete"
+                return final_state, run_rating(final_state)
+        finally:
+            _RUN_ACTIVE.reset(token)
+            if hub is not None:
+                # A caller may have opened the scope to attach a subscriber; the
+                # run still owns its own trace and manifest (OBS-001/002).
+                self._write_telemetry(company_name, trade_date, hub, status)
 
     def stream_run(self, graph_input, **args):
         """Stream a run as ``(messages, state)`` pairs.
@@ -427,12 +456,26 @@ class TradingAgentsGraph:
         A caller outside ``propagate`` (the CLI stream path) gets a run budget
         here, so every call site shares one cap (COST-003).
         """
-        if current_budget() is None:
-            with run_budget_scope(self.config):
-                yield from self._stream_run(graph_input, **args)
-                self._record_context_usage()
-        else:
-            yield from self._stream_run(graph_input, **args)
+        internal = _RUN_ACTIVE.get()
+        hub: Telemetry | None = None
+        last_state: dict[str, Any] = {}
+        status = "failed"
+        try:
+            with telemetry_scope(self.config) as hub:
+                if current_budget() is None:
+                    with run_budget_scope(self.config):
+                        for messages, state in self._stream_run(graph_input, **args):
+                            self._remember_identity(state, last_state)
+                            yield messages, state
+                        self._record_context_usage()
+                else:
+                    for messages, state in self._stream_run(graph_input, **args):
+                        self._remember_identity(state, last_state)
+                        yield messages, state
+            status = "complete"
+        finally:
+            if not internal and hub is not None:
+                self._write_telemetry_identity(graph_input, last_state, hub, status)
 
     def _stream_run(self, graph_input, **args):
         args = {**args, "stream_mode": ["values", "tasks"]}
@@ -459,6 +502,46 @@ class TradingAgentsGraph:
         """Snapshot the run's token ledger for the state log (COST-003)."""
         budget = current_budget()
         self._context_usage = budget.snapshot() if budget is not None else {}
+
+    @staticmethod
+    def _remember_identity(state, sink: dict[str, Any]) -> None:
+        """Remember the run's identity while a stream yields its states."""
+        if not isinstance(state, dict):
+            return
+        for key in ("company_of_interest", "trade_date"):
+            value = state.get(key)
+            if value:
+                sink[key] = value
+
+    def _write_telemetry_identity(self, graph_input, last_state, hub, status) -> None:
+        """Write the trace and manifest; a resume passes ``None`` as the input."""
+        source = graph_input if isinstance(graph_input, dict) else last_state
+        ticker = source.get("company_of_interest")
+        trade_date = source.get("trade_date")
+        if ticker and trade_date:
+            self._write_telemetry(str(ticker), str(trade_date), hub, status)
+
+    def _write_telemetry(self, company_name, trade_date, hub, status="complete") -> None:
+        """Write the run's trace and manifest; a write error never fails the run.
+
+        A resumed run continues a previous, failed leg: its spans are read back
+        and prepended, so the manifest reflects the whole logical run rather
+        than only the leg that happened to finish.
+        """
+        if not hub.events:
+            return
+        events = list(hub.events)
+        try:
+            if self._resuming:
+                trace_path = (
+                    run_output_dir(self.config, company_name) / f"trace_{trade_date}.json"
+                )
+                events = load_trace(trace_path) + events
+            write_run_telemetry(
+                self.config, company_name, trade_date, events, hub.warnings, status=status
+            )
+        except Exception as exc:  # noqa: BLE001 - telemetry must not mask the run
+            logger.warning("Telemetry could not be written for %s: %s", company_name, exc)
 
     def _log_state(self, trade_date, final_state):
         """Write a run's final state to JSON under the run's own ticker."""
