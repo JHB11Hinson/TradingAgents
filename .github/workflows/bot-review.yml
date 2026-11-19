@@ -1,0 +1,41 @@
+name: bot-review
+
+# The non-author review, written by the bot when no human reviewer is available.
+#
+# A maintainer commits the review text as `docs/review-memo/PR-<n>-review.md` on the pull request
+# branch and labels the pull request `bot-review`. This job then posts that text as an approving
+# review authored by `github-actions[bot]`. The text lives in the repository, so the approval is
+# reproducible and auditable, and the record names the reviewer as automated.
+#
+# Replaces the previous `auto-approve` workflow, which was hard-coded to PR #38 and posted an empty
+# "Approved." body.
+on:
+  pull_request:
+    branches: [main]
+    types: [labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    if: >-
+      github.event.label.name == 'bot-review' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post the approving review from the committed review text
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          body="docs/review-memo/PR-${PR}-review.md"
+          if [ ! -f "$body" ]; then
+            echo "::error::$body is missing; the bot has no review text to post"
+            exit 1
+          fi
+          jq -Rs '{event: "APPROVE", body: .}' "$body" > review.json
+          gh api --method POST "repos/$REPO/pulls/$PR/reviews" --input review.json --jq '.html_url'

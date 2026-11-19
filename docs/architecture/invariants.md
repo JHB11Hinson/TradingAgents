@@ -27,6 +27,7 @@ approval (`AGENTS.md` §11).
 | `INV-04` | External and retrieved text is scrubbed of instructions; hostile samples are blocked | `D1-REQ-SAFE-001` | `src/tradingagents/guardrails/` *(planned)* | **not implemented** |
 | `INV-05` | A decision that fails schema validation is rejected/degraded, never emitted as tradeable | `D1-REQ-SAFE-002` | `src/tradingagents/agents/structured.py`, `rating.py`, `managers/portfolio_manager.py` | **partial** — schema + `REVIEW` exist; the free-text fallback can still parse a rating |
 | `INV-06` | A deterministic position ceiling constrains the decision; model output cannot bypass it | `D1-REQ-SAFE-003` | `src/tradingagents/guardrails/` *(planned)*, `agents/managers/` | **not implemented** |
+| `INV-07` | Telemetry is advisory: a failing subscriber or an unwritable trace must not fail or change a run | `D1-REQ-OBS-003` | `src/tradingagents/telemetry/`, `graph/trading_graph.py` | **implemented** (CHG-034) |
 
 ## 2. Invariant details
 
@@ -124,6 +125,22 @@ approval (`AGENTS.md` §11).
   model value never reaches the decision.
 - **Status.** Not implemented. Recorded in `DEBT-002`; the blueprint and permission model must not
   describe the boundary as fully enforced.
+
+### INV-07 — Telemetry never fails a run (`D1-REQ-OBS-003`)
+
+- **Statement.** Telemetry observes a run; it never decides one. A subscriber that raises, a trace
+  that cannot be written, or a price that is unknown must not stop the run or change its decision.
+  `KeyboardInterrupt` and `SystemExit` are not subscriber failures and still stop the run.
+- **Source.** `D1-REQ-OBS-003`; ADR-005.
+- **Enforcing component.** `telemetry/events.py` (`Telemetry.emit` catches a subscriber and records a
+  warning), `telemetry/spans.py` (the span still emits on an exception) and
+  `graph/trading_graph.py` (`_write_telemetry` logs a failed write and returns).
+- **Verification.** `test_raising_subscriber_does_not_block_and_is_recorded`,
+  `test_keyboard_interrupt_is_never_swallowed`, `test_a_broken_subscriber_leaves_the_run_green` and
+  `test_disabled_telemetry_writes_nothing`; the negative tests fail if the guard is removed.
+- **Operational fallback.** Skip the trace/manifest write, log `Telemetry could not be written`,
+  keep the decision and the state log, and report the failed subscriber in `manifest["warnings"]`.
+- **Status.** Implemented (CHG-034).
 
 ## 3. Relationship to the other artifacts
 

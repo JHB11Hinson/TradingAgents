@@ -149,8 +149,10 @@ manifest that aggregates tokens, estimated cost and wall-clock per phase (`OBS-0
 telemetry seam is an **in-process event seam**: a failing subscriber must not block the run
 (`OBS-003`). It is additive; it does not turn the orchestration into an event-driven system.
 
-The trace and manifest are planned; the current evidence is the saved report, the memory log and the
-CLI display. The event seam must not break the public contracts in `AGENTS.md` §8.
+The trace and manifest are implemented in CHG-034: `src/tradingagents/telemetry/` wraps every graph
+step in a span and writes `telemetry/trace_<date>.json` plus `telemetry/manifest_<date>.json` next to
+the state log. A subscriber failure is a warning, never a run failure. The event seam must not break
+the public contracts in `AGENTS.md` §8.
 
 ## 9. Change policy
 

@@ -22,6 +22,7 @@ from tradingagents.agents import (
 )
 from tradingagents.agents.analysts.turn import WRAP_UP
 from tradingagents.agents.state import AgentState
+from tradingagents.telemetry import span
 
 from .analyst_execution import build_analyst_execution_plan
 from .conditional_logic import ConditionalLogic
@@ -50,6 +51,22 @@ def _tools_or_done(state) -> str:
     return "tools" if state["messages"][-1].tool_calls else END
 
 
+def _traced(name: str, node, phase: str | None = None, kind: str = "agent"):
+    """Wrap one graph step so it emits a telemetry span (OBS-001).
+
+    The wrapper keeps the ``(state)`` signature LangGraph inspects. Outside a
+    telemetry scope ``span`` is a no-op, so the graph is unchanged when the
+    feature is off.
+    """
+
+    def traced_node(state):
+        with span(name, phase=phase or name, kind=kind):
+            return node(state) if callable(node) else node.invoke(state)
+
+    traced_node.__name__ = getattr(node, "__name__", name.replace(".", "_"))
+    return traced_node
+
+
 def _analyst_graph(spec, agent, max_tool_rounds: int):
     """One analyst as a graph of its own: the model and its tools, on a private message history.
 
@@ -61,7 +78,7 @@ def _analyst_graph(spec, agent, max_tool_rounds: int):
     """
     output = TypedDict(f"{spec.key.capitalize()}Report", {spec.report_key: str})
     graph = StateGraph(AgentState, output_schema=output)
-    graph.add_node("agent", agent)
+    graph.add_node("agent", _traced(f"{spec.key}.agent", agent, phase=spec.key))
     graph.add_edge(START, "agent")
     if not spec.tools:
         graph.add_edge("agent", END)
@@ -82,8 +99,12 @@ def _analyst_graph(spec, agent, max_tool_rounds: int):
                        spec.agent_node, max_tool_rounds, repeated)
         return agent({**state, "messages": [*state["messages"], HumanMessage(WRAP_UP)]})
 
-    graph.add_node("tools", ToolNode(list(spec.tools)))
-    graph.add_node("wrap_up", wrap_up)
+    graph.add_node(
+        "tools", _traced(f"{spec.key}.tools", ToolNode(list(spec.tools)), phase=spec.key, kind="tool")
+    )
+    graph.add_node(
+        "wrap_up", _traced(f"{spec.key}.wrap_up", wrap_up, phase=spec.key, kind="wrap_up")
+    )
     graph.add_conditional_edges("agent", _tools_or_done, ["tools", END])
     graph.add_conditional_edges("tools", more_or_wrap_up, ["agent", "wrap_up"])
     graph.add_edge("wrap_up", END)
@@ -145,21 +166,23 @@ class GraphSetup:
             workflow.add_node(spec.agent_node,
                               _analyst_graph(spec, analyst_factories[spec.key](), self.max_tool_rounds))
 
-        workflow.add_node("Bull Researcher", bull_researcher_node)
-        workflow.add_node("Bear Researcher", bear_researcher_node)
-        workflow.add_node("Research Manager", research_manager_node)
-        workflow.add_node("Trader", trader_node)
-        workflow.add_node("Aggressive Analyst", aggressive_analyst)
-        workflow.add_node("Neutral Analyst", neutral_analyst)
-        workflow.add_node("Conservative Analyst", conservative_analyst)
-        workflow.add_node("Portfolio Manager", portfolio_manager_node)
+        workflow.add_node("Bull Researcher", _traced("Bull Researcher", bull_researcher_node))
+        workflow.add_node("Bear Researcher", _traced("Bear Researcher", bear_researcher_node))
+        workflow.add_node("Research Manager", _traced("Research Manager", research_manager_node))
+        workflow.add_node("Trader", _traced("Trader", trader_node))
+        workflow.add_node("Aggressive Analyst", _traced("Aggressive Analyst", aggressive_analyst))
+        workflow.add_node("Neutral Analyst", _traced("Neutral Analyst", neutral_analyst))
+        workflow.add_node(
+            "Conservative Analyst", _traced("Conservative Analyst", conservative_analyst)
+        )
+        workflow.add_node("Portfolio Manager", _traced("Portfolio Manager", portfolio_manager_node))
 
         # The analysts work at the same time; the research debate starts once
         # every one of them has filed its report. The memory log settles past
         # decisions alongside them: only the Portfolio Manager reads its lessons.
         first_steps = [spec.agent_node for spec in plan.specs]
         if memory_node is not None:
-            workflow.add_node("Memory Log", memory_node)
+            workflow.add_node("Memory Log", _traced("Memory Log", memory_node))
             first_steps.append("Memory Log")
         for node in first_steps:
             workflow.add_edge(START, node)

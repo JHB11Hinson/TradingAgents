@@ -31,6 +31,9 @@ _ENV_OVERRIDES = {
     "TRADINGAGENTS_CONTEXT_BUDGET_TOKENS":        "context_budget_tokens",
     "TRADINGAGENTS_CONTEXT_CALL_BUDGET_TOKENS":   "context_call_budget_tokens",
     "TRADINGAGENTS_CONTEXT_COMPACTION_THRESHOLD": "context_compaction_threshold",
+    # Observability (OBS-001/002/003): a run writes its trace and manifest
+    # next to the state log; with this off it writes neither.
+    "TRADINGAGENTS_TELEMETRY_ENABLED":            "telemetry_enabled",
     # Provider-specific reasoning/thinking knobs (None = each provider's own
     # default). Settable here for non-interactive runs; the CLI also offers an
     # interactive choice, which is skipped when the matching var is set.
@@ -137,6 +140,10 @@ def build_default_config() -> dict:
         "context_budget_tokens": 50_000,
         "context_call_budget_tokens": 50_000,
         "context_compaction_threshold": 0.8,
+        # Observability (OBS-001/002/003): emit spans to the in-process seam
+        # and write trace_<date>.json + manifest_<date>.json next to the
+        # state log. Off is a true no-op: no spans, no files.
+        "telemetry_enabled": True,
         # Checkpoint/resume: when True, LangGraph saves state after each node
         # so a crashed run can resume from the last successful step.
         "checkpoint_enabled": False,

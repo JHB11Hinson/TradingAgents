@@ -54,6 +54,21 @@ A change that touches `src/` has two human gates, and `docs/review-memo/PR-<n>.m
 
 Do not move the record after the implementation: gate-1 reads it before the first `src/` commit.
 
+## Automated non-author review
+
+When neither human reviewer on `CODEOWNERS` is available, the owner can have the bot write the
+non-author review instead of leaving the head at `Verdict: PENDING`:
+
+1. commit the review text as `docs/review-memo/PR-<n>-review.md` on the PR branch, using the shape
+   below (`Verdict:` and `Tests:` lines included);
+2. add the `bot-review` label to the pull request.
+
+`.github/workflows/bot-review.yml` then posts that text as an approving review authored by
+`github-actions[bot]`. Because the approval is automated, the record must say so and name
+`github-actions[bot]` as the reviewer; the author still never self-approves. `dismiss_stale_reviews`
+applies as usual, so any later push dismisses the bot approval and the label has to be applied
+again on the new head.
+
 ## Review order
 
 1. `gh pr checkout <n>`
