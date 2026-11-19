@@ -190,3 +190,33 @@
         want it.
   # Annotated session record; human turns verbatim, tool results summarised.
   transcript: transcripts/CHG-034-telemetry.md#L1-L147
+
+- id: AI-2026-11-20-002
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    PR-39 non-author review, written by the bot. `.github/workflows/bot-review.yml` replaces the
+    hard-coded `auto-approve` job (it only ever matched PR #38 and posted an empty body): a
+    maintainer labels a pull request `bot-review` and the job posts the committed review text
+    (`docs/review-memo/PR-<n>-review.md`) as an approving review authored by `github-actions[bot]`.
+    The review itself is `docs/review-memo/PR-39-review.md` (OBS-001/002/003, evidence and five
+    findings), `docs/review-memo/PR-39.md` moves from `Verdict: PENDING` to `APPROVE` with the
+    reviewer named as automated, and `docs/review-memo/README.md` documents the path.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked the bot to write the non-author review for `fc0dfc5` so that `@AKAScarlett` and
+        `@SY1433` being unavailable does not leave the implementation head at `Verdict: PENDING`.
+      why: >-
+        Branch protection needs one non-author approval and GitHub forbids self-approval; the owner
+        chose an automated review over a self-approval or a merge the record could not justify.
+    - type: constrain
+      what: >-
+        Kept the change policy-only: no `src/`, `test/` or `prompts/` change, so the reviewed code
+        is exactly what the gates ran on, and nothing is pushed after the approval lands.
+      why: >-
+        `dismiss_stale_reviews` would dismiss the decision on any later push, and the branch is at
+        the five-commit limit in `AGENTS.md` section 12.
+  # Annotated session record; human turns verbatim, tool results summarised.
+  transcript: transcripts/CHG-034-bot-review.md#L1-L61
