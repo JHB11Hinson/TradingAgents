@@ -132,3 +132,32 @@
         A deferred requirement must stay auditable; deleting or rewording it would erase the
         decision that the course grades.
   transcript: transcripts/60198818-HaobinJiang.md
+
+- id: AI-2026-11-17-004
+  date: 2026-11-17
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-033 implementation: add `src/tradingagents/context/` (six-layer `Layer`, `ContextBlock`,
+    `ContextLayers`, `assemble_context`, `AssembledContext`, deterministic `estimate_tokens`,
+    `RunBudget` and `run_budget_scope`), the `agent_layers` helpers, the twelve report-agent call
+    sites, the three context config keys with their `_ENV_OVERRIDES` rows, and the graph's
+    `context_usage` snapshot in the state log. Update ADR-004, the invariant register and the trace
+    matrix from "planned" to "implemented".
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the CHG-033 plan and the test contract (`CTX-001/002/003`, `COST-003`) before the
+        implementation, and chose the run-total plus per-call budget model (both 50,000).
+      why: >-
+        `COST-003` states a run-level cap while ADR-004 describes a per-call cap, so both keys are
+        explicit and the reviewer approved the tests first.
+    - type: constrain
+      what: >-
+        Kept the change additive: no public graph contract, permission, gate or branch-protection
+        change, and no inherited test touched.
+      why: >-
+        The assembler is a new module behind the existing agents; the authority boundary and the
+        `AGENTS.md` section 8 interfaces must stay unchanged.
+  # Range to be added when this session is exported; the session is not yet in the transcript file.
+  transcript: transcripts/60198818-HaobinJiang.md

@@ -51,29 +51,33 @@ approval (`AGENTS.md` §11).
 - **Statement.** Every model call is assembled from exactly six layers, in order: identity,
   standing constraints, retrieved knowledge, conversation history, resumable state, current task.
 - **Source.** `D1-REQ-CTX-001`; ADR-004; course D2.2.
-- **Enforcing component.** `src/tradingagents/context/` (planned assembler). Today the layers exist
-  scattered across `agents/context.py`, `state.py`, the debate state and the checkpoint.
+- **Enforcing component.** `src/tradingagents/context/assembler.py` (`assemble_context`,
+  `ContextLayers`, `Layer`) and the twelve report agents, which declare their layers through
+  `src/tradingagents/context/agent_layers.py`. The identity, reports, history, checkpoint and task
+  evidence still live in `agents/context.py`, `state.py`, the debate state and the checkpoint; the
+  assembler is the single place that orders and budgets them.
 - **Verification.** An assembler unit test asserts each layer's presence and source; the negative
-  test removes one layer and must fail.
+  test removes one layer and must fail (`test_missing_layer_is_rejected_before_rendering`).
 - **Operational fallback.** Do not issue the model call. Return `context_incomplete` to the
   orchestrator, use the last approved prompt template for that agent only, record a warning, and
   require a human review before retrying.
-- **Status.** Planned (ADR-004 accepted as design; assembler not implemented).
+- **Status.** Implemented (CHG-033).
 
 ### INV-03 — Budget and re-injection (`D1-REQ-CTX-003`)
 
 - **Statement.** Assembled context must stay within the token budget, and critical constraints must
   be re-injected **verbatim** after compaction.
 - **Source.** `D1-REQ-CTX-003`, `D1-REQ-COST-003`; ADR-004.
-- **Enforcing component.** The planned context assembler and `default_config.py`
-  (`context_budget_tokens`, default 50,000).
-- **Verification.** A unit test asserts `assembled_tokens <= budget`; a second test hashes the
-  constraint block before and after compaction and asserts it is byte-identical; a negative test
-  removes the budget check and must turn red.
+- **Enforcing component.** `src/tradingagents/context/assembler.py` (`RunBudget`,
+  `run_budget_scope`, `_within_budget`, `_compact`, `_enforce_total`) and `default_config.py`
+  (`context_budget_tokens`, `context_call_budget_tokens`, `context_compaction_threshold`).
+- **Verification.** `test/offline/test_context_assembler.py` asserts `assembled_tokens <= budget`;
+  a second test hashes the constraint block before and after compaction and asserts it is
+  byte-identical; a negative test removes the budget check and turns red.
 - **Operational fallback.** Compact from the lowest priority upward (P3 → P2 → P1), re-inject P0
   verbatim, and if the result is still over budget, abort the call with `budget_exceeded` and return
   `REVIEW`. Never call the provider with an over-budget prompt.
-- **Status.** Planned.
+- **Status.** Implemented (CHG-033).
 
 ### INV-04 — Instruction scrubbing (`D1-REQ-SAFE-001`)
 

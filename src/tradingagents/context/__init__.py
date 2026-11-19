@@ -1,0 +1,41 @@
+"""Layered context assembly for every model call (D1-REQ-CTX-001/002/003)."""
+
+from .assembler import (
+    CEILING_FRACTIONS,
+    LAYER_ORDER,
+    P0_LAYERS,
+    STAGES,
+    AssembledContext,
+    ContextBlock,
+    ContextBudgetExceeded,
+    ContextIncomplete,
+    ContextLayers,
+    Drop,
+    Layer,
+    RunBudget,
+    assemble_context,
+    current_budget,
+    estimate_tokens,
+    make_layers,
+    run_budget_scope,
+)
+
+__all__ = [
+    "CEILING_FRACTIONS",
+    "LAYER_ORDER",
+    "P0_LAYERS",
+    "STAGES",
+    "AssembledContext",
+    "ContextBlock",
+    "ContextBudgetExceeded",
+    "ContextIncomplete",
+    "ContextLayers",
+    "Drop",
+    "Layer",
+    "RunBudget",
+    "assemble_context",
+    "current_budget",
+    "estimate_tokens",
+    "make_layers",
+    "run_budget_scope",
+]

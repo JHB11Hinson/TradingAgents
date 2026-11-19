@@ -5,6 +5,16 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.context import assemble_context, make_layers
+from tradingagents.context.agent_layers import (
+    constraints_block,
+    history_block,
+    identity_block,
+    portfolio_block,
+    resumable_block,
+    retrieved_block,
+    task_block,
+)
 
 
 def create_aggressive_debator(llm):
@@ -29,23 +39,64 @@ def create_aggressive_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
-        prompt = f"""As the Aggressive Risk Analyst, your role is to actively champion high-reward, high-risk opportunities, emphasizing bold strategies and competitive advantages. When evaluating the trader's decision or plan, focus intently on the potential upside, growth potential, and innovative benefits—even when these come with elevated risk. Use the provided market data and sentiment analysis to strengthen your arguments and challenge the opposing views. Specifically, respond directly to each point made by the conservative and neutral analysts, countering with data-driven rebuttals and persuasive reasoning. Highlight where their caution might miss critical opportunities or where their assumptions may be overly conservative. Here is the trader's decision:
+        role = f"""As the Aggressive Risk Analyst, your role is to actively champion high-reward, high-risk opportunities, emphasizing bold strategies and competitive advantages. When evaluating the trader's decision or plan, focus intently on the potential upside, growth potential, and innovative benefits—even when these come with elevated risk. Use the provided market data and sentiment analysis to strengthen your arguments and challenge the opposing views. Specifically, respond directly to each point made by the conservative and neutral analysts, countering with data-driven rebuttals and persuasive reasoning. Highlight where their caution might miss critical opportunities or where their assumptions may be overly conservative. Here is the trader's decision:
 
 {trader_decision}
 
-Your task is to create a compelling case for the trader's decision by questioning and critiquing the conservative and neutral stances to demonstrate why your high-reward perspective offers the best path forward. Incorporate insights from the following sources into your arguments:
+Your task is to create a compelling case for the trader's decision by questioning and critiquing the conservative and neutral stances to demonstrate why your high-reward perspective offers the best path forward. Incorporate insights from the following sources into your arguments:"""
 
-{instrument_context}
-{portfolio_context}
-Market Research Report: {market_research_report}
-Social Media Sentiment Report: {sentiment_report}
-Latest World Affairs Report: {news_report}
-Company Fundamentals Report: {fundamentals_report}
-Here is the current conversation history: {history} Here are the last arguments from the conservative analyst: {current_conservative_response} Here are the last arguments from the neutral analyst: {current_neutral_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
+        history_text = (
+            f"Here is the current conversation history: {history} Here are the last arguments "
+            f"from the conservative analyst: {current_conservative_response} Here are the last "
+            f"arguments from the neutral analyst: {current_neutral_response}. If there are no "
+            "responses from the other viewpoints yet, present your own argument based on the "
+            "available data."
+        )
+        task_text = (
+            "Engage actively by addressing any specific concerns raised, refuting the weaknesses "
+            "in their logic, and asserting the benefits of risk-taking to outpace market norms. "
+            "Maintain a focus on debating and persuading, not just presenting data. Challenge "
+            "each counterpoint to underscore why a high-risk approach is optimal. Output "
+            "conversationally as if you are speaking without any special formatting."
+        ) + get_language_instruction()
 
-Engage actively by addressing any specific concerns raised, refuting the weaknesses in their logic, and asserting the benefits of risk-taking to outpace market norms. Maintain a focus on debating and persuading, not just presenting data. Challenge each counterpoint to underscore why a high-risk approach is optimal. Output conversationally as if you are speaking without any special formatting.""" + get_language_instruction()
+        original = (
+            role
+            + f"\n\n{instrument_context}\n{portfolio_context}\n"
+            f"Market Research Report: {market_research_report}\n"
+            f"Social Media Sentiment Report: {sentiment_report}\n"
+            f"Latest World Affairs Report: {news_report}\n"
+            f"Company Fundamentals Report: {fundamentals_report}\n"
+            f"{history_text}\n\n{task_text}"
+        )
+        layers = make_layers(
+            identity=[identity_block(instrument_context), portfolio_block(portfolio_context)],
+            constraints=[constraints_block(role)],
+            retrieved=[
+                retrieved_block(
+                    "state.market_report", f"Market Research Report: {market_research_report}"
+                ),
+                retrieved_block(
+                    "state.sentiment_report",
+                    f"Social Media Sentiment Report: {sentiment_report}",
+                ),
+                retrieved_block(
+                    "state.news_report", f"Latest World Affairs Report: {news_report}"
+                ),
+                retrieved_block(
+                    "state.fundamentals_report",
+                    f"Company Fundamentals Report: {fundamentals_report}",
+                ),
+            ],
+            history=[history_block(text=history_text, source="state.risk_debate_state.history")],
+            resumable=[resumable_block(state)],
+            task=[task_block(task_text)],
+        )
+        assembled = assemble_context(
+            layers, original=original, agent="Aggressive Analyst"
+        )
 
-        response = llm.invoke(prompt)
+        response = llm.invoke(assembled.text)
 
         argument = f"Aggressive Analyst: {response.content}"
 

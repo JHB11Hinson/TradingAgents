@@ -1,6 +1,6 @@
 # ADR-004: Layered context structure and the assembly pipeline
 
-- Status: accepted (design; the assembler is not implemented yet)
+- Status: accepted, implemented in CHG-033 (`src/tradingagents/context/`)
 - Date: 2026-10-30
 - Deciders: the four team members
 - Related: ADR-001, ADR-002, `D1-REQ-CTX-001`, `D1-REQ-CTX-002`, `D1-REQ-CTX-003`,
@@ -32,7 +32,7 @@ rather than history.
 ## Decision
 
 **1. Six layers, one assembler.** Every model call is assembled from exactly these layers, in this
-order, by a single module (`src/tradingagents/context/`, planned):
+order, by a single module (`src/tradingagents/context/assembler.py`):
 
 | # | Layer | Content today | Status |
 |---|---|---|---|
