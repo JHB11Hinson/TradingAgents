@@ -188,5 +188,5 @@
         Observability is advisory; the authority boundary and the AGENTS.md section 8 contracts
         must stay unchanged, and an off switch keeps the feature from taxing a run that does not
         want it.
-  # Range to be added when this session is exported; the session is not yet in the transcript file.
-  transcript: transcripts/pending
+  # Annotated session record; human turns verbatim, tool results summarised.
+  transcript: transcripts/CHG-034-telemetry.md#L1-L147
