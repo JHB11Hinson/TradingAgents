@@ -161,3 +161,32 @@
         `AGENTS.md` section 8 interfaces must stay unchanged.
   # Range to be added when this session is exported; the session is not yet in the transcript file.
   transcript: transcripts/60198818-HaobinJiang.md
+
+- id: AI-2026-11-20-001
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-034 implementation: add `src/tradingagents/telemetry/` (the in-process `Telemetry` hub,
+    `span`/`telemetry_scope`, `TelemetryCallback` token attribution, the trace writer, the per-phase
+    manifest with a local price table, and the run-output wiring), wrap every graph step in
+    `graph/setup.py`, open the run scope in `graph/trading_graph.py`, add `telemetry_enabled` with
+    its `_ENV_OVERRIDES` row, and update the trace matrix, blueprint and ADR-005.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the CHG-034 plan for OBS-001/002/003 before any code, and merged PR #38 so the
+        branch was cut from the updated main.
+      why: >-
+        The repo contract requires a plan and a human gate before implementation; PR #38 had to be
+        merged first because the telemetry run scope sits on the same graph path.
+    - type: constrain
+      what: >-
+        Kept the change additive and switchable: no gate, permission, branch-protection or public
+        graph-contract change, and `telemetry_enabled=false` writes nothing.
+      why: >-
+        Observability is advisory; the authority boundary and the AGENTS.md section 8 contracts
+        must stay unchanged, and an off switch keeps the feature from taxing a run that does not
+        want it.
+  # Range to be added when this session is exported; the session is not yet in the transcript file.
+  transcript: transcripts/pending

@@ -28,6 +28,7 @@ across two modules, and two elements must not own the same module.
 | Backtest evaluation | `src/tradingagents/backtest.py` | grid runs and decision scoring |
 | Portfolio context | `src/tradingagents/portfolio.py` | holdings input |
 | Reporting | `src/tradingagents/reporting.py`, `src/tradingagents/report_html.py` | report trees and the HTML page |
+| Telemetry | `src/tradingagents/telemetry/` | the in-process event seam, spans, the run trace and the run manifest |
 | Configuration | `src/tradingagents/default_config.py` | defaults and `TRADINGAGENTS_*` overrides |
 | CLI | `src/cli/` | interactive and headless entry points, display, preferences |
 
@@ -59,6 +60,7 @@ same pull request.
 | `memory/` | ADR-001 | `MEM-001`–`MEM-004` |
 | `llm_clients/` | ADR-001 | provider and model selection; no invariant of its own |
 | `backtest.py`, `portfolio.py`, `reporting.py`, `report_html.py` | ADR-001 | reporting and evaluation; no invariant of their own |
+| `telemetry/` | ADR-005 | `OBS-001`/`OBS-002` (trace, manifest), `OBS-003` (subscriber isolation); `INV-07` (telemetry never fails a run) |
 | `default_config.py`, `cli/` | ADR-001, ADR-002 | `GOV-001` (layout), configuration surface |
 
 The **authoritative** requirement-to-component mapping is `docs/architecture/trace-matrix.md`; this
