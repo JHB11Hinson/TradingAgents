@@ -1,4 +1,4 @@
-### PR-40 — CHG-035 non-author review (ADR-006 r4, head `d63d5a9`)
+### PR-40 — CHG-035 non-author review (ADR-006 r5, the status-flipped head)
 
 - Reviewer: `github-actions[bot]` (`.github/workflows/bot-review.yml`). **Automated review.** The
   owner (@JHB11Hinson) asked the bot to write the non-author decision for this ADR; this is an
@@ -6,8 +6,9 @@
   signature.
 - Scope: `D1-REQ-SAFE-002` (decision validity), reviewed against `AGENTS.md` §7/§8/§11, ADR-001,
   ADR-003 and the code the ADR quotes.
-- Head: `d63d5a9` (r4), rebased onto `main`; the diff is `docs/architecture/adr/006-...md` and one
-  appended AI-use entry.
+- Head: the r5 head of this branch (the commit that carries this record and the status flip), rebased
+  onto `main`; the diff is `docs/architecture/adr/006-...md`, one appended AI-use entry and the two
+  review records.
 
 **Specification coverage.** The ADR answers the registry's fit criterion for `SAFE-002`: a decision
 that fails schema validation is rejected and degraded, and the negative test (removing the `REVIEW`
@@ -26,9 +27,9 @@ and the implementation change flips three of them while the fourth follows under
 **Governance.** The change id `CHG-035`, the debt id `DEBT-013` and the AI-use id
 `AI-2026-11-20-006` are unique on `main`. The entry sits in the file its own `members` field
 declares. The transcript is `null` at the owner's explicit request and is recorded as a known gap
-for the implementation change; that is a recorded decision, not an omission. `Status: proposed`
-stays until the implementation change flips it, so this approval is not dismissed by a later push
-(`dismiss_stale_reviews`).
+for the implementation change; that is a recorded decision, not an omission. The status flips to
+`accepted` in this pull request (r5) at the owner's direction, before this final approval, so the
+approval covers the accepted text; the agent applied the edit, the decision is the owner's.
 
 **Findings (non-blocking).**
 

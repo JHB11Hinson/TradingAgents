@@ -326,7 +326,8 @@
     `final_rating`, a failure of any kind degrades to `REVIEW`, at most one structured retry,
     free text stays an explanation for the reader, and a failing free-text call is caught, logged
     and replaced by a deterministic constant that names both failures. The ADR is the only
-    artifact in this pull request (status `proposed`); the tests and the implementation follow in
+    artifact in this pull request; the status flips to `accepted` at the owner's direction in r5.
+    The tests and the implementation follow in
     a separate `feat/CHG-035` change. The same change records the non-author decision as an
     automated `github-actions[bot]` review (`docs/review-memo/PR-40.md` and `PR-40-review.md`), at
     the owner's request, instead of a human-signed review.
@@ -343,8 +344,9 @@
         Fixed four decisions: counters are observed through the two injected mock entry points
         (`with_structured_output(...).invoke.call_count` and `llm.invoke.call_count`) instead of a
         new `decision_authority` key or an `agents/state.py` change; `verification-constraints.md`
-        keeps its `SAFE-002` row at partial and the gap is registered as `DEBT-013`; the status
-        stays `proposed` and only a non-author approves it; and the four failure identifiers are
+        keeps its `SAFE-002` row at partial and the gap is registered as `DEBT-013`; only a non-author
+        approves it, and the status flips to `accepted` in this pull request at the owner's direction
+        (r5); and the four failure identifiers are
         exactly `provider_unsupported`, `structured_failure`, `retry_failed` and `freetext_failed`.
       why: >-
         The state shape and the node's return shape are frozen contracts, a write-ask path must

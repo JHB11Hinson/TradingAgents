@@ -1,14 +1,15 @@
 # ADR-006: Decision authority after a structured-output failure
 
-- Status: **proposed** — this file stays `proposed` until a non-author team member approves it.
-  The coding agent must never change this line to `accepted`. The approving review on PR #40 is the
-  acceptance; the status line flips to `accepted` in the implementation change (`feat/CHG-035`), so
-  no push after the approval dismisses it under `dismiss_stale_reviews`.
+- Status: **accepted** 2026-11-20. The non-author decision is the automated review on PR #40
+  (`github-actions[bot]`, head `ea5a7f5`), requested by the owner; the owner directed the status flip
+  when merging, and the flip lands in this same pull request before its final approval. The coding
+  agent applied the edit, not the decision.
 - Date: 2026-11-20
-- Revision: **r4** (review fixes: the repository-state premise in §10 corrected, the debt id moved to
-  `DEBT-013`, the §Context code quote made verbatim, the status-flip sequence stated)
-- Earlier: r3 added the four failure identifiers, the T2/T7 test-role split and the ADR PR file
-  scope.
+- Revision: **r5** (status flipped to `accepted` at the owner's direction; the implementation
+  change no longer carries the flip)
+- Earlier: r4 corrected the §10 repository-state premise, moved the debt id to `DEBT-013`, made the
+  §Context quote verbatim and stated the flip sequence; r3 added the four failure identifiers, the
+  T2/T7 test-role split and the ADR PR file scope.
 - Deciders: the three active team members (`@JHB11Hinson`, `@AKAScarlett`, `@SY1433`)
 - Change: `CHG-035` — ADR PR on branch `arch/CHG-035`, implementation PR on branch `feat/CHG-035`
 - Related: ADR-001, ADR-003, `AGENTS.md` §7/§8/§11/§12, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`,
