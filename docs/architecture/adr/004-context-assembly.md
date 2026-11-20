@@ -99,3 +99,24 @@ case; only over-budget calls change.
   decision reopens, this ADR reopens with it.
 - The compaction test shows history compression changes decision quality below the evaluation
   threshold.
+
+## Amendment 2026-11-20 (CHG-036): the ledger counts the whole request, and the decision keeps a reserve
+
+Section 5 says the assembler is a no-op under budget, and it stays one: the prompt an agent sends is
+unchanged. What changes is what the run records and what the cap holds back.
+
+- **The recorded number is the whole request.** On an uncompacted call the old ledger stored only the
+  estimate of the assembled text, while section 2 budgets the history layer that the graph passes to
+  the model separately. A run therefore reported 43,616 tokens for a 56,861-token request.
+  `RunBudget.record` now receives `request_tokens = assembled text + non-rendered layers`, and
+  `AssembledContext` carries both `tokens` (the text) and `request_tokens` (what the model receives).
+- **A reserve for the final decision.** `context_decision_reserve_tokens` (default 2,500) is withheld
+  from ordinary calls; the Portfolio Manager's call passes `use_reserve=True` and may spend it. A tight
+  cap now degrades evidence rather than removing the decision, which is what `QUAL-001` requires.
+- **Why it was not left to the reader.** With the old counter the default 50,000 cap looked satisfied
+  while the request exceeded it; with the counter fixed but no reserve, the same run ended in `REVIEW`.
+  Both were measured on the fixed evaluation set (ADR-007) rather than argued.
+
+The default `context_budget_tokens` stays at the requirement's 50,000. A run whose analysis genuinely
+needs more than the cap still compacts sooner than before; that residual risk is `DEBT-011`.
+

@@ -29,14 +29,14 @@
 | D1-REQ-MEM-002 | wont | Prior reflections retrieved by semantic similarity | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-MEM-003 | should | Memory items source-attributable; no future leakage | `src/tradingagents/memory/log`, `date_window` | Point-in-time case | Future-dated item blocked event |
 | D1-REQ-MEM-004 | could | Retention / rotation / size caps configurable | `src/tradingagents/memory/log` | Rotation case | Memory entry count vs cap *(via OBS-001)* |
-| D1-REQ-COST-001 | must | Single analysis <= 50% of baseline tokens and cost | `context/`, `src/tradingagents/graph` *(planned)* | `eval.run` fixed-set totals <= 0.5 * baseline | Run manifest total_tokens / est_cost vs baseline |
+| D1-REQ-COST-001 | must | Single analysis <= 50% of baseline tokens and cost | `src/tradingagents/evaluation/`, `eval/` | `python -m eval.run` over the fixed set: `total_tokens_ratio` and `est_cost_ratio` <= 0.5 (`test/offline/test_eval_report.py`, `test_eval_cli.py`) | `eval/results/report.json` metrics vs the recorded baseline |
 | D1-REQ-COST-002 | wont | Semantic cache with quantified savings | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
-| D1-REQ-COST-003 | must | Single analysis <= configured token budget (default 50000), else compaction | `src/tradingagents/default_config.py`, `src/tradingagents/context/assembler.py` | Over-budget triggers compaction case (`test_token_budget.py`) | Run manifest `context_usage.total_tokens <= budget`; compaction count |
+| D1-REQ-COST-003 | must | Single analysis <= configured token budget (default 50000), else compaction | `src/tradingagents/default_config.py`, `src/tradingagents/context/assembler.py` | Over-budget compaction case (`test_token_budget.py`); whole-request ledger and reserve (`test_context_ledger_reserve.py`) | Run manifest `context_usage.total_tokens <= budget`; compaction count |
 | D1-REQ-PERF-001 | wont | Wall-clock <= 60% of baseline | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-OBS-001 | should | Machine-parsable run trace (span / phase / duration) | `src/tradingagents/telemetry/trace.py`, `src/tradingagents/graph/setup.py` | `test/offline/test_telemetry_trace.py`: parses, one span per step, attribute allowlist | `<results>/<ticker>/TradingAgentsStrategy_logs/telemetry/trace_<date>.json` |
 | D1-REQ-OBS-002 | should | Token / cost / latency aggregated per phase (run manifest) | `src/tradingagents/telemetry/manifest.py`, `src/tradingagents/telemetry/pricing.py` | `test/offline/test_telemetry_manifest.py`: per-phase tokens, cost, wall-clock; unknown model warns | `<results>/<ticker>/TradingAgentsStrategy_logs/telemetry/manifest_<date>.json` |
 | D1-REQ-OBS-003 | should | Structured step events; a failing subscriber must not block the run | `src/tradingagents/telemetry/events.py`, `src/tradingagents/telemetry/spans.py` | `test/offline/test_telemetry_seam.py` + `test/offline/test_telemetry_integration.py`: subscriber raises, run stays green | `Telemetry.warnings` count |
-| D1-REQ-EVAL-001 | must | Fixed set + thresholds + regression runnable locally | `eval/` *(planned)* | Local run + threshold pass/fail | Evaluation logbook |
+| D1-REQ-EVAL-001 | must | Fixed set + thresholds + regression runnable locally | `src/tradingagents/evaluation/`, `eval/run.py` | `python -m eval.run` exit codes (`test_eval_cli.py`), loaders and aggregation (`test_eval_fixed_set.py`, `test_eval_thresholds.py`, `test_eval_report.py`) | `eval/results/report.json` `ok` and threshold verdicts |
 | D1-REQ-EVAL-002 | wont | Prompt/model change triggers evaluation; failure blocks | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-SAFE-001 | must | External/retrieved text scrubbed; hostile samples blocked | `guardrails/` *(planned)* | Injection corpus blocked 100%; scrubbing-off negative test turns red | Blocked-injection event + alert |
 | D1-REQ-SAFE-002 | must | Invalid-schema decision rejected and degraded | `src/tradingagents/agents/structured`, `guardrails/` | Malformed-decision negative test | REVIEW/degrade event |
@@ -69,6 +69,10 @@
 - **Planned components.** Rows whose component is marked *(planned)* have no module yet; their
   `fit_criterion` is not yet checkable, and their tests/monitors are the intended evidence once the
   owning change lands. This is recorded so the gap is visible rather than implied as done.
+- **Evaluation harness (CHG-036).** `COST-001` and `EVAL-001` are now measured with the same artifact:
+  `python -m eval.run` replays `eval/fixed-set.json`, judges `eval/thresholds.yaml` against the
+  `eval/baseline.json` record, and exits on the verdict (ADR-007). That exit code is the local
+  behavioral tier until gate-4 is promoted; the run's `context_usage` is the whole-request ledger.
 - **Invariant fallbacks** (the "what to do when violated" action for `TERM-001`, `CTX-003`,
   `SAFE-001/002/003`) live in `docs/architecture/invariants.md`.
 - **Verification rules** (fit-criterion coverage, negative tests, test-to-requirement references,

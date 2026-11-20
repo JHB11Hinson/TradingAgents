@@ -292,6 +292,7 @@ class TradingAgentsGraph:
             "context_budget_tokens": cfg.get("context_budget_tokens"),
             "context_call_budget_tokens": cfg.get("context_call_budget_tokens"),
             "context_compaction_threshold": cfg.get("context_compaction_threshold"),
+            "context_decision_reserve_tokens": cfg.get("context_decision_reserve_tokens"),
             "telemetry_enabled": cfg.get("telemetry_enabled"),
             "output_language": cfg.get("output_language"),
             "data_vendors": dict(cfg.get("data_vendors") or {}),

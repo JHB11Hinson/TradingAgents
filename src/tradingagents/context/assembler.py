@@ -9,6 +9,12 @@ priority upward, never drops the P0 block, and re-injects P0 verbatim.
 Token counts use the deterministic estimator ``ceil(characters / 4)`` so a run
 is reproducible on any machine (ADR-004 section 3). ``context_budget_tokens``
 caps a whole run; ``context_call_budget_tokens`` caps one call.
+
+The run ledger records the **whole request** the model receives: the assembled
+text plus the layers the prompt template carries separately (``render=False``,
+such as ``state["messages"]``). ``context_decision_reserve_tokens`` keeps a
+slice of the run cap for the final decision, so compaction can never spend the
+Portfolio Manager's turn (ADR-004 amendment, 2026-11-20).
 """
 
 from __future__ import annotations
@@ -125,6 +131,7 @@ class AssembledContext:
     sources: Mapping[Layer, tuple[str, ...]]
     text: str
     tokens: int
+    request_tokens: int
     budget: int
     compacted: bool
     re_injected: bool
@@ -143,10 +150,13 @@ class RunBudget:
         cap: int,
         call_budget: int | None = None,
         compaction_threshold: float = DEFAULT_COMPACTION_THRESHOLD,
+        reserve: int = 0,
     ) -> None:
         self.cap = int(cap)
         self.call_budget = int(cap if call_budget is None else call_budget)
         self.compaction_threshold = float(compaction_threshold)
+        # The slice ordinary calls may not touch; the final decision may.
+        self.reserve = max(0, min(int(reserve), self.cap))
         self._calls: list[dict[str, Any]] = []
         self._max_call_tokens = 0
         self._compacted_calls = 0
@@ -159,9 +169,14 @@ class RunBudget:
     def remaining(self) -> int:
         return max(0, self.cap - self.spent)
 
-    def available(self) -> int:
-        """The cap for the next call: the per-call cap and what is left of the run."""
-        return max(0, min(self.call_budget, self.remaining))
+    def available(self, use_reserve: bool = False) -> int:
+        """The cap for the next call: the per-call cap and what is left of the run.
+
+        An ordinary call cannot reach into the decision reserve; the final
+        decision call (``use_reserve=True``) may.
+        """
+        headroom = self.remaining if use_reserve else self.remaining - self.reserve
+        return max(0, min(self.call_budget, headroom))
 
     def record(self, agent: str, tokens: int, compacted: bool) -> None:
         self._calls.append({"agent": agent, "tokens": int(tokens)})
@@ -174,6 +189,7 @@ class RunBudget:
         return {
             "budget": self.cap,
             "call_budget": self.call_budget,
+            "reserve": self.reserve,
             "total_tokens": self.spent,
             "max_call_tokens": self._max_call_tokens,
             "calls": [dict(call) for call in self._calls],
@@ -194,13 +210,16 @@ def run_budget_scope(config: Mapping[str, Any]):
     """Open a run-level budget from the run configuration.
 
     ``context_budget_tokens`` caps the run and ``context_call_budget_tokens``
-    caps one call; both default to 50,000. Agents read the ledger through
+    caps one call; both default to 50,000. ``context_decision_reserve_tokens``
+    of the run cap is withheld from ordinary calls so the final decision can
+    still be made (ADR-004 amendment). Agents read the ledger through
     :func:`assemble_context` and the graph snapshots it into the state log.
     """
     cap = int(config.get("context_budget_tokens", DEFAULT_BUDGET))
     call_budget = int(config.get("context_call_budget_tokens", cap))
     threshold = float(config.get("context_compaction_threshold", DEFAULT_COMPACTION_THRESHOLD))
-    budget = RunBudget(cap, call_budget, threshold)
+    reserve = int(config.get("context_decision_reserve_tokens", 0))
+    budget = RunBudget(cap, call_budget, threshold, reserve)
     token = _CURRENT.set(budget)
     try:
         yield budget
@@ -230,12 +249,14 @@ def assemble_context(
     original: str | None = None,
     budget: RunBudget | None = None,
     agent: str = "context",
+    use_reserve: bool = False,
 ) -> AssembledContext:
     """Run the assembly pipeline for one model call.
 
     ``original`` is the prompt the agent already builds; it is returned
     unchanged while the request is within budget (ADR-004 section 5).
     ``budget`` defaults to the ledger opened by :func:`run_budget_scope`.
+    ``use_reserve`` lets the final decision call spend the withheld reserve.
     """
     missing = layers.missing()
     if missing:
@@ -246,7 +267,7 @@ def assemble_context(
     run = budget if budget is not None else current_budget()
     if run is None:
         run = RunBudget(DEFAULT_BUDGET)
-    cap = run.available()
+    cap = run.available(use_reserve)
     if cap <= 0:
         raise ContextBudgetExceeded(
             f"run token budget exhausted before the {agent} call ({run.spent}/{run.cap})"
@@ -266,6 +287,8 @@ def assemble_context(
     if within:
         text = original if original is not None else _render(kept)
         tokens = original_tokens if original_tokens is not None else estimate_tokens(text)
+        # Layers the template carries separately are still part of the request.
+        request_tokens = tokens + _non_rendered_tokens(kept)
         compacted = False
         re_injected = False
     else:
@@ -284,16 +307,18 @@ def assemble_context(
             )
         kept = compacted_blocks
         layer_tokens = _layer_tokens(kept)
+        request_tokens = tokens
         compacted = True
         re_injected = True
 
-    run.record(agent, tokens, compacted)
+    run.record(agent, request_tokens, compacted)
 
     return AssembledContext(
         layers=LAYER_ORDER,
         sources={layer: tuple(block.source for block in kept[layer]) for layer in LAYER_ORDER},
         text=text,
         tokens=tokens,
+        request_tokens=request_tokens,
         budget=cap,
         compacted=compacted,
         re_injected=re_injected,

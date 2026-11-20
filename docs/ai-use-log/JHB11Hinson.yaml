@@ -220,3 +220,37 @@
         the five-commit limit in `AGENTS.md` section 12.
   # Annotated session record; human turns verbatim, tool results summarised.
   transcript: transcripts/CHG-034-bot-review.md#L1-L61
+
+- id: AI-2026-11-20-003
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-036: add the deterministic evaluation harness (`src/tradingagents/evaluation/` and `eval/`) so
+    `EVAL-001` and `COST-001` are measurable, and fix the run ledger it reads. A prototype of the
+    offline graph showed the ledger reporting 43,616 tokens for a 56,861-token request; the fix records
+    the whole request and withholds a 2,500-token decision reserve from ordinary calls, because the
+    honest counter alone made the Portfolio Manager return `REVIEW` under the default 50,000 cap.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose option A after the STOP: fix the ledger and add the decision reserve before building the
+        harness, accepting a change to CHG-033's merged behaviour.
+      why: >-
+        `COST-001` would otherwise rest on a counter known to be about 20% low, and `QUAL-001` forbids
+        the cap from turning decisions into `REVIEW`.
+    - type: constrain
+      what: >-
+        Kept the shipped run cap at the requirement's 50,000 and the reserve at 2,500 rather than
+        raising the default, and required the evaluation to stay deterministic and offline.
+      why: >-
+        The requirement's stated default is not the agent's to change, and no provider key exists in
+        this environment, so the harness must be reproducible without one.
+    - type: approve
+      what: >-
+        Authorised the documented `bot-review` channel for the non-author approval on PR #41.
+      why: >-
+        The human's instruction in this session; the review record names the bot as the reviewer, and
+        the change is not on a safety-critical path.
+  # Annotated session record; human turns verbatim, tool results summarised.
+  transcript: transcripts/60198818-HaobinJiang-CHG-036-evaluation.md#L1-L120

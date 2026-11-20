@@ -31,6 +31,9 @@ _ENV_OVERRIDES = {
     "TRADINGAGENTS_CONTEXT_BUDGET_TOKENS":        "context_budget_tokens",
     "TRADINGAGENTS_CONTEXT_CALL_BUDGET_TOKENS":   "context_call_budget_tokens",
     "TRADINGAGENTS_CONTEXT_COMPACTION_THRESHOLD": "context_compaction_threshold",
+    # The slice of the run cap withheld from ordinary calls so the final
+    # decision still has room (ADR-004 amendment, COST-003).
+    "TRADINGAGENTS_CONTEXT_DECISION_RESERVE_TOKENS": "context_decision_reserve_tokens",
     # Observability (OBS-001/002/003): a run writes its trace and manifest
     # next to the state log; with this off it writes neither.
     "TRADINGAGENTS_TELEMETRY_ENABLED":            "telemetry_enabled",
@@ -140,6 +143,11 @@ def build_default_config() -> dict:
         "context_budget_tokens": 50_000,
         "context_call_budget_tokens": 50_000,
         "context_compaction_threshold": 0.8,
+        # The run ledger records the whole request. `context_decision_reserve_tokens`
+        # is withheld from ordinary calls (analysts, debate, managers) and may be
+        # spent by the final decision only, so a tight cap degrades evidence rather
+        # than the decision itself (COST-003, QUAL-001).
+        "context_decision_reserve_tokens": 2_500,
         # Observability (OBS-001/002/003): emit spans to the in-process seam
         # and write trace_<date>.json + manifest_<date>.json next to the
         # state log. Off is a true no-op: no spans, no files.
