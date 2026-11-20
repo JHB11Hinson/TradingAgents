@@ -312,3 +312,50 @@
         The blueprint's rule is that a gap stays visible; the review must reject an overclaim.
   # Annotated session record; human turns verbatim, tool results summarised.
   transcript: transcripts/60198818-HaobinJiang-CHG-038-d2-artifacts.md#L1-L70
+
+- id: AI-2026-11-20-006
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-035: read-only triage of `main` at `e49cea2` (a P0-P3 issue list and a three-task plan) and
+    the ADR-006 draft for `D1-REQ-SAFE-002`. `portfolio_manager.py` still turns a prose "Rating:
+    Sell" into `final_rating` after a structured-output failure, and `structured.py` collapses
+    "the provider cannot bind structured output" and "the call returned an invalid decision" into
+    the same `None`. ADR-006 fixes the boundary: only a schema-valid `PortfolioDecision` may set
+    `final_rating`, a failure of any kind degrades to `REVIEW`, at most one structured retry,
+    free text stays an explanation for the reader, and a failing free-text call is caught, logged
+    and replaced by a deterministic constant that names both failures. The ADR is the only
+    artifact in this pull request (status `proposed`); the tests and the implementation follow in
+    a separate `feat/CHG-035` change.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the ADR-006 technical design at r2 and authorised this ADR-only pull request,
+        limited to two files: the new ADR and this log entry.
+      why: >-
+        The course requires an architecture decision record for a change to a safety-critical
+        path, and the record must be reviewed before the implementation is written.
+    - type: constrain
+      what: >-
+        Fixed four decisions: counters are observed through the two injected mock entry points
+        (`with_structured_output(...).invoke.call_count` and `llm.invoke.call_count`) instead of a
+        new `decision_authority` key or an `agents/state.py` change; `verification-constraints.md`
+        keeps its `SAFE-002` row at partial and the gap is registered as `DEBT-013`; the status
+        stays `proposed` and only a non-author approves it; and the four failure identifiers are
+        exactly `provider_unsupported`, `structured_failure`, `retry_failed` and `freetext_failed`.
+      why: >-
+        The state shape and the node's return shape are frozen contracts, a write-ask path must
+        not be edited without authorisation, and a stable identifier set keeps the tests and the
+        prose from drifting apart.
+    - type: correct
+      what: >-
+        Split the test roles: T2 proves a prose rating never becomes `final_rating` (asserting no
+        counts) and T7 proves at most two structured and one free-text call (asserting no rating
+        beyond the documented default), and required the failing free-text path to name both
+        failures.
+      why: >-
+        A single test asserting both contracts makes a failure ambiguous: a correct count would
+        hide a leaked rating, and a correct rating would hide an unbounded retry.
+  # Transcript pending: the human asked that this session be exported after the change lands.
+  transcript: null
