@@ -327,7 +327,9 @@
     free text stays an explanation for the reader, and a failing free-text call is caught, logged
     and replaced by a deterministic constant that names both failures. The ADR is the only
     artifact in this pull request (status `proposed`); the tests and the implementation follow in
-    a separate `feat/CHG-035` change.
+    a separate `feat/CHG-035` change. The same change records the non-author decision as an
+    automated `github-actions[bot]` review (`docs/review-memo/PR-40.md` and `PR-40-review.md`), at
+    the owner's request, instead of a human-signed review.
   human_interventions:
     - type: approve
       what: >-
