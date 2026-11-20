@@ -1,0 +1,14 @@
+# Thresholds for the fixed evaluation set (D1-REQ-EVAL-001).
+#
+# One bound per metric. A run that misses any bound exits non-zero, so gate-4
+# (and a local run) can block a change instead of only printing numbers.
+metrics:
+  # D1-REQ-COST-001: at most half of the recorded baseline, in tokens and cost.
+  total_tokens_ratio: {max: 0.5}
+  est_cost_ratio: {max: 0.5}
+  # D1-REQ-COST-003: every case must stay inside its configured run budget.
+  budget_respected_rate: {min: 1.0}
+  # D1-REQ-QUAL-001: a tight budget must not turn decisions into REVIEW.
+  review_rate: {max: 0.0}
+  # A crashed case is a failed evaluation, never a silent omission.
+  cases_failed: {max: 0}

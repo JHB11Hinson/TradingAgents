@@ -131,7 +131,7 @@ Ground every conclusion in specific evidence from the analysts. The risk debate 
 
         try:
             assembled = assemble_context(
-                layers, original=original, agent="Portfolio Manager"
+                layers, original=original, agent="Portfolio Manager", use_reserve=True
             )
         except ContextBudgetExceeded as exc:
             # SAFE-002: the decision is deterministic and authoritative; without

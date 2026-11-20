@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "recorded_at": "2026-11-20",
+  "source": "Inherited TradingAgents v0.6.0 single-ticker analysis, recorded estimate (docs/req/requirements.yaml, D1-REQ-COST-001 source note: about 120,000 tokens per analysis). Per analysis; the aggregator scales it by the number of cases.",
+  "per_analysis": {
+    "total_tokens": 120000,
+    "est_cost_usd": 0.30
+  },
+  "usd_per_million_input_tokens": 2.5
+}

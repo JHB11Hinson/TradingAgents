@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "description": "Deterministic fixed set for `python -m eval.run` (D1-REQ-EVAL-001): a full four-analyst run and a narrower two-analyst run, both historical so the set replays on any date.",
+  "cases": [
+    {
+      "id": "NVDA-2026-01-09",
+      "ticker": "NVDA",
+      "trade_date": "2026-01-09"
+    },
+    {
+      "id": "BABA-2026-01-09-market-news",
+      "ticker": "BABA",
+      "trade_date": "2026-01-09",
+      "analysts": ["market", "news"]
+    }
+  ]
+}
