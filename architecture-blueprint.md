@@ -172,11 +172,9 @@ the public contracts in `AGENTS.md` §8.
 
 | Gap | Requirement | Where recorded |
 |---|---|---|
-| the context assembler is not implemented | `CTX-001/002/003` | `DEBT-002`; trace matrix *(planned)* |
+| injection scrubbing is not implemented | `SAFE-001` | `DEBT-002`; invariants register |
 | the position ceiling is not implemented | `SAFE-003` | `DEBT-002`; invariants register |
 | the portfolio-manager free-text fallback can produce a rating after a schema failure | `SAFE-002` | invariants register; debt register |
-| injection scrubbing is not implemented | `SAFE-001` | `DEBT-002`; invariants register |
-| the evaluation table, memory design and runtime policy catalog are still to be written | D2.5/7/8 | trace matrix; this table |
 
 A gap in this table is not permission to claim the capability. It is the opposite: it is the
 evidence a reviewer uses to reject an overclaim.

@@ -80,9 +80,13 @@ truth for requirement content; prose must not invent a requirement that is not i
 | 9 | `docs/code-governance/protection.json` | the committed branch-protection baseline (D7) |
 | 10 | `.github/workflows/ci.yml` | the real gate names and their steps |
 | 11 | `docs/review-memo/`, `docs/ai-use-log/` (and the legacy archives) | per-PR review records and the AI-use log |
+| 12 | `docs/architecture/memory-design.md` | memory/state design (D2.5) |
+| 13 | `docs/architecture/runtime-policy-catalog.md` | degraded/failure paths (D2.7) |
+| 14 | `docs/architecture/evaluation-table.md` | candidate comparison behind the architecture (D2.8) |
 
-> The remaining D2 artifacts (memory design, runtime policy catalog, evaluation table) are planned;
-> when they exist they slot in after #8.
+> The optional D2 artifacts (`evaluation-logbook.md`, `risk-list.md`, `option-ledger.md`) exist and
+> sit beside #12–#14. `test/offline/test_d2_artifacts.py` checks that every artifact the registry
+> names exists and that every module the blueprint names exists on disk.
 
 ---
 

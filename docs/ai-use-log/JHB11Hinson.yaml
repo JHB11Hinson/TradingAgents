@@ -282,3 +282,33 @@
         is debt category 4.
   # Annotated session record; human turns verbatim, tool results summarised.
   transcript: transcripts/60198818-HaobinJiang-CHG-037-gate-4.md#L1-L60
+
+- id: AI-2026-11-20-005
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-038: write the six D2 architecture artifacts the registry names — memory/state design,
+    runtime policy catalog, candidate evaluation table, and the optional evaluation logbook, risk list
+    and option ledger — and pin them with `test/offline/test_d2_artifacts.py` (every artifact exists
+    and is non-empty; every module the blueprint names exists). The same record carries the gate-4 and gate-1
+    deliberate-violation evidence: probe PR #44 failed `gate-4-semantic-eval` (0.374 against a 0.0
+    threshold, exit 1, 42 s) and was closed without merging. Probe PR #45 failed
+    `gate-1-test-approval` ("no Test-Approval: trailer", exit 1), with `gate-6-ai-use-log` failing on
+    the same src change; it was closed without merging too.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked for the three D2 artifacts and authorized the bot review; the scope was widened to the
+        six the registry names, with the extra three kept short and marked optional.
+      why: >-
+        `GOV-009`'s fit criterion lists six files; writing three would leave the registry's own check
+        unmet. The course marks D2.9–D2.11 optional, which the files state.
+    - type: constrain
+      what: >-
+        Kept the artifacts descriptive of the shipped code, with planned items marked as gaps rather
+        than described as implemented.
+      why: >-
+        The blueprint's rule is that a gap stays visible; the review must reject an overclaim.
+  # Annotated session record; human turns verbatim, tool results summarised.
+  transcript: transcripts/60198818-HaobinJiang-CHG-038-d2-artifacts.md#L1-L70
