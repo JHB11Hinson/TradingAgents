@@ -1,10 +1,14 @@
 # ADR-006: Decision authority after a structured-output failure
 
 - Status: **proposed** — this file stays `proposed` until a non-author team member approves it.
-  The coding agent must never change this line to `accepted`.
+  The coding agent must never change this line to `accepted`. The approving review on PR #40 is the
+  acceptance; the status line flips to `accepted` in the implementation change (`feat/CHG-035`), so
+  no push after the approval dismisses it under `dismiss_stale_reviews`.
 - Date: 2026-11-20
-- Revision: **r3** (r2 decisions applied; adds the four failure identifiers, the T2/T7 test-role
-  split, the debt entry for the documentary gap, and the ADR PR file scope)
+- Revision: **r4** (review fixes: the repository-state premise in §10 corrected, the debt id moved to
+  `DEBT-013`, the §Context code quote made verbatim, the status-flip sequence stated)
+- Earlier: r3 added the four failure identifiers, the T2/T7 test-role split and the ADR PR file
+  scope.
 - Deciders: the three active team members (`@JHB11Hinson`, `@AKAScarlett`, `@SY1433`)
 - Change: `CHG-035` — ADR PR on branch `arch/CHG-035`, implementation PR on branch `feat/CHG-035`
 - Related: ADR-001, ADR-003, `AGENTS.md` §7/§8/§11/§12, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`,
@@ -31,6 +35,7 @@ The code matches that description.
    ```python
    decision = invoke_structured(structured_llm, assembled.text, "Portfolio Manager")
    if decision is not None:
+       final_trade_decision = render_pm_decision(decision)
        final_rating = decision.rating.value
    else:
        final_trade_decision = llm.invoke(assembled.text).content
@@ -190,14 +195,16 @@ decision path was taken from the text alone.
 - `TradingMemoryLog.store_decision` (`memory/log.py`) keeps `rating = rating or parse_rating(...)`.
   The graph always passes the explicit rating, so that line is a legacy fallback for direct callers
   only. It is **not** changed by this ADR.
-- **Documentation gap, recorded deliberately (confirmed decision 3).**
-  `docs/code-governance/verification-constraints.md` keeps its `SAFE-002` row at **partial** after
-  this change, because that file is a write-ask path and no authorisation to edit it exists. The
-  discrepancy is registered as **`DEBT-011`** in `docs/debt-register.md` in the implementation
-  change, with the trigger "after CHG-035 merges". Until that follow-up lands, the trace matrix,
-  the invariant register and the blueprint say *enforced*, and `verification-constraints.md` says
-  *partial*; a reviewer must read the former and treat the latter as stale, and this ADR is the
-  reason why.
+- **Documentation sequencing, recorded deliberately (review decision 3).**
+  On `main` today all four records agree that `SAFE-002` is **partial**: `invariants.md` INV-05 says
+  the free-text fallback can still parse a rating, `architecture-blueprint.md` §5 says "partial, not
+  fully enforced", the `trace-matrix.md` SAFE-002 row lists the evidence without claiming
+  enforcement, and `verification-constraints.md` §4 says partial. The implementation change
+  (`feat/CHG-035`) flips the first three to **implemented** with the new tests; it does not edit
+  `docs/code-governance/verification-constraints.md` in the same pass without an authorisation for
+  that write-ask path, so that row is updated under **`DEBT-013`** with the trigger "after CHG-035
+  merges". Until the follow-up lands, that one row is stale and says *partial* while the other three
+  say *implemented* — this ADR is the reason why.
 - A REVIEW decision is still written to memory with the REVIEW tag; settlement and reflection
   continue to work on it as today.
 
@@ -215,7 +222,7 @@ decision path was taken from the text alone.
   `final_trade_decision`, so the state shape is untouched.
 - **The node's return shape** — still exactly `risk_debate_state`, `final_trade_decision`,
   `final_rating`.
-- **`docs/code-governance/verification-constraints.md`** — not modified (see §10; `DEBT-011`).
+- **`docs/code-governance/verification-constraints.md`** — not modified (see §10; `DEBT-013`).
 - **Every existing test file** — not modified.
 - **`SAFE-003` position ceiling** (INV-06) — still not implemented; out of scope.
 
@@ -235,7 +242,7 @@ decision path was taken from the text alone.
 
 - `INV-05` moves *Partial* → *Implemented* once the tests exist; blueprint §5 and the
   `trace-matrix.md` `SAFE-002` row follow in the implementation change. `verification-constraints.md`
-  follows later under `DEBT-011`.
+  follows later under `DEBT-013`.
 - The inherited test
   `test/offline/test_memory_log.py::test_pm_falls_back_to_freetext_when_structured_unavailable`
   asserts only `final_trade_decision`, which still equals the prose under §3 — it **stays green and
@@ -265,7 +272,7 @@ decision path was taken from the text alone.
 - **A `decision_authority` key in the node's return dict.** Rejected (confirmed decision 2): it
   would change the node's return shape; the two mock entry points already observe both counters.
 - **Edit `verification-constraints.md` in this change to avoid the stale row.** Rejected (confirmed
-  decision 3): the path is write-ask; the gap is registered as `DEBT-011` instead.
+  decision 3): the path is write-ask; the gap is registered as `DEBT-013` instead.
 
 ## Reconsider if
 
@@ -275,4 +282,4 @@ decision path was taken from the text alone.
 - A provider gains native structured output and the unsupported branch becomes dead code.
 - `SAFE-003` (position ceiling) lands and must compose with this flow; the composition point is the
   same node and must be added here.
-- `DEBT-011` is closed and the four documents agree; then §10's warning paragraph is removed.
+- `DEBT-013` is closed and the four documents agree; then §10's warning paragraph is removed.
