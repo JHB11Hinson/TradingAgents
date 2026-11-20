@@ -46,3 +46,5 @@ __all__ = [
     "load_fixed_set",
     "load_thresholds",
 ]
+
+# Deliberate-violation probe for gate-1: a src change with no Test-Approval record.
