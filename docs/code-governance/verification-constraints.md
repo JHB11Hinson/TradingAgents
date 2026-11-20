@@ -64,10 +64,11 @@ when the environment has keys.
 |---|---|---|
 | **Structural** | imports, module boundaries, permissions, architectural fitness functions | `test/offline/test_layering.py`; the module table in `docs/code-governance/structural-constraints.md`; the three-way permission check |
 | **Regression** | all prior suites, zero regressions | `pytest -q` (gate-5); inherited 1262-passed baseline |
-| **Behavioral** | quality thresholds, zero safety escapes | `eval/fixed-set.json`, `eval/thresholds.yaml`, `python -m eval.run` (CHG-036; gate-4 still planned); the review checklist fills the gaps until gate-4 |
+| **Behavioral** | quality thresholds, zero safety escapes | `eval/fixed-set.json`, `eval/thresholds.yaml`, `python -m eval.run`; **gate-4** runs it on every pull request (CHG-037) |
 
 The behavioral tier is not optional in the course. CHG-036 brought it online as a local, runnable
-check (ADR-007); promoting it to `gate-4-semantic-eval` is the remaining step (`GOV-003`).
+check and CHG-037 made it the blocking `gate-4-semantic-eval`; the deliberate-violation probe is
+recorded in the CHG-038 AI-use entry and the review memo.
 
 ## 3. Test layout and naming
 
@@ -104,7 +105,7 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 | `SAFE-003` position ceiling | over-ceiling clip/reject + bypass negative test | **not implemented** (INV-06) |
 | `GOV-001` layout | src/test present, install green, README states the test commands | **partial** — README reset in CHG-031; verify after merge |
 | `GOV-002` AGENTS.md sections | review checklist | **partial** — the “six required sections” count is being corrected (P1-08) |
-| `GOV-003` six gates | `protection.json` + deliberate-violation records | **partial** — gate-4 missing; gate-1 promotion pending |
+| `GOV-003` six gates | `protection.json` + deliberate-violation records | **done** for the context set (CHG-037 adds `gate-4-semantic-eval`); the gate-4 probe is recorded with CHG-038 |
 | `GOV-004` trace matrix | 40 rows for 40 requirements | **done** |
 | `GOV-005` tool manifest | manifest vs permission model | **done** (review check) |
 | `GOV-006` three-source whitelist | three-way comparison | **partial** — read paths/commands still need alignment (P1-07) |
@@ -132,7 +133,7 @@ mypy --follow-imports=silent <changed-src-files>
 # Schema (gate-3)
 check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
-# Behavioral (CHG-036; gate-4 still planned)
+# Behavioral (gate-4 runs this on every pull request)
 python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
 ```
 
@@ -143,7 +144,7 @@ python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
 | `gate-1-test-approval` | tests exist and were approved before the implementation (Rule 1 + the human gate) |
 | `gate-2-static-analysis` | structural hygiene: `pip check`, `ruff`, scoped `mypy` |
 | `gate-3-schema` | the registry is valid |
-| `gate-4-semantic-eval` | behavioral tier (planned; Rule 1 for quality requirements) |
+| `gate-4-semantic-eval` | behavioral tier (Rule 1 for quality requirements): the fixed set replays and a failed threshold blocks (CHG-037) |
 | `gate-5-regression` | Rule 4 |
 | `gate-6-ai-use-log` | the AI-use log is current when code, tests or prompts change |
 

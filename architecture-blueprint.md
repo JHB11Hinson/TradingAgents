@@ -172,7 +172,6 @@ the public contracts in `AGENTS.md` §8.
 
 | Gap | Requirement | Where recorded |
 |---|---|---|
-| gate-4 semantic evaluation is not online; `eval/` is empty | `EVAL-001/002` | `DEBT-003`; `AGENTS.md` §10 |
 | the context assembler is not implemented | `CTX-001/002/003` | `DEBT-002`; trace matrix *(planned)* |
 | the position ceiling is not implemented | `SAFE-003` | `DEBT-002`; invariants register |
 | the portfolio-manager free-text fallback can produce a rating after a schema failure | `SAFE-002` | invariants register; debt register |

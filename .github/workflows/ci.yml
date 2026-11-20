@@ -89,6 +89,22 @@ jobs:
       - run: pip install check-jsonschema
       - run: check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
+  gate-4-semantic-eval:
+    name: gate-4-semantic-eval
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e .
+      - name: Replay the fixed set and block when a threshold fails
+        run: |
+          python -m eval.run \
+            --set eval/fixed-set.json \
+            --thresholds eval/thresholds.yaml \
+            --out "$RUNNER_TEMP/eval-report.json"
+
   gate-6-ai-use-log:
     name: gate-6-ai-use-log
     runs-on: ubuntu-latest
