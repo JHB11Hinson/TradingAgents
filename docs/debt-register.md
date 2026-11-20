@@ -57,7 +57,9 @@ inventing a ninth.
 - **Owner:** Member 3.
 - **Trigger to revisit:** before gate-4 is scheduled; before any COST/PERF/QUAL claim in the report.
 - **Linked requirement:** `D1-REQ-EVAL-001`, `D1-REQ-EVAL-002`, `D1-REQ-COST-001`, `D1-REQ-PERF-001`.
-- **Status:** open
+- **Status:** mitigated by CHG-035 (2026-11-20): the fixed set, thresholds, recorded baseline and
+  `python -m eval.run` exist, and `COST-001` is measured on them (ADR-006). The remaining half is
+  promoting the runner to `gate-4-semantic-eval`; the follow-ups are `DEBT-011`.
 
 ## DEBT-004 — Environment-only dependencies
 
@@ -145,4 +147,34 @@ inventing a ninth.
 - **Trigger to revisit:** before the first change to a safety-critical path and before Sprint 3
   safety work; do not describe gate 2 as fully implementing the course gate until then.
 - **Linked requirement:** `D1-REQ-GOV-003`, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`.
+- **Status:** open
+
+## DEBT-011 — The evaluation harness is deterministic, small and offline
+
+- **Category:** 6. Evaluation debt
+- **What:** the shipped fixed set has two cases and synthetic, fixed vendor payloads. The replay
+  backend proves the harness and the token accounting, not the cost of a real 120,000-token analysis.
+  There is no live mode.
+- **Impact:** `COST-001`'s ratio (0.374) is reproducible and comparable on the same fixtures, but it
+  cannot be quoted as the production cost until a live run confirms it.
+- **Owner:** admin (context/cost), with member 3 for the evaluation set.
+- **Trigger to revisit:** before quoting a cost figure in `Report.md`; before raising or lowering
+  `context_budget_tokens`; when a key is available in CI (add and compare a live mode).
+- **Linked requirement:** `D1-REQ-EVAL-001`, `D1-REQ-COST-001`, `D1-REQ-COST-003`, `D1-REQ-QUAL-001`.
+- **Status:** open
+
+## DEBT-012 — Only the Portfolio Manager degrades when the budget is exhausted
+
+- **Category:** 7. Guardrail debt
+- **What:** `ContextBudgetExceeded` is caught by the Portfolio Manager (which returns `REVIEW`), but an
+  analyst, researcher, trader or risk debator that hits the run cap mid-flight aborts the run with an
+  exception. The honest whole-request ledger makes this reachable for a run whose analysis needs far
+  more than the cap.
+- **Impact:** a pathological input under a tight budget loses the run instead of producing a partial
+  report. The default 50,000 cap plus the 2,500 decision reserve makes it unlikely on the fixed set,
+  but it is not impossible.
+- **Owner:** admin (context/cost).
+- **Trigger to revisit:** the first real run that exhausts the analysis budget, or before
+  `context_budget_tokens` is lowered.
+- **Linked requirement:** `D1-REQ-COST-003`, `D1-REQ-TERM-001`.
 - **Status:** open

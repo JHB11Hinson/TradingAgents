@@ -64,10 +64,10 @@ when the environment has keys.
 |---|---|---|
 | **Structural** | imports, module boundaries, permissions, architectural fitness functions | `test/offline/test_layering.py`; the module table in `docs/code-governance/structural-constraints.md`; the three-way permission check |
 | **Regression** | all prior suites, zero regressions | `pytest -q` (gate-5); inherited 1262-passed baseline |
-| **Behavioral** | quality thresholds, zero safety escapes | **planned**: `eval/fixed-set.json`, `eval/thresholds.yaml`, `python -m eval.run` (gate-4); until then, a review checklist |
+| **Behavioral** | quality thresholds, zero safety escapes | `eval/fixed-set.json`, `eval/thresholds.yaml`, `python -m eval.run` (CHG-035; gate-4 still planned); the review checklist fills the gaps until gate-4 |
 
-The behavioral tier is not optional in the course. Its absence is recorded in `DEBT-003`; it must
-come online before the semantic-evaluation gate can be described as implemented.
+The behavioral tier is not optional in the course. CHG-035 brought it online as a local, runnable
+check (ADR-006); promoting it to `gate-4-semantic-eval` is the remaining step (`GOV-003`).
 
 ## 3. Test layout and naming
 
@@ -87,18 +87,18 @@ test/
 
 This table is a **status snapshot**, not a second registry. The IDs, statements and fit criteria are
 in `docs/req/requirements.yaml`; the per-row mapping is `docs/architecture/trace-matrix.md`. Status
-is as of 2026-11-17.
+is as of 2026-11-17, with the COST/EVAL rows updated by CHG-035 on 2026-11-20.
 
 | Requirement | Evidence today | Status |
 |---|---|---|
 | `DEBATE-001` structured turns | schema validator on a fixed set | **planned** — no debate schema/eval yet |
 | `DEBATE-004` round bound | `graph/conditional_logic.py` bound; `test/offline/test_risk_router_path_map.py` reaches the terminal at the bound | **done** (existing bound + router case) |
 | `TERM-001` self-termination | oscillation/stall cases + detector-removal negative test | **partial** — round bounds exist; detectors planned (INV-01) |
-| `CTX-001` six layers | assembler unit test | **planned** (INV-02) |
-| `CTX-003` budget + re-injection | budget and byte-identical re-injection tests | **planned** (INV-03) |
-| `COST-001` ≤50% baseline | `eval.run` fixed-set totals | **planned** — no eval set |
-| `COST-003` token budget | `test/offline/test_token_budget.py` | **planned** — the named test does not exist yet |
-| `EVAL-001` fixed set + runner | `python -m eval.run` pass/fail | **planned** — `eval/` empty (DEBT-003) |
+| `CTX-001` six layers | assembler unit test | **done** (CHG-033; `test/offline/test_context_assembler.py`) |
+| `CTX-003` budget + re-injection | budget and byte-identical re-injection tests | **done** (CHG-033; `test/offline/test_token_budget.py`) |
+| `COST-001` ≤50% baseline | `eval.run` fixed-set totals | **done** (CHG-035; `test/offline/test_eval_*.py`, `python -m eval.run` -> 0.374) |
+| `COST-003` token budget | `test/offline/test_token_budget.py` | **done** (CHG-033/CHG-035; the ledger counts the whole request, `test/offline/test_context_ledger_reserve.py`) |
+| `EVAL-001` fixed set + runner | `python -m eval.run` pass/fail | **done** (CHG-035; `test/offline/test_eval_cli.py`) |
 | `SAFE-001` injection scrubbing | adversarial corpus + scrubbing-off negative test | **not implemented** (INV-04) |
 | `SAFE-002` schema rejection | malformed-decision negative test, including the PM free-text fallback | **partial** (INV-05) |
 | `SAFE-003` position ceiling | over-ceiling clip/reject + bypass negative test | **not implemented** (INV-06) |
@@ -132,7 +132,7 @@ mypy --follow-imports=silent <changed-src-files>
 # Schema (gate-3)
 check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
-# Behavioral (gate-4, planned)
+# Behavioral (CHG-035; gate-4 still planned)
 python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
 ```
 

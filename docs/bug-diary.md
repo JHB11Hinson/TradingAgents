@@ -81,3 +81,30 @@ request, not here.
   This is an owner-only UI action; `gh workflow enable` does not clear the fork-level disable.
 - **Invariant gap exposed:** the gate pre-flight assumed Actions were running. Add "the Actions tab
   shows no fork-disable banner" to the pre-flight checks before relying on `gh pr checks`.
+
+## BUG-005 — The run ledger under-counted the request it was capping
+
+- **Date:** 2026-11-20
+- **Symptom:** the state log reported `context_usage.total_tokens = 43,616` for a run whose model
+  calls carried 56,861 estimated tokens. A run could therefore "fit" the 50,000 cap while sending
+  more than 50,000 tokens to the provider. When the counter was made honest, the same run compacted
+  to the cap and the Portfolio Manager, with no budget left, returned `REVIEW` without a model call.
+- **Reproduction:** run the graph offline (scripted model, fixed vendor payloads) on NVDA 2026-01-09,
+  and compare `graph._context_usage["total_tokens"]` with the sum of
+  `assemble_context(...).layer_tokens`. Or read `test/offline/test_context_ledger_reserve.py`: the
+  first test fails against the CHG-033 code (it asserted the old, smaller number).
+- **Classification:** code (accounting), with a safety consequence
+- **Root cause:** `assemble_context` recorded `original_tokens` on an uncompacted call. The history
+  layer is budgeted (`_within_budget`) but passed to the model separately through `state["messages"]`,
+  so it never entered the recorded total. Compacted calls recorded the whole request, which made the
+  run total a mix of two units.
+- **Fix:** CHG-035 records `request_tokens = assembled text + non-rendered layers` for every call and
+  exposes it on `AssembledContext`; a `context_decision_reserve_tokens` slice (default 2,500) is
+  withheld from ordinary calls so the Portfolio Manager can still decide (ADR-004 amendment,
+  ADR-006).
+- **Invariant gap exposed:** `COST-003` said "the run log reports `total_tokens <= budget`", but no
+  test compared the logged number with the tokens actually assembled for the call, so the invariant
+  was measured against its own bookkeeping. The new test asserts the ledger equals the request, not
+  just that it is under the cap. A residual risk remains for a run whose analysis needs far more than
+  the cap: only the Portfolio Manager degrades gracefully (`DEBT-011`).
+
