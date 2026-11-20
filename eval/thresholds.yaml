@@ -4,7 +4,7 @@
 # (and a local run) can block a change instead of only printing numbers.
 metrics:
   # D1-REQ-COST-001: at most half of the recorded baseline, in tokens and cost.
-  total_tokens_ratio: {max: 0.5}
+  total_tokens_ratio: {max: 0.0}
   est_cost_ratio: {max: 0.5}
   # D1-REQ-COST-003: every case must stay inside its configured run budget.
   budget_respected_rate: {min: 1.0}
