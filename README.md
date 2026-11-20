@@ -151,7 +151,7 @@ branch-protection `contexts` character for character.
 | `gate-1-test-approval` | a `src/` change carries a `Test-Approval:` record approved before the first `src/` commit; test and implementation commits are separate | implemented on the CHG-030 branch; promotion to `main` pending |
 | `gate-2-static-analysis` | `pip check`, `ruff`, and scoped `mypy` on the `src/**/*.py` files a PR touches; inherited errors are quarantined in `mypy-legacy.txt` | online |
 | `gate-3-schema` | `requirements.yaml` validates against `req-schema.json` | online |
-| `gate-4-semantic-eval` | a prompt or model change replays a fixed evaluation set against thresholds | planned (no evaluation set or runner yet; `DEBT-003`) |
+| `gate-4-semantic-eval` | the fixed evaluation set replays against `eval/thresholds.yaml` on every pull request; a failed threshold blocks | online |
 | `gate-5-regression` | the full inherited and new offline suite (`pytest -q`); a regression blocks | online |
 | `gate-6-ai-use-log` | a PR that changes `src/`, `test/` or `prompts/` updates the AI-use log | online |
 

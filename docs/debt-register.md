@@ -58,8 +58,8 @@ inventing a ninth.
 - **Trigger to revisit:** before gate-4 is scheduled; before any COST/PERF/QUAL claim in the report.
 - **Linked requirement:** `D1-REQ-EVAL-001`, `D1-REQ-EVAL-002`, `D1-REQ-COST-001`, `D1-REQ-PERF-001`.
 - **Status:** mitigated by CHG-036 (2026-11-20): the fixed set, thresholds, recorded baseline and
-  `python -m eval.run` exist, and `COST-001` is measured on them (ADR-007). The remaining half is
-  promoting the runner to `gate-4-semantic-eval`; the follow-ups are `DEBT-011`.
+  `python -m eval.run` exist, and `COST-001` is measured on them (ADR-007); `gate-4-semantic-eval`
+  runs the command on every pull request (CHG-037). The follow-ups are `DEBT-011`.
 
 ## DEBT-004 — Environment-only dependencies
 

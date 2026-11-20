@@ -254,3 +254,31 @@
         the change is not on a safety-critical path.
   # Annotated session record; human turns verbatim, tool results summarised.
   transcript: transcripts/60198818-HaobinJiang-CHG-036-evaluation.md#L1-L120
+
+- id: AI-2026-11-20-004
+  date: 2026-11-20
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-037: bring `gate-4-semantic-eval` online. The job installs the package and runs
+    `python -m eval.run` over `eval/fixed-set.json` with `eval/thresholds.yaml`, so a failed
+    threshold blocks the merge; `protection.json` gains the sixth context, `pyyaml` is declared
+    instead of arriving through `langchain-core`, and the gate tables in AGENTS.md, README, the
+    blueprint, the trace matrix and the verification constraints say "online".
+  human_interventions:
+    - type: approve
+      what: >-
+        Authorized the gate-4 job, the live branch-protection `contexts` change, the three D2
+        artifacts and the bot review in one instruction.
+      why: >-
+        The protected-path and administrator operations need explicit human authorization; the
+        course's D7 requires six blocking gates and the local evaluator had no CI consumer.
+    - type: constrain
+      what: >-
+        Kept the gate's runner deterministic and offline (the replay backend), and declared the YAML
+        dependency rather than relying on the transitive one.
+      why: >-
+        A gate that needs a key or a network cannot block every pull request, and a hidden dependency
+        is debt category 4.
+  # Annotated session record; human turns verbatim, tool results summarised.
+  transcript: transcripts/60198818-HaobinJiang-CHG-037-gate-4.md#L1-L60

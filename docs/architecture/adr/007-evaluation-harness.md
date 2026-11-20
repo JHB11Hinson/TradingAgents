@@ -66,7 +66,8 @@ reason. Live runs keep the telemetry manifest (ADR-005) as the authoritative cos
 - `COST-001` is measured: two cases, `total_tokens_ratio 0.374`, `review_rate 0`, `budget_respected_rate
   1.0` on the shipped set; the 50,000 cap binds on the NVDA case (49,912 tokens, 2 compactions).
 - `EVAL-001` is runnable: `python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml`
-  exits on the verdict. Gate-4 can consume that exit code when it is scheduled.
+  exits on the verdict. `gate-4-semantic-eval` runs exactly that command on every pull request
+  (CHG-037), so a failed threshold blocks the merge.
 - The ledger change alters CHG-033's behaviour: a run that needs more than the cap now compacts
   sooner, and a run that needs far more may still exhaust the analysis budget mid-flight. That
   residual risk is `DEBT-011`, not a silent success.

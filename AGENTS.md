@@ -196,6 +196,9 @@ Generated code must satisfy all of the following before it is offered for review
   the inherited suite is the baseline. Integration tests run with `pytest -m integration`.
 - **Schema.** `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml`
   must pass whenever requirements change.
+- **Behavioral.** `python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml`
+  must pass whenever the analysis, a prompt, a model, the context budget or the evaluation set
+  changes; gate-4 runs it on every pull request and a failed threshold blocks the merge.
 - **Traceability.** Every `fit_criterion` of an in-scope requirement has at least one test; a
   requirement whose `priority` is `wont` is out of the delivery, carries a `deferred_reason` in the
   registry instead of evidence, and is not counted as a gap. Every invariant has a test that
@@ -222,7 +225,7 @@ branch-protection `contexts` **character for character**.
 | `gate-1-test-approval` | the change is covered by tests committed before the implementation; `Test-Approval:` points at a review record with `Verdict: APPROVE` and a `Tests:` line of existing paths, and that record exists before the first `src/` commit; test and `src/` changes must not share a commit | **online** |
 | `gate-2-static-analysis` | `ruff` and scoped `mypy` on the `src/**/*.py` files this PR touches; inherited errors stay quarantined in `mypy-legacy.txt` | **online** |
 | `gate-3-schema` | `requirements.yaml` validates against `req-schema.json` | **online** |
-| `gate-4-semantic-eval` | prompt/model changes run the semantic evaluation | planned |
+| `gate-4-semantic-eval` | the fixed evaluation set replays against `eval/thresholds.yaml`; a failed threshold blocks the merge | **online** |
 | `gate-5-regression` | full inherited + new suite, `pytest -q` | **online** |
 | `gate-6-ai-use-log` | a PR that changes code or prompts (`src/`, `test/`, `prompts/`) must update the AI-use log | **online** |
 

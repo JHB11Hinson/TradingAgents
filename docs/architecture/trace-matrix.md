@@ -36,7 +36,7 @@
 | D1-REQ-OBS-001 | should | Machine-parsable run trace (span / phase / duration) | `src/tradingagents/telemetry/trace.py`, `src/tradingagents/graph/setup.py` | `test/offline/test_telemetry_trace.py`: parses, one span per step, attribute allowlist | `<results>/<ticker>/TradingAgentsStrategy_logs/telemetry/trace_<date>.json` |
 | D1-REQ-OBS-002 | should | Token / cost / latency aggregated per phase (run manifest) | `src/tradingagents/telemetry/manifest.py`, `src/tradingagents/telemetry/pricing.py` | `test/offline/test_telemetry_manifest.py`: per-phase tokens, cost, wall-clock; unknown model warns | `<results>/<ticker>/TradingAgentsStrategy_logs/telemetry/manifest_<date>.json` |
 | D1-REQ-OBS-003 | should | Structured step events; a failing subscriber must not block the run | `src/tradingagents/telemetry/events.py`, `src/tradingagents/telemetry/spans.py` | `test/offline/test_telemetry_seam.py` + `test/offline/test_telemetry_integration.py`: subscriber raises, run stays green | `Telemetry.warnings` count |
-| D1-REQ-EVAL-001 | must | Fixed set + thresholds + regression runnable locally | `src/tradingagents/evaluation/`, `eval/run.py` | `python -m eval.run` exit codes (`test_eval_cli.py`), loaders and aggregation (`test_eval_fixed_set.py`, `test_eval_thresholds.py`, `test_eval_report.py`) | `eval/results/report.json` `ok` and threshold verdicts |
+| D1-REQ-EVAL-001 | must | Fixed set + thresholds + regression runnable locally | `src/tradingagents/evaluation/`, `eval/run.py` | `python -m eval.run` exit codes (`test_eval_cli.py`), loaders and aggregation (`test_eval_fixed_set.py`, `test_eval_thresholds.py`, `test_eval_report.py`) | `gate-4-semantic-eval` on every pull request; `eval/results/report.json` |
 | D1-REQ-EVAL-002 | wont | Prompt/model change triggers evaluation; failure blocks | none — deferred | Deferred (CHG-032); the registry carries a `deferred_reason` | none — deferred |
 | D1-REQ-SAFE-001 | must | External/retrieved text scrubbed; hostile samples blocked | `guardrails/` *(planned)* | Injection corpus blocked 100%; scrubbing-off negative test turns red | Blocked-injection event + alert |
 | D1-REQ-SAFE-002 | must | Invalid-schema decision rejected and degraded | `src/tradingagents/agents/structured`, `guardrails/` | Malformed-decision negative test | REVIEW/degrade event |
@@ -69,10 +69,11 @@
 - **Planned components.** Rows whose component is marked *(planned)* have no module yet; their
   `fit_criterion` is not yet checkable, and their tests/monitors are the intended evidence once the
   owning change lands. This is recorded so the gap is visible rather than implied as done.
-- **Evaluation harness (CHG-036).** `COST-001` and `EVAL-001` are now measured with the same artifact:
+- **Evaluation harness (CHG-036/CHG-037).** `COST-001` and `EVAL-001` are now measured with the same artifact:
   `python -m eval.run` replays `eval/fixed-set.json`, judges `eval/thresholds.yaml` against the
-  `eval/baseline.json` record, and exits on the verdict (ADR-007). That exit code is the local
-  behavioral tier until gate-4 is promoted; the run's `context_usage` is the whole-request ledger.
+  `eval/baseline.json` record, and exits on the verdict (ADR-007). `gate-4-semantic-eval` runs that
+  command on every pull request, so a failed threshold blocks the merge; the run's `context_usage` is
+  the whole-request ledger.
 - **Invariant fallbacks** (the "what to do when violated" action for `TERM-001`, `CTX-003`,
   `SAFE-001/002/003`) live in `docs/architecture/invariants.md`.
 - **Verification rules** (fit-criterion coverage, negative tests, test-to-requirement references,
