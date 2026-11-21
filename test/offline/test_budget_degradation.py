@@ -52,7 +52,7 @@ class _Client:
         return self.model
 
 
-def _graph(tmp_path, monkeypatch, *, debug=False, **config):
+def _graph(tmp_path, monkeypatch, *, debug=False, selected_analysts=None, **config):
     cfg = copy.deepcopy(DEFAULT_CONFIG)
     cfg.update(
         results_dir=str(tmp_path / "results"),
@@ -66,7 +66,10 @@ def _graph(tmp_path, monkeypatch, *, debug=False, **config):
     )
     # Identity resolution is a live vendor lookup; the boundary tests do not need it.
     monkeypatch.setattr(trading_graph, "resolve_instrument_identity", lambda ticker: {})
-    return trading_graph.TradingAgentsGraph(config=cfg, debug=debug)
+    kwargs = {"config": cfg, "debug": debug}
+    if selected_analysts is not None:
+        kwargs["selected_analysts"] = selected_analysts
+    return trading_graph.TradingAgentsGraph(**kwargs)
 
 
 def _raise(exc_type, message="run cap"):
@@ -103,6 +106,24 @@ def test_a_tiny_budget_returns_review_instead_of_raising(tmp_path, monkeypatch):
     assert signal == state["final_rating"] == "REVIEW"
     assert state["termination_reason"] == "budget_exhausted"
     assert statuses == ["degraded"]
+
+
+@pytest.mark.unit
+def test_a_real_tiny_budget_degrades_before_any_model_call(tmp_path, monkeypatch):
+    """A genuine cap (not a patched exception) ends the analyse step in REVIEW."""
+    graph = _graph(
+        tmp_path,
+        monkeypatch,
+        selected_analysts=("market",),
+        context_budget_tokens=1,
+        context_call_budget_tokens=1,
+        context_decision_reserve_tokens=0,
+    )
+
+    state, signal = graph.propagate(TICKER, TRADE_DATE)
+
+    assert signal == state["final_rating"] == "REVIEW"
+    assert state["termination_reason"] == "budget_exhausted"
 
 
 @pytest.mark.unit
