@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 from tradingagents.evaluation import (
@@ -73,11 +74,24 @@ def main(argv: list[str] | None = None) -> int:
 
     from eval.replay import build_replay_analyzer
 
+    results_dir = Path(args.results_dir)
     overrides = {"context_budget_tokens": args.budget} if args.budget is not None else None
-    analyzer = build_replay_analyzer(args.results_dir, overrides)
+    capped = build_replay_analyzer(results_dir / "capped", overrides)
+    uncapped_overrides = {
+        "context_budget_tokens": 10**9,
+        "context_call_budget_tokens": 10**9,
+        "context_decision_reserve_tokens": 0,
+    }
+    uncapped = build_replay_analyzer(results_dir / "uncapped", uncapped_overrides)
+
+    def analyze(case):
+        observation = capped(case)
+        same_condition = uncapped(case)
+        return replace(observation, uncapped_total_tokens=same_condition.total_tokens)
+
     report = evaluate_cases(
         cases,
-        analyzer,
+        analyze,
         baseline,
         thresholds,
         set_path=str(args.set),

@@ -42,8 +42,10 @@ tests at risk. Reopen only if the course changes the baseline (it does not) — 
 | Rely on provider truncation | 5 | 1 | 1 | 1 | 5 | 13 | rejected: providers drop the oldest tokens, which can be the constraints |
 | Fixed message-count window | 4 | 3 | 2 | 2 | 4 | 15 | rejected: size varies by an order of magnitude |
 
-Measured on the fixed set: 49,912 tokens for the NVDA analysis against a 50,000 cap and a 120,000
-recorded baseline (ratio 0.374); the uncapped same run records 56,861 (`BUG-005`).
+Measured on the fixed set: 89,858 tokens capped vs 96,820 uncapped (`capped_tokens_ratio 0.928`);
+NVDA alone is 49,912 against a 50,000 cap, and 56,874 uncapped. The `total_tokens_ratio` of 0.374 is
+measured against the inherited 120,000 estimate; the uncapped replay is already 0.403 of that
+baseline, so the headline is **not** a production saving claim (`DEBT-011`, `E-006`).
 
 ### C. Debate — structured, diverge-then-converge
 
@@ -83,8 +85,9 @@ graded behaviour does not need. Reopen if a cross-ticker lesson proves to change
 | Live provider replay | 4 | 1 | 5 | 3 | 4 | 17 | rejected for CI: a key, a cost per pull request, model drift |
 | Replay recorded metrics | 5 | 5 | 1 | 2 | 4 | 17 | rejected: never fails when the code regresses |
 
-Measured: two cases, `total_tokens_ratio 0.374`, `review_rate 0`, exit 0; the deliberate-violation
-probe (PR #44) failed the gate as designed.
+Measured: two cases, `total_tokens_ratio 0.374`, `capped_tokens_ratio 0.928`, `review_rate 0`,
+exit 0; the deliberate-violation probe (PR #44) failed the gate as designed. The same-condition
+ratio is the mechanism check; the baseline ratio alone does not prove the cap caused the saving.
 
 ### G. Safety — deterministic guardrails
 

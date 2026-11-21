@@ -149,19 +149,25 @@ inventing a ninth.
 - **Linked requirement:** `D1-REQ-GOV-003`, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`.
 - **Status:** open
 
-## DEBT-011 — The evaluation harness is deterministic, small and offline
+## DEBT-011 — The evaluation baseline was not like-for-like
 
 - **Category:** 6. Evaluation debt
-- **What:** the shipped fixed set has two cases and synthetic, fixed vendor payloads. The replay
-  backend proves the harness and the token accounting, not the cost of a real 120,000-token analysis.
-  There is no live mode.
-- **Impact:** `COST-001`'s ratio (0.374) is reproducible and comparable on the same fixtures, but it
-  cannot be quoted as the production cost until a live run confirms it.
+- **What:** `COST-001` compared a synthetic replay with a recorded 120,000-token production estimate.
+  The same replay with the cap lifted is 96,820 tokens, already 0.403 of that baseline, so the 0.374
+  headline did not isolate the budget's effect. The fixed set is still two synthetic cases and
+  there is still no live mode; both are deliberate, not hidden.
+- **Impact:** the capped/uncapped mechanism is now measured (`capped_tokens_ratio 0.928`, threshold
+  0.98), but the number is not a production cost claim. A real analysis can still differ from the
+  two fixtures.
 - **Owner:** admin (context/cost), with member 3 for the evaluation set.
 - **Trigger to revisit:** before quoting a cost figure in `Report.md`; before raising or lowering
-  `context_budget_tokens`; when a key is available in CI (add and compare a live mode).
+  `context_budget_tokens`; when a key is available for a one-off live release check (not CI);
+  **before growing the fixed set** — the aggregate ratio rises toward 1.0 as non-compacting cases
+  are added, so revisit the mechanism metric (for example, a binding rate) at that point.
 - **Linked requirement:** `D1-REQ-EVAL-001`, `D1-REQ-COST-001`, `D1-REQ-COST-003`, `D1-REQ-QUAL-001`.
-- **Status:** open
+- **Status:** mitigated by CHG-039 (2026-11-21): capped 89,858 / uncapped 96,820, ratio 0.928093;
+  `eval/thresholds.yaml` fails when the cap stops binding. `E-006` records the numbers and the
+  caveat. A live release check remains the trigger, not a CI requirement.
 
 ## DEBT-012 — Only the Portfolio Manager degrades when the budget is exhausted
 

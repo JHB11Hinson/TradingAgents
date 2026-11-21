@@ -21,8 +21,10 @@ KNOWN_METRICS: tuple[str, ...] = (
     "cases",
     "cases_failed",
     "total_tokens",
+    "uncapped_tokens",
     "baseline_tokens",
     "total_tokens_ratio",
+    "capped_tokens_ratio",
     "est_cost_usd",
     "baseline_cost_usd",
     "est_cost_ratio",
@@ -42,6 +44,7 @@ class CaseObservation:
     wall_clock_s: float = 0.0
     rating: str = ""
     est_cost_usd: float | None = None
+    uncapped_total_tokens: int | None = None
 
 
 def aggregate(
@@ -60,6 +63,16 @@ def aggregate(
     else:
         est_cost = round(total_tokens * baseline.usd_per_million_input_tokens / 1_000_000, 8)
 
+    uncapped_complete = all(
+        observation.uncapped_total_tokens is not None and observation.uncapped_total_tokens > 0
+        for observation in observations
+    )
+    uncapped_tokens = sum(
+        observation.uncapped_total_tokens
+        if observation.uncapped_total_tokens is not None
+        else observation.total_tokens
+        for observation in observations
+    )
     baseline_tokens = baseline.tokens_for(case_count)
     baseline_cost = baseline.cost_for(case_count)
     respected = sum(
@@ -71,8 +84,14 @@ def aggregate(
         "cases": case_count,
         "cases_failed": failed,
         "total_tokens": total_tokens,
+        "uncapped_tokens": uncapped_tokens,
         "baseline_tokens": baseline_tokens,
         "total_tokens_ratio": _ratio(total_tokens, baseline_tokens),
+        "capped_tokens_ratio": (
+            _ratio(total_tokens, uncapped_tokens)
+            if uncapped_complete and uncapped_tokens
+            else 1.0
+        ),
         "est_cost_usd": est_cost,
         "baseline_cost_usd": baseline_cost,
         "est_cost_ratio": _ratio(est_cost, baseline_cost),
@@ -94,8 +113,10 @@ def metric_names() -> Mapping[str, str]:
         "cases": "cases in the fixed set",
         "cases_failed": "cases whose analysis raised",
         "total_tokens": "whole-request tokens recorded by the run ledger",
+        "uncapped_tokens": "whole-request tokens with the run and call caps lifted",
         "baseline_tokens": "recorded baseline tokens for the set",
         "total_tokens_ratio": "total_tokens / baseline_tokens",
+        "capped_tokens_ratio": "total_tokens / uncapped_tokens; 1.0 means the cap did not bind",
         "est_cost_usd": "total_tokens priced at the baseline's reference price",
         "baseline_cost_usd": "recorded baseline cost for the set",
         "est_cost_ratio": "est_cost_usd / baseline_cost_usd",

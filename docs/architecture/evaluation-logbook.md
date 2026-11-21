@@ -54,3 +54,16 @@ not evidence; every entry names the command, the date and the result.
 - **Interpretation:** a quality regression that turns one case into `REVIEW` fails immediately; a
   40% cost regression would still pass. Tightening the ratio is a decision for the next set version,
   not a silent edit.
+
+## E-006 — The same-condition measurement (2026-11-21)
+
+- **Question:** does the token budget actually reduce the request on the shipped set, or does the
+  synthetic replay simply cost less than the inherited production analysis?
+- **Command:** `.venv/bin/python -m eval.run --results-dir /tmp/opencode/eval-a`
+- **Result:** capped **89,858** tokens (NVDA 49,912, BABA 39,946); the same cases with the run and
+  call caps lifted **96,820** tokens (NVDA 56,874, BABA 39,946); `capped_tokens_ratio 0.928093`.
+  The uncapped total is **0.403417** of the 120,000×2 baseline.
+- **Interpretation:** the cap binds (NVDA compacts twice), but the `COST-001` ratio of 0.374 is
+  **not** a production saving claim: the uncapped synthetic run already passes the 0.5 threshold
+  against the inherited estimate. The new `capped_tokens_ratio` is the mechanism check; a live
+  release run remains the only way to quote a production number (`DEBT-011`).

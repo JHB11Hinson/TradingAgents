@@ -179,7 +179,12 @@ def build_replay_analyzer(
     results_dir: str | Path,
     overrides: Mapping[str, Any] | None = None,
 ) -> Callable[[EvaluationCase], CaseObservation]:
-    """Return a ``case -> CaseObservation`` callable backed by the replay fixtures."""
+    """Return a ``case -> CaseObservation`` callable backed by the replay fixtures.
+
+    ``results_dir`` must be specific to this analyzer pass: the memory log, cache
+    and trace live under it, so two passes that share one directory read each
+    other's state and the same-condition comparison becomes false.
+    """
     _install_vendor_stubs()
     graphs: dict[str, tuple[trading_graph.TradingAgentsGraph, dict[str, Any]]] = {}
 
