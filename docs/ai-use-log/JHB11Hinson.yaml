@@ -502,7 +502,9 @@
     fenced JSON block, or prose (with an explicit "no convergence stated" marker); a claimed-JSON
     answer that fails validation raises `DebateTurnError`. `turn_records` keeps one record per turn
     in all five debate nodes, while `turn_digests` keeps the existing termination detector unchanged.
-    ADR-011 and INV-08, the trace matrix and structural constraints record the result.
+    ADR-011 and INV-08, the trace matrix and structural constraints record the result. Because the
+    compact turns cut a full run to about 43,500 tokens, the gate-4 evidence now replays at
+    `--budget 40000` so the DEBT-011 cap comparison still binds (`E-008`).
   human_interventions:
     - type: approve
       what: >-

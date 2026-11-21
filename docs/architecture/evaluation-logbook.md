@@ -79,3 +79,23 @@ not evidence; every entry names the command, the date and the result.
 - **Interpretation:** the fixed set now exercises the structured path. A prompt or provider change
   that sends one decision through free text lowers the metric and fails gate-4; a crash is still
   counted by `cases_failed`, not as a silent pass.
+
+## E-008 — The cap evidence after the debate got leaner (2026-11-21)
+
+- **Question:** do the same-condition numbers still prove that the context budget compacts, now that
+  CHG-043 turns every debate turn into a compact schema instance?
+- **Result:** no, at the shipped default. On `main` (CHG-042 + CHG-045) NVDA is 52,452 uncapped /
+  48,389 capped, ratio 0.953768. On the CHG-043 tree NVDA is **43,541 uncapped / 43,541 capped,
+  ratio 1.0** — the whole run now fits under the 50,000 cap, so `capped_tokens_ratio` fails its
+  `0.98` bound and gate-4 blocks. The drop is not an early stop: the debate round counts are
+  identical (investment 2, risk 3) and the investment history shrinks from 6,488 to 744 characters.
+- **Command:** `python -m eval.run --budget 40000` (the gate-4 command since CHG-043).
+- **Result at 40,000:** NVDA 43,541 uncapped / 38,430 capped (2 compacted), `capped_tokens_ratio
+  0.927049`; every other threshold passes; verdict pass. A 35,000 budget would compact once more and
+  degrade NVDA to `REVIEW`, which `review_rate` and `structured_output_pass_rate` reject.
+- **Interpretation:** 40,000 is the highest budget that still binds, so it is the evidence budget,
+  not a new shipped cap: `D1-REQ-COST-003` keeps the 50,000 default. Compaction is now a
+  cheap-run exemption rather than a routine event, so the comparison has to be forced deliberately;
+  the alternative — lowering the shipped default to make the metric bind again — would change a
+  requirement value to fit the test.
+

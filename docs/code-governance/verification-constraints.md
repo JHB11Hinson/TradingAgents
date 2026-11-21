@@ -136,7 +136,7 @@ mypy --follow-imports=silent <changed-src-files>
 check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
 # Behavioral (gate-4 runs this on every pull request)
-python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
+python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml --budget 40000
 ```
 
 ## 6. Gate mapping
