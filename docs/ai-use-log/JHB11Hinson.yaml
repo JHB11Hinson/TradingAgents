@@ -434,3 +434,32 @@
         A budget-ended run is not a call; quoting it as one would poison the next run's lessons,
         while discarding its checkpoint would lose recoverable work.
   transcript: transcripts/60198818-HaobinJiang-CHG-040-debt-012.md#L1-L120
+
+- id: AI-2026-11-21-009
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-041 (TERM-001): both debate loops had configurable round bounds but no oscillation, stall
+    or budget detector, and the trace matrix claimed a detector test that did not exist. The change
+    adds a pure `agents/termination.py` (`turn_digest`, `detect_termination`, budget first, then a
+    period-2/period-3 repeat, then three identical turns), records one digest per turn in all five
+    debate nodes, and lets the router stop a debate early while keeping the hard bound first. The
+    terminal managers record the earliest reason and emit a `loop.terminated` span; the PM's own
+    budget catch still overrides with `budget_exhausted`. The shipped replay stays bound-terminated
+    with an empty reason. ADR-009 and INV-01, the trace matrix and the runtime catalog record it.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved batch B and the bot-review channel; PR C follows PR B as the TERM-001 slice of the
+        approved design.
+      why: >-
+        The merge order is A -> B -> C, and the agent may not approve or merge.
+    - type: constrain
+      what: >-
+        The standing PR B rules continue: native execution, tests before implementation, separate
+        test and src commits, and no `Test-Approval` placeholder in the test commit.
+      why: >-
+        `gate-1-test-approval` must read a real record before the first `src/` commit, and the
+        course requires the test-independence covenant.
+  transcript: transcripts/60198818-HaobinJiang-CHG-041-term-001.md#L1-L120

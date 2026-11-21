@@ -18,7 +18,7 @@ from typing import Any
 
 # Trace attributes are an allowlist. Prompts, provider endpoints, API keys and
 # local paths must never reach a file that may be shared with a report.
-SAFE_ATTRIBUTE_KEYS = frozenset({"node", "error", "model"})
+SAFE_ATTRIBUTE_KEYS = frozenset({"node", "error", "model", "reason"})
 
 
 def utc_now() -> str:

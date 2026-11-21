@@ -4,7 +4,7 @@
 **Requirement:** `D1-REQ-GOV-009` (D2.7); carries the degradation paths of `SAFE-001/002`,
 `COST-003`, `OBS-001/003`, `MEM-003`.
 **Related:** ADR-001 (baseline), ADR-003 (authority boundary), ADR-004 (context budget), ADR-005
-(telemetry), ADR-007 (evaluation), ADR-008 (budget-exhaustion REVIEW).
+(telemetry), ADR-007 (evaluation), ADR-008 (budget-exhaustion REVIEW), ADR-009 (debate termination).
 
 This catalog answers one question for every degraded or failure path: **what does the running system
 do, deterministically, when this happens?** A policy that is not in code is not a policy; each row
@@ -35,6 +35,16 @@ described as if they were.
 | Context budget exhausted before the Portfolio Manager | `ContextBudgetExceeded` in the PM | return a deterministic `REVIEW` decision that names the cause and sets `termination_reason = "budget_exhausted"`; do not call the model | `REVIEW` with an explanation, no trade | `agents/managers/portfolio_manager.py` | `SAFE-002`, `COST-003` |
 | Context budget exhausted for any other agent | `ContextBudgetExceeded` at the run boundary | return a deterministic `REVIEW`; write the state log; skip the memory log; preserve the checkpoint | `REVIEW` with an explanation, no trade; the run can resume | `graph/trading_graph.py:_run_graph`, `_budget_exhausted_state`, `stream_run`; `cli/run.py` | `COST-003`, `TERM-001`; ADR-008 |
 | A model output tries to set a position directly | the authority boundary | deterministic code owns the decision; the model's text is advisory | never bypassed | ADR-003 | `SAFE-003` *(ceiling planned)* |
+
+### 2.1 Debate termination (`TERM-001`)
+
+| Trigger | Detection | Runtime action | User-visible effect | Code | Requirement |
+|---|---|---|---|---|---|
+| The investment debate repeats itself | the last 2 digests equal the previous 2 and contain more than one distinct turn | route to the Research Manager before the bound; set `termination_reason = "oscillation"`; emit `loop.terminated` | the debate ends early; the reason is in the state log | `agents/termination.py`, `graph/conditional_logic.py`, `agents/managers/research_manager.py` | `TERM-001` |
+| The risk debate repeats itself | the last 3 digests equal the previous 3 (more than one distinct) | route to the Portfolio Manager; keep the earliest reason; emit `loop.terminated` | the debate ends early; the reason is in the state log | `agents/termination.py`, `graph/conditional_logic.py`, `agents/managers/portfolio_manager.py` | `TERM-001` |
+| Three consecutive turns are identical | `detect_termination` stall check | route to the terminal manager; set `termination_reason = "stall"` | the debate ends early; the reason is in the state log | `agents/termination.py`, `graph/conditional_logic.py`, managers | `TERM-001` |
+| The run budget is exhausted during a debate | `detect_termination` budget check (`available(use_reserve=False) <= 0`) | route to the terminal manager with `budget_exhausted`; if its own call then raises, the run boundary returns the deterministic REVIEW (ADR-008) | REVIEW, no trade; checkpoint kept | `agents/termination.py`, managers, `graph/trading_graph.py` | `TERM-001`, `COST-003` |
+| The debate reaches its configured bound | hard-bound check runs first | route to the terminal manager; `termination_reason` stays empty | a normal, bound-terminated debate | `graph/conditional_logic.py`, managers | `TERM-001`, `DEBATE-004` |
 
 ## 3. Context and cost
 

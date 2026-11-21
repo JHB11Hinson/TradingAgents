@@ -136,6 +136,7 @@ def test_a_full_run_reaches_a_logged_decision(tmp_path, monkeypatch, offline, st
     state, signal = graph.propagate("NVDA", TRADE_DATE)
 
     assert signal == state["final_rating"] == "Overweight"
+    assert state["termination_reason"] == ""   # both debates ended at their bound
     for key in ("market_report", "sentiment_report", "news_report", "fundamentals_report",
                 "investment_plan", "trader_investment_plan", "final_trade_decision"):
         assert state[key].strip(), key

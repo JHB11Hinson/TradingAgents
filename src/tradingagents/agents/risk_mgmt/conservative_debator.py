@@ -5,6 +5,7 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.agents.termination import turn_digest
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
     constraints_block,
@@ -114,6 +115,10 @@ Your task is to actively counter the arguments of the Aggressive and Neutral Ana
                 "current_neutral_response", ""
             ),
             "count": risk_debate_state["count"] + 1,
+            "turn_digests": [
+                *risk_debate_state.get("turn_digests", []),
+                turn_digest(response.content),
+            ],
         }
 
         return {"risk_debate_state": new_risk_debate_state}

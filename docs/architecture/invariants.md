@@ -21,7 +21,7 @@ approval (`AGENTS.md` §11).
 
 | ID | Invariant | Source | Enforcing component | Current status |
 |---|---|---|---|---|
-| `INV-01` | A loop must stop itself on oscillation, stalled progress or budget exhaustion | `D1-REQ-TERM-001` | `src/tradingagents/graph/conditional_logic.py`, `setup.py` | **partial** — round bounds exist; oscillation/stall/budget detectors do not |
+| `INV-01` | A loop must stop itself on oscillation, stalled progress or budget exhaustion | `D1-REQ-TERM-001` | `src/tradingagents/agents/termination.py`, `src/tradingagents/graph/conditional_logic.py`, `setup.py` | **implemented** (CHG-041) — hard bounds first, then the detector |
 | `INV-02` | Every model call is assembled from the six context layers | `D1-REQ-CTX-001` | `src/tradingagents/context/` *(planned assembler)* | **planned** |
 | `INV-03` | Assembled context stays within the token budget; critical constraints are re-injected verbatim | `D1-REQ-CTX-003` | `src/tradingagents/context/` *(planned assembler)*, `default_config.py` | **planned** |
 | `INV-04` | External and retrieved text is scrubbed of instructions; hostile samples are blocked | `D1-REQ-SAFE-001` | `src/tradingagents/guardrails/` *(planned)* | **not implemented** |
@@ -37,15 +37,21 @@ approval (`AGENTS.md` §11).
   must never run unbounded.
 - **Source.** `D1-REQ-TERM-001`; course D2.3; intro P16–P17 (termination discipline).
 - **Enforcing component.** `graph/conditional_logic.py` (`max_debate_rounds`,
-  `max_risk_discuss_rounds`) and `graph/setup.py` (`max_tool_rounds`, `wrap_up`). The oscillation,
-  stall and budget detectors are **not implemented**.
-- **Verification.** Constructed oscillation and stall cases terminate within the configured bounds;
-  a negative test that removes the detector must turn red. The test is planned with the detector.
-- **Operational fallback.** Stop the loop immediately; return the current best decision with
-  `termination_reason = "unconverged"`; emit a `loop.terminated` telemetry event; open a bug-diary
-  entry with the oscillation/stall evidence. Never continue to a second unbounded loop.
-- **Status.** Partial. The hard round bounds are the current safety net; they are not a substitute
-  for the detector.
+  `max_risk_discuss_rounds`), `graph/setup.py` (`max_tool_rounds`, `wrap_up`) and
+  `agents/termination.py` (`turn_digest`, `detect_termination`). The router checks the configured
+  hard bound first; the detector only runs while the debate is below that bound.
+- **Verification.** `test/offline/test_termination.py` covers oscillation (period 2 for the
+  investment debate, period 3 for the risk debate), the three-identical-turn stall, budget
+  precedence, the hard-bound-first ordering, one digest per turn in all five debate nodes, the
+  managers' earliest-reason rule and the safe `loop.terminated` attributes. A negative test
+  monkeypatches the detector away and proves the oscillating state falls through to the bound.
+  `test_graph_end_to_end.py` pins the shipped replay to `termination_reason == ""`.
+- **Operational fallback.** Stop the loop immediately; return the current best decision; set
+  `termination_reason` to the detector reason (`oscillation`, `stall` or `budget_exhausted`); emit a
+  `loop.terminated` span with `node` and `reason`; open a bug-diary entry with the oscillation/stall
+  evidence. Never continue to a second unbounded loop.
+- **Status.** Implemented (CHG-041); the hard round bounds remain the outer guarantee and the
+  detector is an early stop inside them.
 
 ### INV-02 — Layered context (`D1-REQ-CTX-001`)
 
