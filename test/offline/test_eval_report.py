@@ -86,6 +86,21 @@ def test_a_missing_uncapped_measurement_reports_one():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("missing", [None, 0])
+def test_one_missing_uncapped_measurement_forces_the_whole_ratio_to_one(missing):
+    observations = [
+        CaseObservation(total_tokens=100, budget=1000, rating="Hold", uncapped_total_tokens=1000),
+        CaseObservation(
+            total_tokens=1, budget=1000, rating="Hold", uncapped_total_tokens=missing
+        ),
+    ]
+
+    metrics = aggregate(observations, _baseline(), 2)
+
+    assert metrics["capped_tokens_ratio"] == 1.0
+
+
+@pytest.mark.unit
 def test_review_and_budget_breaches_are_counted():
     observations = [
         CaseObservation(total_tokens=600, budget=500, rating="REVIEW"),
