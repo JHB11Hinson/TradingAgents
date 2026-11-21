@@ -10,7 +10,9 @@ metrics:
   capped_tokens_ratio: {max: 0.98}
   # D1-REQ-COST-003: every case must stay inside its configured run budget.
   budget_respected_rate: {min: 1.0}
-  # D1-REQ-QUAL-001: a tight budget must not turn decisions into REVIEW.
+  # D1-REQ-QUAL-001: a tight budget must not turn decisions into REVIEW, and
+  # every successful case must carry a schema-validated final decision.
   review_rate: {max: 0.0}
+  structured_output_pass_rate: {min: 1.0}
   # A crashed case is a failed evaluation, never a silent omission.
   cases_failed: {max: 0}

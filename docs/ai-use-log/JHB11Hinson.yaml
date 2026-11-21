@@ -493,3 +493,26 @@
         the test-independence covenant.
   transcript: transcripts/60198818-HaobinJiang-CHG-042-guardrails.md#L1-L45
 
+- id: AI-2026-11-21-013
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-045 (QUAL-001): the evaluation reported `review_rate` but not the structured-output pass
+    rate. The report now carries `structured_output_pass_rate` over successful cases, the per-case
+    `structured_output_ok` flag, and a gate-4 threshold of 1.0. The replay model returns deterministic
+    schema instances from `with_structured_output`, so the fixed set exercises the structured path
+    instead of the free-text fallback. ADR-013 and E-007 record the result; the branch is stacked on
+    CHG-042 because it reads `final_decision_source`.
+  human_interventions:
+    - type: approve
+      what: >-
+        Delegated all implementation decisions except the merge and asked for Bot Review.
+      why: >-
+        The owner accepted the priority order and the concurrent worktree execution.
+    - type: constrain
+      what: >-
+        Required the fixed set and the evaluation thresholds to stay offline and deterministic.
+      why: >-
+        ADR-007 rejects a live provider call in gate-4; the metric must be reproducible without a key.
+  transcript: transcripts/60198818-HaobinJiang-CHG-045-structured-metric.md#L1-L40

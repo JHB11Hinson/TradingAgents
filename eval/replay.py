@@ -82,7 +82,7 @@ class ScriptedModel(BaseChatModel):
         return self.model_copy(update={"tools": tuple(tools)})
 
     def with_structured_output(self, schema, **kwargs):
-        raise NotImplementedError
+        return _ScriptedStructured(schema)
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs) -> ChatResult:
         self.calls.append(1)
@@ -103,6 +103,62 @@ class ScriptedModel(BaseChatModel):
         else:
             message = AIMessage(content=REPORT)
         return ChatResult(generations=[ChatGeneration(message=message)])
+
+
+class _ScriptedStructured:
+    """A deterministic structured-output binding for the replay model."""
+
+    def __init__(self, schema) -> None:
+        self.schema = schema
+
+    def invoke(self, prompt, **kwargs):
+        return _structured_value(self.schema)
+
+
+def _structured_value(schema):
+    """A schema-valid canned value for the replay model.
+
+    The replay exercises the shipped structured path rather than the free-text
+    fallback, so QUAL-001 can measure it. A schema added later must either be
+    listed here or raise: a silent generic object would measure nothing.
+    """
+    name = getattr(schema, "__name__", "")
+    if name == "SentimentReport":
+        return schema(
+            overall_band="Neutral",
+            overall_score=5.0,
+            confidence="medium",
+            narrative=REPORT,
+        )
+    if name == "ResearchPlan":
+        return schema(
+            recommendation="Overweight",
+            rationale="The bull case carried on the supplied evidence.",
+            strategic_actions="Build the position gradually; respect the ceiling.",
+        )
+    if name == "TraderProposal":
+        return schema(
+            action="Buy",
+            reasoning="The research plan and the price structure support a long.",
+            position_pct=5.0,
+        )
+    if name == "PortfolioDecision":
+        return schema(
+            rating="Overweight",
+            executive_summary="Build the position gradually within the ceiling.",
+            investment_thesis="The analysts' evidence favours the bull case.",
+            position_pct=5.0,
+        )
+    if name == "DebateTurn":
+        return schema(
+            claim="The evidence supports a constructive position.",
+            evidence=[{"source": "analyst reports", "quote": "Breadth and guidance are positive."}],
+            rebuttal="The bear case is acknowledged but the evidence is stronger here.",
+            confidence="medium",
+            diverge="Weighed the bear case and the volatility regime.",
+            converge="A moderate long is the best-supported position.",
+        )
+    raise NotImplementedError(f"the replay model has no structured value for {name}")
 
 
 class _Client:
@@ -203,7 +259,7 @@ def build_replay_analyzer(
     def analyze(case: EvaluationCase) -> CaseObservation:
         graph, config = graph_for(case)
         started = time.perf_counter()
-        _, rating = graph.propagate(case.ticker, case.trade_date)
+        final_state, rating = graph.propagate(case.ticker, case.trade_date)
         elapsed = time.perf_counter() - started
         usage = dict(getattr(graph, "_context_usage", {}) or {})
         return CaseObservation(
@@ -212,6 +268,9 @@ def build_replay_analyzer(
             compacted_calls=int(usage.get("compacted_calls", 0)),
             wall_clock_s=round(elapsed, 3),
             rating=str(rating),
+            structured_output_ok=(
+                final_state.get("final_decision_source") == "structured"
+            ),
         )
 
     return analyze
