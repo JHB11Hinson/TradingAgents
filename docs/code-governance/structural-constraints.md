@@ -21,6 +21,7 @@ across two modules, and two elements must not own the same module.
 | Trader | `src/tradingagents/agents/trader/` | the trade proposal |
 | Risk management | `src/tradingagents/agents/risk_mgmt/` | the risk discussion |
 | Agent contracts | `src/tradingagents/agents/` (`state.py`, `schemas.py`, `structured.py`, `rating.py`, `context.py`, `tools.py`, `post_screen.py`, `debate.py`) | state shape, structured output, the REVIEW sentinel, context assembly, tool surface, post screening, debate schema and adapter |
+| Safety guardrails | `src/tradingagents/guardrails/` | instruction scrubbing (`SAFE-001`), the strict free-text decision contract (`SAFE-002`) and the position ceiling (`SAFE-003`) |
 | Data access | `src/tradingagents/dataflows/` (+ `vendors/`) | the provider chain, point-in-time rules, vendor errors |
 | Orchestration | `src/tradingagents/graph/` | graph wiring, routing, checkpoints, propagation |
 | LLM access | `src/tradingagents/llm_clients/` | provider clients, model catalog, key handling |
@@ -55,6 +56,7 @@ same pull request.
 | Module | ADR | Requirement / invariant it carries |
 |---|---|---|
 | `agents/` | ADR-001, ADR-011 | `CTX-001`/`CTX-003` (layered context, budget), `DEBATE-001`/`DEBATE-002` (structured turns, diverge/converge), `SAFE-002` (schema failure → REVIEW) |
+| `guardrails/` | ADR-010 | `SAFE-001` (instruction scrubbing), `SAFE-002` (strict free-text contract), `SAFE-003` (position ceiling) |
 | `agents/managers/`, `agents/trader/`, `agents/risk_mgmt/` | ADR-001, ADR-003 | `SAFE-002`, `SAFE-003` (authority boundary) |
 | `dataflows/` | ADR-001 | `MEM-003` (point-in-time, no future leakage), `SAFE-001` (external text scrubbed) |
 | `graph/` | ADR-001 | `TERM-001` (self-termination), `DEBATE-004` (round bound), `COST-003` (token budget) |
@@ -80,10 +82,10 @@ enforcers and concrete fallbacks; the requirement ids above are the structural r
 - **No bypass:** a model output may not reach a tradeable decision by skipping that code. A change
   that lets model output set a final action directly is a safety-critical change (ADR + human review).
 
-**Known gap, stated honestly:** the deterministic position ceiling (`D1-REQ-SAFE-003`) is **not
-implemented yet**. Until it lands, the boundary is enforced only by schema validation and the REVIEW
-sentinel. The gap is recorded in `docs/architecture/trace-matrix.md`; it must not be described as
-enforced.
+**Authority boundary implemented:** `guardrails/instructions.py` scrubs external text, the
+Portfolio Manager's free-text path accepts only one explicit rating, and `guardrails/positions.py`
+clips a claimed size to `max_position_pct` (ADR-010). The remaining limit is the pattern corpus: a
+paraphrase outside it is not blocked, and `INV-04` says so rather than claiming zero misses.
 
 ## 5. Enforcement
 

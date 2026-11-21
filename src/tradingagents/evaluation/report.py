@@ -34,6 +34,7 @@ class CaseResult:
     compacted_calls: int = 0
     wall_clock_s: float = 0.0
     rating: str = ""
+    structured_output_ok: bool = True
     error: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -46,6 +47,7 @@ class CaseResult:
             "compacted_calls": self.compacted_calls,
             "wall_clock_s": self.wall_clock_s,
             "rating": self.rating,
+            "structured_output_ok": self.structured_output_ok,
             "error": self.error,
         }
 
@@ -170,6 +172,7 @@ def evaluate_cases(
                 compacted_calls=observation.compacted_calls,
                 wall_clock_s=round(elapsed, 3),
                 rating=observation.rating,
+                structured_output_ok=observation.structured_output_ok,
             )
         )
         observations.append(observation)

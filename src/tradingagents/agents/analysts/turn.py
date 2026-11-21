@@ -4,10 +4,27 @@ import json
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
+from tradingagents.guardrails.instructions import scrub_untrusted
+
 WRAP_UP = (
     "You have used every tool round this report allows. Write your final report "
     "now from the tool results above, and say which data you could not retrieve."
 )
+
+
+def sanitize_messages(messages):
+    """Replace every tool result with its SAFE-001-scrubbed copy.
+
+    Tool results are external text. The copy keeps the tool-call id and order, so
+    the provider still sees a valid history.
+    """
+    cleaned = []
+    for message in messages:
+        if isinstance(message, ToolMessage) and isinstance(message.content, str):
+            cleaned.append(message.model_copy(update={"content": scrub_untrusted(message.content).text}))
+        else:
+            cleaned.append(message)
+    return cleaned
 
 
 def take_turn(prompt, llm, tools, messages):
@@ -17,6 +34,7 @@ def take_turn(prompt, llm, tools, messages):
     whatever it is told. Its earlier calls and their results reach it as text,
     since a provider may refuse a history holding tool calls when none are bound.
     """
+    messages = sanitize_messages(messages)
     if messages and isinstance(messages[-1], HumanMessage) and messages[-1].content == WRAP_UP:
         # The prompt lists the tools it offers; a model told of tools it cannot
         # call may still try, and some providers then answer with nothing.

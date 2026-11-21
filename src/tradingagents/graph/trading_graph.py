@@ -116,6 +116,7 @@ class TradingAgentsGraph:
             self.deep_thinking_llm,
             self.conditional_logic,
             max_tool_rounds,
+            max_position_pct=self.config.get("max_position_pct", 10.0),
         )
 
         self.propagator = Propagator(
@@ -421,6 +422,7 @@ class TradingAgentsGraph:
                 "completed; no tradeable decision was produced."
             ),
             "final_rating": "REVIEW",
+            "final_decision_source": "review",
             "termination_reason": "budget_exhausted",
             "memory_note": "The context budget ended this run before a decision.",
             "investment_plan": base_state.get("investment_plan", ""),

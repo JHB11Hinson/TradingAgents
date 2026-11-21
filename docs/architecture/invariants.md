@@ -24,9 +24,9 @@ approval (`AGENTS.md` §11).
 | `INV-01` | A loop must stop itself on oscillation, stalled progress or budget exhaustion | `D1-REQ-TERM-001` | `src/tradingagents/agents/termination.py`, `src/tradingagents/graph/conditional_logic.py`, `setup.py` | **implemented** (CHG-041) — hard bounds first, then the detector |
 | `INV-02` | Every model call is assembled from the six context layers | `D1-REQ-CTX-001` | `src/tradingagents/context/` *(planned assembler)* | **planned** |
 | `INV-03` | Assembled context stays within the token budget; critical constraints are re-injected verbatim | `D1-REQ-CTX-003` | `src/tradingagents/context/` *(planned assembler)*, `default_config.py` | **planned** |
-| `INV-04` | External and retrieved text is scrubbed of instructions; hostile samples are blocked | `D1-REQ-SAFE-001` | `src/tradingagents/guardrails/` *(planned)* | **not implemented** |
-| `INV-05` | A decision that fails schema validation is rejected/degraded, never emitted as tradeable | `D1-REQ-SAFE-002` | `src/tradingagents/agents/structured.py`, `rating.py`, `managers/portfolio_manager.py` | **partial** — schema + `REVIEW` exist; the free-text fallback can still parse a rating |
-| `INV-06` | A deterministic position ceiling constrains the decision; model output cannot bypass it | `D1-REQ-SAFE-003` | `src/tradingagents/guardrails/` *(planned)*, `agents/managers/` | **not implemented** |
+| `INV-04` | External and retrieved text is scrubbed of instructions; hostile samples are blocked | `D1-REQ-SAFE-001` | `src/tradingagents/guardrails/instructions.py`, `context/agent_layers.py`, `agents/analysts/turn.py` | **implemented** (CHG-042) |
+| `INV-05` | A decision that fails schema validation is rejected/degraded, never emitted as tradeable | `D1-REQ-SAFE-002` | `src/tradingagents/agents/structured.py`, `rating.py`, `guardrails/decisions.py`, `managers/portfolio_manager.py` | **implemented** (CHG-042) — the free-text path needs one explicit rating |
+| `INV-06` | A deterministic position ceiling constrains the decision; model output cannot bypass it | `D1-REQ-SAFE-003` | `src/tradingagents/guardrails/positions.py`, `agents/managers/`, `default_config.py` | **implemented** (CHG-042) |
 | `INV-07` | Telemetry is advisory: a failing subscriber or an unwritable trace must not fail or change a run | `D1-REQ-OBS-003` | `src/tradingagents/telemetry/`, `graph/trading_graph.py` | **implemented** (CHG-034) |
 | `INV-08` | Every debate turn is a schema-valid `DebateTurn` with an explicit divergence and convergence | `D1-REQ-DEBATE-001`, `D1-REQ-DEBATE-002` | `src/tradingagents/agents/debate.py`, `agents/schemas.py`, the five debate nodes | **implemented** (CHG-043) — a JSON answer that fails validation aborts; prose is adapted |
 
@@ -96,14 +96,17 @@ approval (`AGENTS.md` §11).
 - **Statement.** External and retrieved text must be scrubbed of instructions before it reaches the
   model; hostile samples must be blocked at 100% (zero tolerance).
 - **Source.** `D1-REQ-SAFE-001`; course safety boundary; D2.3.
-- **Enforcing component.** `src/tradingagents/guardrails/` (planned). No guardrail module exists
-  today.
-- **Verification.** A fixed adversarial corpus is blocked at 100%; the negative test disables
-  scrubbing and must turn red.
-- **Operational fallback.** Discard the offending text block; continue with the remaining evidence;
-  record a `security.injection_blocked` event and alert the operator. Never pass the block through
-  "for analysis".
-- **Status.** Not implemented. Recorded in `DEBT-002`.
+- **Enforcing component.** `src/tradingagents/guardrails/instructions.py` (`scrub_untrusted`),
+  called by `context/agent_layers.retrieved_block`, `agents/analysts/turn.take_turn` and the
+  sentiment analyst's pre-fetched blocks.
+- **Verification.** `test/offline/test_guardrails.py` blocks a fixed adversarial corpus at 100%; the
+  negative test removes the detector (`monkeypatch.setattr(instructions, "detect", ...)`) or the
+  seam (`agent_layers.scrub_untrusted`) and observes the hostile text survive.
+- **Operational fallback.** Replace the offending span with `[blocked instruction]`; keep the
+  surrounding evidence; log the warning; alert the operator. Never pass the block through "for
+  analysis".
+- **Status.** Implemented (CHG-042); the patterns are the maintenance point, not a claim that every
+  paraphrase is caught.
 
 ### INV-05 — Decision validity (`D1-REQ-SAFE-002`)
 
@@ -111,31 +114,31 @@ approval (`AGENTS.md` §11).
   never be emitted as a tradeable action.
 - **Source.** `D1-REQ-SAFE-002`; `agents/rating.py` (`REVIEW` sentinel); ADR-003.
 - **Enforcing component.** `agents/structured.py` (schema binding), `agents/rating.py` (`REVIEW`),
+  `guardrails/decisions.py` (`validate_free_text_decision`, `review_decision`) and
   `agents/managers/portfolio_manager.py` (final rating).
-- **Verification.** A malformed portfolio-manager decision is rejected and produces `REVIEW`, with
-  no tradeable action. The test must cover the **free-text fallback** path, not only the structured
-  happy path. The negative test removes the `REVIEW` guard and must turn red.
-- **Operational fallback.** Set `final_rating = REVIEW`; emit no tradeable action; record
-  `decision.invalid_schema` with the malformed payload; require a human or a fresh run.
-- **Status.** Partial. The structured path is guarded; `portfolio_manager.py` falls back to
-  `llm.invoke(prompt).content` and `parse_rating`, so a parseable free-text rating can still become
-  `final_rating` after a structured failure. This is a known gap, not an accepted design; it must be
-  fixed or the invariant must be reworded with human approval.
+- **Verification.** `test/offline/test_guardrails.py` drives a malformed and an ambiguous PM answer
+  to `REVIEW`, and a clean `**Rating**: Sell` answer to `Sell`. The negative test removes the
+  strict contract and the ambiguity would be accepted.
+- **Operational fallback.** Set `final_rating = REVIEW` and `final_decision_source = "review"`; emit
+  no tradeable action; record the reason in the decision text; require a human or a fresh run.
+- **Status.** Implemented (CHG-042). The inheritance contract keeps a clean prose answer (one
+  explicit rating) working, but an arbitrary parseable prose answer is no longer a decision.
 
 ### INV-06 — Authority boundary and position ceiling (`D1-REQ-SAFE-003`)
 
 - **Statement.** Position size must pass a deterministic ceiling; model output must never bypass
   deterministic code to take effect.
 - **Source.** `D1-REQ-SAFE-003`; ADR-003; course safety boundary.
-- **Enforcing component.** `src/tradingagents/guardrails/` (planned) and the deterministic manager
-  path. No ceiling exists today; the model only writes "position sizing" prose.
-- **Verification.** A decision over the ceiling is clipped or rejected by deterministic code; a
-  bypass-attempt negative test proves the model cannot set the final action directly.
-- **Operational fallback.** The deterministic layer clamps the position to the ceiling or forces
-  `REVIEW`; it records `position.ceiling_clipped` with the requested and applied values. The raw
-  model value never reaches the decision.
-- **Status.** Not implemented. Recorded in `DEBT-002`; the blueprint and permission model must not
-  describe the boundary as fully enforced.
+- **Enforcing component.** `src/tradingagents/guardrails/positions.py`
+  (`enforce_position_ceiling`, `clip_free_text_decision`, `claimed_position_pct`),
+  `agents/managers/portfolio_manager.py` and `default_config.py` (`max_position_pct`, default 10%).
+- **Verification.** `test/offline/test_guardrails.py` clips a 50% structured claim to 10%, clips a
+  free-text `Position Size: 50%` line, leaves a 10% claim unchanged, and drives the PM node with a
+  5% configured ceiling. The bypass attempt is a model that states 50% in either path; neither
+  reaches the rendered decision.
+- **Operational fallback.** Clip to the ceiling, log the requested and applied values, and keep the
+  decision. A negative or non-finite claim becomes 0%.
+- **Status.** Implemented (CHG-042).
 
 ### INV-07 — Telemetry never fails a run (`D1-REQ-OBS-003`)
 

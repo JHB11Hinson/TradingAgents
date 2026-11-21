@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from tradingagents.evaluation import (
     Baseline,
     CaseObservation,
@@ -181,3 +182,40 @@ def test_the_report_json_round_trips(tmp_path):
 def test_an_empty_set_is_refused_by_the_aggregator():
     with pytest.raises(ValueError, match="at least one case"):
         aggregate([], _baseline(), 0)
+
+
+@pytest.mark.unit
+def test_structured_output_pass_rate_is_the_share_of_successful_cases():
+    """D1-REQ-QUAL-001: only a schema-validated final decision counts as a pass."""
+    observations = [
+        CaseObservation(total_tokens=100, budget=1000, rating="Buy"),
+        CaseObservation(total_tokens=100, budget=1000, rating="Hold"),
+        CaseObservation(total_tokens=100, budget=1000, rating="Hold", structured_output_ok=False),
+    ]
+
+    metrics = aggregate(observations, _baseline(), 3)
+
+    assert metrics["structured_output_pass_rate"] == pytest.approx(0.666667)
+
+
+@pytest.mark.unit
+def test_the_report_carries_the_structured_flag_per_case():
+    """D1-REQ-QUAL-001: the per-case evidence survives into the JSON report."""
+    def analyze(case: EvaluationCase) -> CaseObservation:
+        return CaseObservation(
+            total_tokens=100,
+            budget=1000,
+            rating="Hold",
+            structured_output_ok=case.id == "structured",
+        )
+
+    report = evaluate_cases(
+        [_case("structured"), _case("free_text")],
+        analyze,
+        _baseline(),
+        _thresholds(),
+    )
+
+    flags = {case.case_id: case.structured_output_ok for case in report.cases}
+    assert flags == {"structured": True, "free_text": False}
+    assert report.to_dict()["cases"][0]["structured_output_ok"] in {True, False}

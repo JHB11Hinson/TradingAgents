@@ -48,6 +48,7 @@ from tradingagents.dataflows.vendors.reddit import (
     subreddits_for,
 )
 from tradingagents.dataflows.vendors.stocktwits import fetch_stocktwits_messages
+from tradingagents.guardrails.instructions import scrub_untrusted
 
 _PREAMBLE = (
     "You are a helpful AI assistant, collaborating with other assistants."
@@ -93,6 +94,11 @@ def create_sentiment_analyst(llm):
         reddit_block = fetch_reddit_posts(
             ticker, subreddits, start_date=start_date, end_date=end_date, screen=screen
         )
+        # SAFE-001: these three blocks are external text embedded in the prompt
+        # template, so they do not pass through the context assembler.
+        news_block = scrub_untrusted(news_block).text
+        stocktwits_block = scrub_untrusted(stocktwits_block).text
+        reddit_block = scrub_untrusted(reddit_block).text
 
         system_message = _build_system_message(
             ticker=ticker,

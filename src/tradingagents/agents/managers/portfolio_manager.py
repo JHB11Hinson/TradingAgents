@@ -17,7 +17,6 @@ from tradingagents.agents.context import (
     get_language_instruction,
     get_portfolio_context_from_state,
 )
-from tradingagents.agents.rating import parse_rating
 from tradingagents.agents.schemas import PortfolioDecision, render_pm_decision
 from tradingagents.agents.structured import NO_EXTERNAL_TOOLS, bind_structured, invoke_structured
 from tradingagents.agents.termination import detect_termination
@@ -35,12 +34,20 @@ from tradingagents.context.agent_layers import (
     retrieved_block,
     task_block,
 )
+from tradingagents.guardrails.decisions import review_decision, validate_free_text_decision
+from tradingagents.guardrails.positions import (
+    DEFAULT_MAX_POSITION_PCT,
+    clip_free_text_decision,
+    enforce_position_ceiling,
+)
 from tradingagents.telemetry import span
 
 logger = logging.getLogger(__name__)
 
 
-def create_portfolio_manager(llm, max_turns: int = 3):
+def create_portfolio_manager(
+    llm, max_turns: int = 3, max_position_pct: float = DEFAULT_MAX_POSITION_PCT
+):
     structured_llm = bind_structured(llm, PortfolioDecision, "Portfolio Manager")
 
     def portfolio_manager_node(state) -> dict:
@@ -168,6 +175,7 @@ Ground every conclusion in specific evidence from the analysts. The risk debate 
                     "decision was produced."
                 ),
                 "final_rating": "REVIEW",
+                "final_decision_source": "review",
                 "termination_reason": "budget_exhausted",
             }
 
@@ -175,16 +183,37 @@ Ground every conclusion in specific evidence from the analysts. The risk debate 
         # Read back from text, a rating the thesis quotes could replace it.
         decision = invoke_structured(structured_llm, assembled.text, "Portfolio Manager")
         if decision is not None:
+            decision, ceiling_warning = enforce_position_ceiling(decision, max_position_pct)
+            if ceiling_warning:
+                logger.warning("Portfolio Manager: %s", ceiling_warning)
             final_trade_decision = render_pm_decision(decision)
             final_rating = decision.rating.value
+            final_decision_source = "structured"
         else:
-            final_trade_decision = llm.invoke(assembled.text).content
-            final_rating = parse_rating(final_trade_decision)
+            # SAFE-002: prose is not a schema-validated decision. Accept it only
+            # when it carries one explicit rating; otherwise degrade to REVIEW.
+            free_text = llm.invoke(assembled.text).content
+            rating = validate_free_text_decision(free_text)
+            if rating is None:
+                final_trade_decision = review_decision(
+                    "the free-text answer had no single explicit rating"
+                )
+                final_rating = "REVIEW"
+                final_decision_source = "review"
+            else:
+                final_trade_decision, ceiling_warning = clip_free_text_decision(
+                    free_text, max_position_pct
+                )
+                if ceiling_warning:
+                    logger.warning("Portfolio Manager: %s", ceiling_warning)
+                final_rating = rating
+                final_decision_source = "free_text"
 
         return {
             "risk_debate_state": new_risk_debate_state,
             "final_trade_decision": final_trade_decision,
             "final_rating": final_rating,
+            "final_decision_source": final_decision_source,
             "termination_reason": termination_reason,
         }
 

@@ -463,6 +463,35 @@
         `gate-1-test-approval` must read a real record before the first `src/` commit, and the
         course requires the test-independence covenant.
   transcript: transcripts/60198818-HaobinJiang-CHG-041-term-001.md#L1-L120
+- id: AI-2026-11-21-010
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-042 (SAFE-001/002/003): the last three unimplemented must requirements. A new pure
+    `guardrails/` package scrubs instruction-like spans from retrieved text and tool results, accepts
+    a Portfolio Manager free-text answer only when it carries one explicit rating, and clips a
+    claimed position size to `max_position_pct` (default 10%). The Portfolio Manager records
+    `final_decision_source` (`structured`, `free_text`, `review`) for the later QUAL-001 metric.
+    ADR-010 and INV-04/05/06, the trace matrix, structural constraints, runtime catalogue,
+    verification constraints and DEBT-002 record the result.
+  human_interventions:
+    - type: approve
+      what: >-
+        Instructed the agent to implement the remaining requirements in priority order, run
+        independent work concurrently, decide everything except the merge, and use bot review.
+      why: >-
+        The owner delegated the design and implementation decisions while keeping the merge as a
+        human action.
+    - type: constrain
+      what: >-
+        Required tests before implementation, separate test and src commits, and plan approval
+        before code under AGENTS.md.
+      why: >-
+        gate-1-test-approval reads a real record before the first src commit, and the course requires
+        the test-independence covenant.
+  transcript: transcripts/60198818-HaobinJiang-CHG-042-guardrails.md#L1-L45
+
 - id: AI-2026-11-21-011
   date: 2026-11-21
   members: ["JHB11Hinson"]
@@ -488,3 +517,27 @@
       why: >-
         TERM-001 is already shipped; a debate change must not silently alter its evidence.
   transcript: transcripts/60198818-HaobinJiang-CHG-043-structured-debate.md#L1-L45
+
+- id: AI-2026-11-21-013
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-045 (QUAL-001): the evaluation reported `review_rate` but not the structured-output pass
+    rate. The report now carries `structured_output_pass_rate` over successful cases, the per-case
+    `structured_output_ok` flag, and a gate-4 threshold of 1.0. The replay model returns deterministic
+    schema instances from `with_structured_output`, so the fixed set exercises the structured path
+    instead of the free-text fallback. ADR-013 and E-007 record the result; the branch is stacked on
+    CHG-042 because it reads `final_decision_source`.
+  human_interventions:
+    - type: approve
+      what: >-
+        Delegated all implementation decisions except the merge and asked for Bot Review.
+      why: >-
+        The owner accepted the priority order and the concurrent worktree execution.
+    - type: constrain
+      what: >-
+        Required the fixed set and the evaluation thresholds to stay offline and deterministic.
+      why: >-
+        ADR-007 rejects a live provider call in gate-4; the metric must be reproducible without a key.
+  transcript: transcripts/60198818-HaobinJiang-CHG-045-structured-metric.md#L1-L40
