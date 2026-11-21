@@ -463,3 +463,28 @@
         `gate-1-test-approval` must read a real record before the first `src/` commit, and the
         course requires the test-independence covenant.
   transcript: transcripts/60198818-HaobinJiang-CHG-041-term-001.md#L1-L120
+- id: AI-2026-11-21-011
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-043 (DEBATE-001/002): every debate turn is now a schema-valid `DebateTurn` with claim,
+    evidence, rebuttal, confidence, diverge and converge. A deterministic adapter accepts JSON, a
+    fenced JSON block, or prose (with an explicit "no convergence stated" marker); a claimed-JSON
+    answer that fails validation raises `DebateTurnError`. `turn_records` keeps one record per turn
+    in all five debate nodes, while `turn_digests` keeps the existing termination detector unchanged.
+    ADR-011 and INV-08, the trace matrix and structural constraints record the result.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the priority order and the concurrent implementation, with all decisions delegated
+        except the merge and Bot Review as the review channel.
+      why: >-
+        The owner wanted the remaining requirements implemented without another approval round.
+    - type: constrain
+      what: >-
+        Required the inherited debate and termination tests to stay green and the raw-text digest to
+        stay unchanged.
+      why: >-
+        TERM-001 is already shipped; a debate change must not silently alter its evidence.
+  transcript: transcripts/60198818-HaobinJiang-CHG-043-structured-debate.md#L1-L45

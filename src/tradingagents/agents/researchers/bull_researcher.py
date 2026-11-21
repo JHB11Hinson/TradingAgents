@@ -4,6 +4,11 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.agents.debate import (
+    DEBATE_TURN_INSTRUCTION,
+    invoke_debate_turn,
+    render_debate_turn,
+)
 from tradingagents.agents.termination import turn_digest
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
@@ -52,7 +57,8 @@ Key points to focus on:
             f"Last bear argument: {current_response}"
         )
         task_text = """Use this information to deliver a compelling bull argument, refute the bear's concerns, and engage in a dynamic debate that demonstrates the strengths of the bull position.
-""" + get_language_instruction()
+
+""" + DEBATE_TURN_INSTRUCTION + get_language_instruction()
 
         original = (
             role
@@ -88,9 +94,14 @@ Key points to focus on:
         )
         assembled = assemble_context(layers, original=original, agent="Bull Researcher")
 
-        response = llm.invoke(assembled.text)
+        turn, raw_text = invoke_debate_turn(
+            llm,
+            assembled.text,
+            side="Bull Analyst",
+            opponent=investment_debate_state.get("current_response", ""),
+        )
 
-        argument = f"Bull Analyst: {response.content}"
+        argument = render_debate_turn(turn, "Bull Analyst")
 
         new_investment_debate_state = {
             "history": history + "\n" + argument,
@@ -100,7 +111,11 @@ Key points to focus on:
             "count": investment_debate_state["count"] + 1,
             "turn_digests": [
                 *investment_debate_state.get("turn_digests", []),
-                turn_digest(response.content),
+                turn_digest(raw_text),
+            ],
+            "turn_records": [
+                *investment_debate_state.get("turn_records", []),
+                turn.model_dump(),
             ],
         }
 

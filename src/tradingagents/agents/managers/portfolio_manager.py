@@ -82,6 +82,7 @@ def create_portfolio_manager(llm, max_turns: int = 3):
             "current_neutral_response": risk_debate_state["current_neutral_response"],
             "count": risk_debate_state["count"],
             "turn_digests": risk_debate_state.get("turn_digests", []),
+            "turn_records": risk_debate_state.get("turn_records", []),
         }
 
         past_context = state.get("past_context", "")
