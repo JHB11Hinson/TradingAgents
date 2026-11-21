@@ -64,6 +64,28 @@ def test_aggregate_reports_tokens_cost_and_ratios_against_the_baseline():
 
 
 @pytest.mark.unit
+def test_aggregate_reports_the_same_condition_ratio():
+    observations = [
+        CaseObservation(total_tokens=900, budget=1000, rating="Hold", uncapped_total_tokens=1000),
+        CaseObservation(total_tokens=1000, budget=1000, rating="Hold", uncapped_total_tokens=1000),
+    ]
+
+    metrics = aggregate(observations, _baseline(), 2)
+
+    assert metrics["uncapped_tokens"] == 2000
+    assert metrics["capped_tokens_ratio"] == 0.95
+
+
+@pytest.mark.unit
+def test_a_missing_uncapped_measurement_reports_one():
+    observations = [CaseObservation(total_tokens=100, budget=1000, rating="Hold")]
+
+    metrics = aggregate(observations, _baseline(), 1)
+
+    assert metrics["capped_tokens_ratio"] == 1.0
+
+
+@pytest.mark.unit
 def test_review_and_budget_breaches_are_counted():
     observations = [
         CaseObservation(total_tokens=600, budget=500, rating="REVIEW"),
