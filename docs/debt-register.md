@@ -35,18 +35,20 @@ inventing a ninth.
 - **Linked requirement:** `D1-REQ-GOV-012` (versioned runtime prompts), `D1-REQ-EVAL-002`.
 - **Status:** open
 
-## DEBT-002 — Two safety guardrails are documented but not implemented
+## DEBT-002 — Safety guardrails are now implemented but pattern-bounded
 
 - **Category:** 7. Guardrail debt
-- **What:** `D1-REQ-SAFE-001` (external/retrieved text scrubbing) and `D1-REQ-SAFE-003` (deterministic
-  position ceiling) have no module yet; there is no `src/tradingagents/guardrails/`.
-- **Impact:** the authority boundary is enforced only by schema validation and the `REVIEW` sentinel
-  (`docs/code-governance/structural-constraints.md` §4). Model output is not yet ceiling-limited.
+- **What:** `D1-REQ-SAFE-001` (external/retrieved text scrubbing), `D1-REQ-SAFE-002` (strict
+  free-text decision) and `D1-REQ-SAFE-003` (deterministic position ceiling) are implemented in
+  `src/tradingagents/guardrails/` (ADR-010). The scrubber is a fixed pattern corpus, so a paraphrase
+  outside the corpus is not blocked.
+- **Impact:** the authority boundary is enforced, but the corpus is the maintenance surface: a new
+  injection style needs a new pattern and a corpus sample, not a new subsystem.
 - **Owner:** Member 3 (safety).
-- **Trigger to revisit:** before Sprint 3 safety work; do not describe the boundary as fully
-  enforced until both look-tests exist.
-- **Linked requirement:** `D1-REQ-SAFE-001`, `D1-REQ-SAFE-003`.
-- **Status:** open
+- **Trigger to revisit:** a hostile sample that the corpus misses; before describing the guard as
+  "complete protection".
+- **Linked requirement:** `D1-REQ-SAFE-001`, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`.
+- **Status:** mitigated by CHG-042 (2026-11-21); the pattern-corpus limit is recorded in `INV-04`.
 
 ## DEBT-003 — No evaluation set, thresholds or runner
 

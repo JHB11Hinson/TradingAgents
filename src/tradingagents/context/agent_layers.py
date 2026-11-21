@@ -10,6 +10,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+from tradingagents.guardrails.instructions import scrub_untrusted
+
 from .assembler import ContextBlock, Layer, estimate_tokens
 
 DEFAULT_POINTER = (
@@ -34,8 +36,13 @@ def constraints_block(role: str) -> ContextBlock:
 
 
 def retrieved_block(source: str, text: str, *, render: bool = True) -> ContextBlock:
-    """One piece of retrieved knowledge with its state source."""
-    return ContextBlock(Layer.RETRIEVED, source, text, render=render)
+    """One piece of retrieved knowledge with its state source.
+
+    Retrieved text can be vendor or social content, so SAFE-001 scrubs
+    instruction-like spans here, at the one seam every report, memory lesson and
+    manager plan passes through.
+    """
+    return ContextBlock(Layer.RETRIEVED, source, scrub_untrusted(text).text, render=render)
 
 
 def history_block(

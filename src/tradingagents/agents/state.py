@@ -16,6 +16,7 @@ class InvestDebateState(TypedDict):
     current_response: Annotated[str, "Latest response"]
     count: Annotated[int, "Length of the current conversation"]
     turn_digests: Annotated[list[str], "One digest per debate turn"]
+    turn_records: Annotated[list[dict], "One structured DebateTurn record per debate turn"]
 
 
 # Risk management team state
@@ -42,6 +43,7 @@ class RiskDebateState(TypedDict):
     ]
     count: Annotated[int, "Length of the current conversation"]
     turn_digests: Annotated[list[str], "One digest per debate turn"]
+    turn_records: Annotated[list[dict], "One structured DebateTurn record per debate turn"]
 
 
 class AgentState(MessagesState):
@@ -70,6 +72,7 @@ class AgentState(MessagesState):
     ]
     final_trade_decision: Annotated[str, "Final decision from the Portfolio Manager"]
     final_rating: Annotated[str, "The Portfolio Manager's 5-tier rating, or REVIEW when it has none"]
+    final_decision_source: Annotated[str, "structured, free_text or review; how the final decision was produced"]
     termination_reason: Annotated[str, "Why the run stopped early; empty on a normal run"]
     past_context: Annotated[str, "Memory log context for the Portfolio Manager (same-ticker decisions + cross-ticker lessons), written by the Memory Log step"]
     memory_note: Annotated[str, "What the Memory Log step could not settle or read this run, for the report; empty when all went well"]

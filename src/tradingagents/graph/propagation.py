@@ -37,6 +37,7 @@ class Propagator:
             "memory_note": "",
             "portfolio_context": portfolio_context,
             "termination_reason": "",
+            "final_decision_source": "",
             "investment_debate_state": InvestDebateState(
                 {
                     "bull_history": "",
@@ -45,6 +46,7 @@ class Propagator:
                     "current_response": "",
                     "count": 0,
                     "turn_digests": [],
+                    "turn_records": [],
                 }
             ),
             "risk_debate_state": RiskDebateState(
@@ -59,6 +61,7 @@ class Propagator:
                     "current_neutral_response": "",
                     "count": 0,
                     "turn_digests": [],
+                    "turn_records": [],
                 }
             ),
             "market_report": "",

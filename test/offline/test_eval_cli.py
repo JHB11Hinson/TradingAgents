@@ -16,6 +16,11 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[2]
 
+# The evidence budget gate-4 replays at. Since CHG-043 the compact debate turns put a full run at
+# about 43,500 tokens, below the shipped 50,000 cap, so the shipped default would leave the
+# capped/uncapped comparison at 1.0 (see `docs/architecture/evaluation-logbook.md` E-008).
+EVIDENCE_BUDGET = ("--budget", "40000")
+
 
 def _run(*args: str, timeout: int = 240) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -31,7 +36,9 @@ def _run(*args: str, timeout: int = 240) -> subprocess.CompletedProcess[str]:
 def test_the_runner_exits_zero_when_every_threshold_passes(tmp_path):
     out = tmp_path / "report.json"
 
-    proc = _run("--results-dir", str(tmp_path / "runs"), "--out", str(out))
+    proc = _run(
+        *EVIDENCE_BUDGET, "--results-dir", str(tmp_path / "runs"), "--out", str(out)
+    )
 
     assert proc.returncode == 0, proc.stdout + proc.stderr
     report = json.loads(out.read_text(encoding="utf-8"))
@@ -41,6 +48,7 @@ def test_the_runner_exits_zero_when_every_threshold_passes(tmp_path):
     assert report["metrics"]["est_cost_ratio"] <= 0.5
     assert report["metrics"]["budget_respected_rate"] == 1.0
     assert report["metrics"]["review_rate"] == 0.0
+    assert report["metrics"]["structured_output_pass_rate"] == 1.0
     assert report["metrics"]["uncapped_tokens"] > report["metrics"]["total_tokens"]
     assert report["metrics"]["capped_tokens_ratio"] <= 0.98
     assert "verdict: pass" in proc.stdout
@@ -52,7 +60,7 @@ def test_the_runner_exits_zero_when_every_threshold_passes(tmp_path):
 def test_the_runner_writes_the_default_report_under_results_dir(tmp_path):
     results = tmp_path / "runs"
 
-    proc = _run("--results-dir", str(results))
+    proc = _run(*EVIDENCE_BUDGET, "--results-dir", str(results))
 
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert (results / "report.json").is_file()

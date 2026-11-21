@@ -30,6 +30,7 @@ KNOWN_METRICS: tuple[str, ...] = (
     "est_cost_ratio",
     "budget_respected_rate",
     "review_rate",
+    "structured_output_pass_rate",
     "wall_clock_s",
 )
 
@@ -43,6 +44,7 @@ class CaseObservation:
     compacted_calls: int = 0
     wall_clock_s: float = 0.0
     rating: str = ""
+    structured_output_ok: bool = True
     est_cost_usd: float | None = None
     uncapped_total_tokens: int | None = None
 
@@ -97,6 +99,12 @@ def aggregate(
         "est_cost_ratio": _ratio(est_cost, baseline_cost),
         "budget_respected_rate": round(respected / case_count, 6),
         "review_rate": round(reviews / case_count, 6),
+        "structured_output_pass_rate": (
+            round(sum(1 for observation in observations if observation.structured_output_ok)
+                  / len(observations), 6)
+            if observations
+            else 0.0
+        ),
         "wall_clock_s": round(sum(observation.wall_clock_s for observation in observations), 3),
     }
 
@@ -122,5 +130,8 @@ def metric_names() -> Mapping[str, str]:
         "est_cost_ratio": "est_cost_usd / baseline_cost_usd",
         "budget_respected_rate": "share of cases within their token budget",
         "review_rate": "share of cases whose rating is REVIEW",
+        "structured_output_pass_rate": (
+            "share of successful cases whose final decision came from a validated schema"
+        ),
         "wall_clock_s": "summed analysis wall-clock",
     }

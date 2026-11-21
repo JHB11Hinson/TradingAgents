@@ -200,9 +200,12 @@ Generated code must satisfy all of the following before it is offered for review
   the inherited suite is the baseline. Integration tests run with `pytest -m integration`.
 - **Schema.** `check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml`
   must pass whenever requirements change.
-- **Behavioral.** `python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml`
-  must pass whenever the analysis, a prompt, a model, the context budget or the evaluation set
-  changes; gate-4 runs it on every pull request and a failed threshold blocks the merge.
+- **Behavioral.** `python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
+  --budget 40000` must pass whenever the analysis, a prompt, a model, the context budget or the
+  evaluation set changes; gate-4 runs it on every pull request and a failed threshold blocks the
+  merge. The explicit budget is the evidence budget, not a change to the shipped 50,000 cap
+  (`D1-REQ-COST-003`): since CHG-043 a full run costs about 43,500 tokens, so 40,000 is the highest
+  budget that still makes the capped/uncapped comparison prove compaction (`E-008`).
 - **Traceability.** Every `fit_criterion` of an in-scope requirement has at least one test; a
   requirement whose `priority` is `wont` is out of the delivery, carries a `deferred_reason` in the
   registry instead of evidence, and is not counted as a gap. Every invariant has a test that

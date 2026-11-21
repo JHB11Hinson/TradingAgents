@@ -23,6 +23,7 @@ from tradingagents.agents import (
 )
 from tradingagents.agents.analysts.turn import WRAP_UP
 from tradingagents.agents.state import AgentState
+from tradingagents.guardrails.positions import DEFAULT_MAX_POSITION_PCT
 from tradingagents.telemetry import span
 
 from .analyst_execution import build_analyst_execution_plan
@@ -166,12 +167,14 @@ class GraphSetup:
         deep_thinking_llm: Any,
         conditional_logic: ConditionalLogic,
         max_tool_rounds: int,
+        max_position_pct: float = DEFAULT_MAX_POSITION_PCT,
     ):
         """Initialize with required components."""
         self.quick_thinking_llm = quick_thinking_llm
         self.deep_thinking_llm = deep_thinking_llm
         self.conditional_logic = conditional_logic
         self.max_tool_rounds = max_tool_rounds
+        self.max_position_pct = max_position_pct
 
     def setup_graph(
         self, selected_analysts=("market", "social", "news", "fundamentals"), memory_node=None
@@ -210,6 +213,7 @@ class GraphSetup:
         portfolio_manager_node = create_portfolio_manager(
             self.deep_thinking_llm,
             max_turns=3 * self.conditional_logic.max_risk_discuss_rounds,
+            max_position_pct=self.max_position_pct,
         )
 
         workflow = StateGraph(AgentState)
