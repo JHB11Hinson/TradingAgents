@@ -248,9 +248,16 @@ class LoopingModel(ScriptedModel):
             return super()._generate(messages, stop, run_manager, **kwargs)
         self.tool_turns.append(1)
         tool = self.tools[0]
-        call = {"name": tool.name, "id": f"call_{len(self.tool_turns)}",
-                "args": {k: v for k, v in ARGS.items()
-                         if k in tool.tool_call_schema.model_json_schema()["properties"]}}
+        args = {k: v for k, v in ARGS.items()
+                if k in tool.tool_call_schema.model_json_schema()["properties"]}
+        # Vary a date each round: this model tests the hard round bound
+        # (#1420), while an identical repeat is TERM-002's earlier, separate
+        # path. A fixed date would make this a repeated-call case.
+        offset = len(self.tool_turns)
+        for key in ("curr_date", "start_date"):
+            if key in args:
+                args[key] = f"2026-01-{offset + 1:02d}"
+        call = {"name": tool.name, "id": f"call_{offset}", "args": args}
         return ChatResult(generations=[ChatGeneration(message=AIMessage(content="", tool_calls=[call]))])
 
 
