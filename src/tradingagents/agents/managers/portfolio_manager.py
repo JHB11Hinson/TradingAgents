@@ -145,6 +145,7 @@ Ground every conclusion in specific evidence from the analysts. The risk debate 
                     "decision was produced."
                 ),
                 "final_rating": "REVIEW",
+                "termination_reason": "budget_exhausted",
             }
 
         # The typed rating is the decision; the rendered text only carries it.

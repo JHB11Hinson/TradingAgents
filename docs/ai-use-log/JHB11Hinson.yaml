@@ -395,3 +395,42 @@
       why: >-
         The three changes are sequential and share interfaces; the plan and ledger carry the design.
   transcript: transcripts/60198818-HaobinJiang-CHG-039-debt-011.md#L1-L75
+
+- id: AI-2026-11-21-008
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-040 (DEBT-012): a budget-exhausted run used to fail unless the Portfolio Manager itself was
+    the agent that ran out of budget. The run boundary now catches `ContextBudgetExceeded` on
+    `propagate`, the debug path, `stream_run` and the CLI, and ends in a deterministic `REVIEW` with
+    `termination_reason = "budget_exhausted"`. The state log is written with empty plan fields, the
+    memory log is skipped only for that non-decision, and the checkpoint is preserved so a larger
+    budget can resume. The PM's own catch stays and sets the same reason; every other exception
+    still propagates. ADR-008 and the runtime catalog, INV-03, trace matrix and debt register record
+    the policy.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved batch B and the bot-review channel, and assigned PR B (DEBT-012) as the only scope
+        of this change.
+      why: >-
+        The other debts and PR C stay out of this pull request, and the agent may not approve or
+        merge.
+    - type: constrain
+      what: >-
+        Required native (inline) execution, tests before implementation, separate test and src
+        commits, no `Test-Approval` placeholder in the test commit, and the review record only in
+        the PR body and committed memo.
+      why: >-
+        `gate-1-test-approval` must see a real record before the first `src/` commit, and the
+        course requires the test-independence covenant.
+    - type: constrain
+      what: >-
+        Required the exact logging and checkpoint rule: state log always, memory log only when the
+        run is not a REVIEW budget non-decision, checkpoint kept for that non-decision, and a PM
+        decision on the reserve recorded normally.
+      why: >-
+        A budget-ended run is not a call; quoting it as one would poison the next run's lessons,
+        while discarding its checkpoint would lose recoverable work.
+  transcript: transcripts/60198818-HaobinJiang-CHG-040-debt-012.md#L1-L120

@@ -349,10 +349,17 @@ def run_analysis(checkpoint: bool | None = None, portfolio=None, flags=None):
             # Clean run: log the decision, then drop this run's checkpoint so a
             # later run starts fresh. A mid-stream failure skips both, keeping
             # the checkpoint for resume.
-            graph.record_decision(selections["ticker"], selections["analysis_date"], final_state)
-            graph.clear_checkpoint_on_success(
-                selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
+            # A REVIEW non-decision writes the state log above but is not a
+            # position: keep its checkpoint for a later, larger-budget run.
+            non_decision = (
+                is_review(run_rating(final_state))
+                and final_state.get("termination_reason") == "budget_exhausted"
             )
+            graph.record_decision(selections["ticker"], selections["analysis_date"], final_state)
+            if not non_decision:
+                graph.clear_checkpoint_on_success(
+                    selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
+                )
         finally:
             # Always restore the plain uncheckpointed graph, even on failure.
             graph.end_checkpoint()
@@ -377,11 +384,18 @@ def run_analysis(checkpoint: bool | None = None, portfolio=None, flags=None):
     # A decision nobody can read is not a position. Say so here rather than
     # leaving the run to look like a normal result.
     if is_review(run_rating(final_state)):
-        console.print(
-            "[yellow]No rating could be read from the final decision, so this run "
-            "is recorded for review rather than as a position. Re-run, or read the "
-            "decision text below and judge it yourself.[/yellow]\n"
-        )
+        if final_state.get("termination_reason") == "budget_exhausted":
+            console.print(
+                "[yellow]The context budget ended this run before a decision. It is "
+                "recorded for review and its checkpoint is kept, so a later run with "
+                "a larger budget can resume.[/yellow]\n"
+            )
+        else:
+            console.print(
+                "[yellow]No rating could be read from the final decision, so this run "
+                "is recorded for review rather than as a position. Re-run, or read the "
+                "decision text below and judge it yourself.[/yellow]\n"
+            )
     console.print(f"[dim]{analyst_wall_time_tracker.format_summary()}[/dim]")
 
     _offer_reports(final_state, graph, selections["ticker"],
