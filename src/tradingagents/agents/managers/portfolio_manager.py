@@ -20,6 +20,7 @@ from tradingagents.agents.context import (
 from tradingagents.agents.rating import parse_rating
 from tradingagents.agents.schemas import PortfolioDecision, render_pm_decision
 from tradingagents.agents.structured import NO_EXTERNAL_TOOLS, bind_structured, invoke_structured
+from tradingagents.agents.termination import detect_termination
 from tradingagents.context import (
     ContextBudgetExceeded,
     assemble_context,
@@ -34,11 +35,12 @@ from tradingagents.context.agent_layers import (
     retrieved_block,
     task_block,
 )
+from tradingagents.telemetry import span
 
 logger = logging.getLogger(__name__)
 
 
-def create_portfolio_manager(llm):
+def create_portfolio_manager(llm, max_turns: int = 3):
     structured_llm = bind_structured(llm, PortfolioDecision, "Portfolio Manager")
 
     def portfolio_manager_node(state) -> dict:
@@ -49,6 +51,25 @@ def create_portfolio_manager(llm):
         risk_debate_state = state["risk_debate_state"]
         research_plan = state["investment_plan"]
         trader_plan = state["trader_investment_plan"]
+        count = risk_debate_state["count"]
+        existing_reason = state.get("termination_reason", "")
+        reason = (
+            detect_termination(risk_debate_state.get("turn_digests", []), cycle=3)
+            if count < max_turns
+            else None
+        )
+        if reason and not existing_reason:
+            # The debate stopped before its bound; keep the earliest reason.
+            with span(
+                "loop.terminated",
+                phase="termination",
+                kind="termination",
+                attributes={"node": "Portfolio Manager", "reason": reason},
+            ):
+                pass
+            termination_reason = reason
+        else:
+            termination_reason = existing_reason
 
         new_risk_debate_state = {
             "history": risk_debate_state["history"],
@@ -60,6 +81,7 @@ def create_portfolio_manager(llm):
             "current_conservative_response": risk_debate_state["current_conservative_response"],
             "current_neutral_response": risk_debate_state["current_neutral_response"],
             "count": risk_debate_state["count"],
+            "turn_digests": risk_debate_state.get("turn_digests", []),
         }
 
         past_context = state.get("past_context", "")
@@ -162,6 +184,7 @@ Ground every conclusion in specific evidence from the analysts. The risk debate 
             "risk_debate_state": new_risk_debate_state,
             "final_trade_decision": final_trade_decision,
             "final_rating": final_rating,
+            "termination_reason": termination_reason,
         }
 
     return portfolio_manager_node

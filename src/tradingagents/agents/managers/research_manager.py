@@ -9,6 +9,7 @@ from tradingagents.agents.structured import (
     bind_structured,
     invoke_structured_or_freetext,
 )
+from tradingagents.agents.termination import detect_termination
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
     constraints_block,
@@ -18,9 +19,10 @@ from tradingagents.context.agent_layers import (
     retrieved_block,
     task_block,
 )
+from tradingagents.telemetry import span
 
 
-def create_research_manager(llm):
+def create_research_manager(llm, max_turns: int = 2):
     structured_llm = bind_structured(llm, ResearchPlan, "Research Manager")
 
     def research_manager_node(state) -> dict:
@@ -28,6 +30,25 @@ def create_research_manager(llm):
         history = state["investment_debate_state"].get("history", "")
 
         investment_debate_state = state["investment_debate_state"]
+        count = investment_debate_state["count"]
+        existing_reason = state.get("termination_reason", "")
+        reason = (
+            detect_termination(investment_debate_state.get("turn_digests", []), cycle=2)
+            if count < max_turns
+            else None
+        )
+        if reason and not existing_reason:
+            # The debate stopped before its configured bound; record why.
+            with span(
+                "loop.terminated",
+                phase="termination",
+                kind="termination",
+                attributes={"node": "Research Manager", "reason": reason},
+            ):
+                pass
+            termination_reason = reason
+        else:
+            termination_reason = existing_reason
 
         role = """As the Research Manager and debate facilitator, your role is to critically evaluate this round of debate and deliver a clear, actionable investment plan for the trader.
 
@@ -97,11 +118,13 @@ Write these sections, in this order, starting with the recommendation on its own
             "bull_history": investment_debate_state.get("bull_history", ""),
             "current_response": investment_plan,
             "count": investment_debate_state["count"],
+            "turn_digests": investment_debate_state.get("turn_digests", []),
         }
 
         return {
             "investment_debate_state": new_investment_debate_state,
             "investment_plan": investment_plan,
+            "termination_reason": termination_reason,
         }
 
     return research_manager_node
