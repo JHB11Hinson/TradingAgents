@@ -24,7 +24,7 @@
         archives.
       why: >-
         Review and AI-use records are evidence and must not be rewritten.
-  transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
+  transcript: transcripts/60198818-HaobinJiang-S11-merge-train-protection-audit.md#L10-L32
 
 - id: AI-2026-11-15-003
   date: 2026-11-15
@@ -48,7 +48,7 @@
         runtime module.
       why: >-
         The checker is CI glue, not product behavior.
-  transcript: transcripts/60198818-HaobinJiang.md#L30547-L30569
+  transcript: transcripts/60198818-HaobinJiang-S11-merge-train-protection-audit.md#L10-L32
 
 - id: AI-2026-11-17-001
   date: 2026-11-17
@@ -569,3 +569,37 @@
       why: >-
         ADR-007 rejects a live provider call in gate-4; the metric must be reproducible without a key.
   transcript: transcripts/60198818-HaobinJiang-CHG-045-structured-metric.md#L1-L40
+
+- id: AI-2026-11-21-014
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-046 (D5, GOV-011): split the 30,569-line / 1.2 MB combined transcript into one part per
+    annotated session plus an index at the original path, because a GitHub blob above 1 MB is not
+    viewable in review. Session bodies are byte-identical to the pre-split blob at `e26f47f`; the
+    index carries the part links, the D5 coverage map, a legacy line-range map and the SHA-256
+    evidence. The two active AI-use ranges are repointed to the Session 11 part, while the archive
+    keeps its entries with a header note. A new `test/offline/test_transcripts_split.py` fails when
+    a part is unlinked, a session is duplicated or a part exceeds 1,000,000 bytes; the GOV-011 row,
+    trace matrix and DEBT-006 record the result.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked for the transcripts to be split into several parts, submitted under the repository
+        rules, and reviewed by the bot.
+      why: >-
+        The combined file was too large to read on GitHub, and the D5 evidence must be reviewable.
+    - type: constrain
+      what: >-
+        Kept the session content unchanged and limited the archive edit to a header note; only the
+        two active citations were repointed.
+      why: >-
+        Transcripts are append-only evidence; a split must not alter what the human and agent said.
+    - type: constrain
+      what: >-
+        Limited the code change to one offline test under `test/offline/`, with no `src/`, prompt,
+        model or gate change.
+      why: >-
+        The work is an evidence-layout change, not a product behaviour change.
+  transcript: transcripts/60198818-HaobinJiang-CHG-046-transcript-split.md#L1-L62

@@ -1,5 +1,9 @@
 # AI use log — historical archive through 2026-11-15
 # New entries go to docs/ai-use-log/<member>.yaml. Do not append here.
+# Line-range citations below point into the pre-split transcript; CHG-046 split it into
+# per-session parts. The ranges stay meaningful against the pre-split file at commit
+# e26f47f, and transcripts/60198818-HaobinJiang.md maps each range to its part. No
+# historical entry is altered.
 - id: AI-2026-10-06-001
   date: 2026-10-06
   members: ["JHB11Hinson"]
