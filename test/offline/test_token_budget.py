@@ -213,4 +213,5 @@ def test_portfolio_manager_returns_review_without_a_model_call_when_p0_exceeds_t
         result = node(_state())
 
     assert result["final_rating"] == "REVIEW"
+    assert result["termination_reason"] == "budget_exhausted"
     assert llm.calls == 0
