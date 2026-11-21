@@ -11,7 +11,7 @@ from typing import Any
 import tradingagents
 from tradingagents.agents.context import build_instrument_context, resolve_instrument_identity
 from tradingagents.agents.rating import run_rating
-from tradingagents.context import current_budget, run_budget_scope
+from tradingagents.context import ContextBudgetExceeded, current_budget, run_budget_scope
 from tradingagents.dataflows.config import run_config, run_config_context, set_config
 from tradingagents.dataflows.date_window import get_current_date, is_historical
 from tradingagents.dataflows.symbols import safe_ticker_component
@@ -384,6 +384,18 @@ class TradingAgentsGraph:
         """Record a finished run: its state log, and its decision in the memory log
         for reflection on the next same-ticker run. propagate() and the CLI both end here."""
         self._log_state(trade_date, final_state)
+        if (
+            run_rating(final_state) == "REVIEW"
+            and final_state.get("termination_reason") == "budget_exhausted"
+        ):
+            # A budget-ended run is not a call: keep it out of the lessons the
+            # next same-ticker run would quote (COST-003, INV-03).
+            logger.info(
+                "Budget-exhausted REVIEW for %s on %s; nothing added to the memory log",
+                company_name,
+                trade_date,
+            )
+            return
         decision = final_state.get("final_trade_decision")
         if not decision:
             logger.warning("No final decision for %s on %s; nothing added to the memory log",
@@ -438,24 +450,43 @@ class TradingAgentsGraph:
                 if self.debug:
                     # A state repeats the messages before it, so each prints once (#1027).
                     final_state, printed = {}, set()
-                    for messages, state in self.stream_run(graph_input, **args):
-                        for msg in messages:
-                            key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
-                            if key not in printed:
-                                printed.add(key)
-                                msg.pretty_print()
-                        if state is not None:
-                            final_state.update(state)
+                    try:
+                        for messages, state in self.stream_run(graph_input, **args):
+                            for msg in messages:
+                                key = getattr(msg, "id", None) or (type(msg).__name__, getattr(msg, "content", None))
+                                if key not in printed:
+                                    printed.add(key)
+                                    msg.pretty_print()
+                            if state is not None:
+                                final_state.update(state)
+                    except ContextBudgetExceeded as exc:
+                        # stream_run re-raises only when neither its input nor a
+                        # received state carries the ticker; here the initial
+                        # state always does, so the run can still report REVIEW.
+                        logger.warning("Run budget exhausted: %s", exc)
+                        final_state = self._budget_exhausted_state(init_agent_state, exc)
                 else:
-                    final_state = self.graph.invoke(graph_input, **args)
+                    try:
+                        final_state = self.graph.invoke(graph_input, **args)
+                    except ContextBudgetExceeded as exc:
+                        logger.warning("Run budget exhausted: %s", exc)
+                        final_state = self._budget_exhausted_state(init_agent_state, exc)
 
                 self._record_context_usage()
                 self.record_decision(company_name, trade_date, final_state)
 
-                # Clear checkpoint on successful completion to avoid stale state.
-                self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
+                # A REVIEW non-decision keeps its checkpoint so a later run with
+                # a larger budget can resume; an ordinary run clears it (#1249).
+                degraded = (
+                    final_state.get("termination_reason") == "budget_exhausted"
+                    and run_rating(final_state) == "REVIEW"
+                )
+                if not degraded:
+                    self.clear_checkpoint_on_success(
+                        company_name, trade_date, asset_type, portfolio
+                    )
 
-                status = "complete"
+                status = "degraded" if degraded else "complete"
                 return final_state, run_rating(final_state)
         finally:
             _RUN_ACTIVE.reset(token)
@@ -484,17 +515,36 @@ class TradingAgentsGraph:
         status = "failed"
         try:
             with telemetry_scope(self.config) as hub:
-                if current_budget() is None:
-                    with run_budget_scope(self.config):
+                try:
+                    if current_budget() is None:
+                        with run_budget_scope(self.config):
+                            for messages, state in self._stream_run(graph_input, **args):
+                                self._remember_state(state, last_state)
+                                yield messages, state
+                            self._record_context_usage()
+                    else:
                         for messages, state in self._stream_run(graph_input, **args):
-                            self._remember_identity(state, last_state)
+                            self._remember_state(state, last_state)
                             yield messages, state
-                        self._record_context_usage()
+                except ContextBudgetExceeded as exc:
+                    # Without identity there is no state to report: a resume that
+                    # failed before its first chunk re-raises instead of making
+                    # up a ticker (COST-003).
+                    base = (
+                        graph_input
+                        if isinstance(graph_input, dict) and graph_input.get("company_of_interest")
+                        else last_state
+                    )
+                    if not base.get("company_of_interest"):
+                        raise
+                    logger.warning("Stream budget exhausted: %s", exc)
+                    self._record_context_usage()
+                    degraded = self._budget_exhausted_state(base, exc)
+                    last_state.update(degraded)
+                    status = "degraded"
+                    yield [], degraded
                 else:
-                    for messages, state in self._stream_run(graph_input, **args):
-                        self._remember_identity(state, last_state)
-                        yield messages, state
-            status = "complete"
+                    status = "complete"
         finally:
             if not internal and hub is not None:
                 self._write_telemetry_identity(graph_input, last_state, hub, status)
@@ -526,14 +576,10 @@ class TradingAgentsGraph:
         self._context_usage = budget.snapshot() if budget is not None else {}
 
     @staticmethod
-    def _remember_identity(state, sink: dict[str, Any]) -> None:
-        """Remember the run's identity while a stream yields its states."""
-        if not isinstance(state, dict):
-            return
-        for key in ("company_of_interest", "trade_date"):
-            value = state.get(key)
-            if value:
-                sink[key] = value
+    def _remember_state(state, sink: dict[str, Any]) -> None:
+        """Keep the whole value state, so a later failure can still report it."""
+        if isinstance(state, dict):
+            sink.update(state)
 
     def _write_telemetry_identity(self, graph_input, last_state, hub, status) -> None:
         """Write the trace and manifest; a resume passes ``None`` as the input."""
@@ -592,6 +638,7 @@ class TradingAgentsGraph:
             "investment_plan": final_state["investment_plan"],
             "final_trade_decision": final_state["final_trade_decision"],
             "final_rating": run_rating(final_state),
+            "termination_reason": final_state.get("termination_reason", ""),
             "context_usage": getattr(self, "_context_usage", {}),
             "run_settings": self.run_settings(),
         }
