@@ -603,3 +603,30 @@
       why: >-
         The work is an evidence-layout change, not a product behaviour change.
   transcript: transcripts/60198818-HaobinJiang-CHG-046-transcript-split.md#L1-L62
+
+- id: AI-2026-11-22-001
+  date: 2026-11-22
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-047: post-merge housekeeping. Pruned the stale `origin/docs/CHG-046-transcript-split`
+    tracking ref, removed the ignored pytest/mypy/ruff caches, the `__pycache__` trees and the
+    local `.superpowers/` SDD scratch, and removed the eight completed `docs/superpowers/`
+    implementation plans and design specs for CHG-039 and CHG-042 to CHG-045. No governance
+    artifact or test references them; the transcripts that mention them are historical and stay
+    unchanged, and the files remain recoverable from Git history.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked for the current pull-request and merge state and for the outdated plans, builds,
+        branches and worktrees to be removed.
+      why: >-
+        The CHG-046 pull request had merged, so the planning scratch and local build state were no
+        longer needed.
+    - type: constrain
+      what: >-
+        Kept the change docs-only: no `src/`, test, prompt, model or gate change, and no historical
+        transcript rewritten.
+      why: >-
+        This is housekeeping, not product behaviour, and transcripts are append-only evidence.
+  transcript: transcripts/60198818-HaobinJiang-CHG-047-cleanup.md#L1-L56
