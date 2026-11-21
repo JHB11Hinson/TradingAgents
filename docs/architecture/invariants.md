@@ -28,6 +28,7 @@ approval (`AGENTS.md` §11).
 | `INV-05` | A decision that fails schema validation is rejected/degraded, never emitted as tradeable | `D1-REQ-SAFE-002` | `src/tradingagents/agents/structured.py`, `rating.py`, `guardrails/decisions.py`, `managers/portfolio_manager.py` | **implemented** (CHG-042) — the free-text path needs one explicit rating |
 | `INV-06` | A deterministic position ceiling constrains the decision; model output cannot bypass it | `D1-REQ-SAFE-003` | `src/tradingagents/guardrails/positions.py`, `agents/managers/`, `default_config.py` | **implemented** (CHG-042) |
 | `INV-07` | Telemetry is advisory: a failing subscriber or an unwritable trace must not fail or change a run | `D1-REQ-OBS-003` | `src/tradingagents/telemetry/`, `graph/trading_graph.py` | **implemented** (CHG-034) |
+| `INV-08` | Every debate turn is a schema-valid `DebateTurn` with an explicit divergence and convergence | `D1-REQ-DEBATE-001`, `D1-REQ-DEBATE-002` | `src/tradingagents/agents/debate.py`, `agents/schemas.py`, the five debate nodes | **implemented** (CHG-043) — a JSON answer that fails validation aborts; prose is adapted |
 
 ## 2. Invariant details
 
@@ -154,6 +155,22 @@ approval (`AGENTS.md` §11).
 - **Operational fallback.** Skip the trace/manifest write, log `Telemetry could not be written`,
   keep the decision and the state log, and report the failed subscriber in `manifest["warnings"]`.
 - **Status.** Implemented (CHG-034).
+
+### INV-08 — Structured debate turns (`D1-REQ-DEBATE-001`, `D1-REQ-DEBATE-002`)
+
+- **Statement.** Every debate turn is a schema-valid `DebateTurn` containing a non-empty claim,
+  evidence list, rebuttal, confidence, divergence and convergence; a malformed structured turn does
+  not enter the debate.
+- **Source.** `D1-REQ-DEBATE-001`, `D1-REQ-DEBATE-002`; ADR-011.
+- **Enforcing component.** `agents/schemas.py` (`DebateTurn` validators),
+  `agents/debate.py` (`parse_debate_turn`, `invoke_debate_turn`) and the five debate nodes.
+- **Verification.** `test/offline/test_debate_turns.py` rejects missing/empty fields and an empty
+  `converge`, parses JSON and prose, and records exactly one turn per node. The negative test sends a
+  JSON object with an empty convergence and expects `DebateTurnError`.
+- **Operational fallback.** A prose answer is adapted with an explicit "no convergence stated"
+  marker; a claimed-JSON answer that fails validation aborts the run rather than entering a
+  fabricated complete turn.
+- **Status.** Implemented (CHG-043).
 
 ## 3. Relationship to the other artifacts
 

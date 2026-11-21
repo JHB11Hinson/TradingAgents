@@ -5,6 +5,11 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.agents.debate import (
+    DEBATE_TURN_INSTRUCTION,
+    invoke_debate_turn,
+    render_debate_turn,
+)
 from tradingagents.agents.termination import turn_digest
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
@@ -57,9 +62,8 @@ Your task is to create a compelling case for the trader's decision by questionin
             "Engage actively by addressing any specific concerns raised, refuting the weaknesses "
             "in their logic, and asserting the benefits of risk-taking to outpace market norms. "
             "Maintain a focus on debating and persuading, not just presenting data. Challenge "
-            "each counterpoint to underscore why a high-risk approach is optimal. Output "
-            "conversationally as if you are speaking without any special formatting."
-        ) + get_language_instruction()
+            "each counterpoint to underscore why a high-risk approach is optimal.\n\n"
+        ) + DEBATE_TURN_INSTRUCTION + get_language_instruction()
 
         original = (
             role
@@ -97,9 +101,19 @@ Your task is to create a compelling case for the trader's decision by questionin
             layers, original=original, agent="Aggressive Analyst"
         )
 
-        response = llm.invoke(assembled.text)
+        opponent = "\n\n".join(
+            part
+            for part in (
+                risk_debate_state.get("current_conservative_response", ""),
+                risk_debate_state.get("current_neutral_response", ""),
+            )
+            if part.strip()
+        )
+        turn, raw_text = invoke_debate_turn(
+            llm, assembled.text, side="Aggressive Analyst", opponent=opponent
+        )
 
-        argument = f"Aggressive Analyst: {response.content}"
+        argument = render_debate_turn(turn, "Aggressive Analyst")
 
         new_risk_debate_state = {
             "history": history + "\n" + argument,
@@ -115,7 +129,11 @@ Your task is to create a compelling case for the trader's decision by questionin
             "count": risk_debate_state["count"] + 1,
             "turn_digests": [
                 *risk_debate_state.get("turn_digests", []),
-                turn_digest(response.content),
+                turn_digest(raw_text),
+            ],
+            "turn_records": [
+                *risk_debate_state.get("turn_records", []),
+                turn.model_dump(),
             ],
         }
 

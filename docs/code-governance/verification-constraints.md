@@ -92,7 +92,8 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 
 | Requirement | Evidence today | Status |
 |---|---|---|
-| `DEBATE-001` structured turns | schema validator on a fixed set | **planned** — no debate schema/eval yet |
+| `DEBATE-001` structured turns | schema validator: JSON and prose paths, one record per turn | **done** (CHG-043; `test/offline/test_debate_turns.py`) |
+| `DEBATE-002` diverge/converge | explicit fields; empty convergence rejects | **done** (CHG-043; `test/offline/test_debate_turns.py`) |
 | `DEBATE-004` round bound | `graph/conditional_logic.py` bound; `test/offline/test_risk_router_path_map.py` reaches the terminal at the bound | **done** (existing bound + router case) |
 | `TERM-001` self-termination | oscillation/stall cases + detector-removal negative test | **partial** — round bounds exist; detectors planned (INV-01) |
 | `CTX-001` six layers | assembler unit test | **done** (CHG-033; `test/offline/test_context_assembler.py`) |
@@ -135,7 +136,7 @@ mypy --follow-imports=silent <changed-src-files>
 check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 
 # Behavioral (gate-4 runs this on every pull request)
-python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml
+python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml --budget 40000
 ```
 
 ## 6. Gate mapping

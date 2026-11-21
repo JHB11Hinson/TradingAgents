@@ -5,6 +5,11 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.agents.debate import (
+    DEBATE_TURN_INSTRUCTION,
+    invoke_debate_turn,
+    render_debate_turn,
+)
 from tradingagents.agents.termination import turn_digest
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
@@ -57,9 +62,8 @@ Your task is to actively counter the arguments of the Aggressive and Neutral Ana
             "may have overlooked. Address each of their counterpoints to showcase why a "
             "conservative stance is ultimately the safest path for the firm's assets. Focus on "
             "debating and critiquing their arguments to demonstrate the strength of a low-risk "
-            "strategy over their approaches. Output conversationally as if you are speaking "
-            "without any special formatting."
-        ) + get_language_instruction()
+            "strategy over their approaches.\n\n"
+        ) + DEBATE_TURN_INSTRUCTION + get_language_instruction()
 
         original = (
             role
@@ -97,9 +101,19 @@ Your task is to actively counter the arguments of the Aggressive and Neutral Ana
             layers, original=original, agent="Conservative Analyst"
         )
 
-        response = llm.invoke(assembled.text)
+        opponent = "\n\n".join(
+            part
+            for part in (
+                risk_debate_state.get("current_aggressive_response", ""),
+                risk_debate_state.get("current_neutral_response", ""),
+            )
+            if part.strip()
+        )
+        turn, raw_text = invoke_debate_turn(
+            llm, assembled.text, side="Conservative Analyst", opponent=opponent
+        )
 
-        argument = f"Conservative Analyst: {response.content}"
+        argument = render_debate_turn(turn, "Conservative Analyst")
 
         new_risk_debate_state = {
             "history": history + "\n" + argument,
@@ -117,7 +131,11 @@ Your task is to actively counter the arguments of the Aggressive and Neutral Ana
             "count": risk_debate_state["count"] + 1,
             "turn_digests": [
                 *risk_debate_state.get("turn_digests", []),
-                turn_digest(response.content),
+                turn_digest(raw_text),
+            ],
+            "turn_records": [
+                *risk_debate_state.get("turn_records", []),
+                turn.model_dump(),
             ],
         }
 

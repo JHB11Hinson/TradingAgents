@@ -405,3 +405,71 @@ def render_sentiment_report(report: SentimentReport) -> str:
         "",
         report.narrative,
     ])
+
+
+# ---------------------------------------------------------------------------
+# Debate turns
+# ---------------------------------------------------------------------------
+
+
+def _non_empty_text(value: str) -> str:
+    """Strip a required text field and reject an empty or whitespace value."""
+    text = value.strip()
+    if not text:
+        raise ValueError("must not be empty")
+    return text
+
+
+class DebateEvidence(BaseModel):
+    """One sourced piece of evidence behind a debate turn.
+
+    A debate turn must be auditable: every claim carries at least one
+    ``(source, quote)`` pair so the reader can trace it to a report, filing or
+    news item instead of trusting an unsupported assertion.
+    """
+
+    source: str = Field(
+        description="Where the evidence comes from, e.g. 'market report' or '10-K filing'.",
+    )
+    quote: str = Field(
+        description="The specific fact or quotation from that source, not a paraphrase.",
+    )
+
+    @field_validator("source", "quote")
+    @classmethod
+    def _required_text(cls, value: str) -> str:
+        return _non_empty_text(value)
+
+
+class DebateTurn(BaseModel):
+    """One structured debate turn (D1-REQ-DEBATE-001, D1-REQ-DEBATE-002).
+
+    The six fields make the free-form debate auditable and force the
+    diverge-then-converge method: ``diverge`` states the alternatives the
+    speaker considered and ``converge`` states the position it settled on.
+    Every field is required and non-empty so a partial turn cannot enter the
+    debate history.
+    """
+
+    claim: str = Field(description="The speaker's position in one or two sentences.")
+    evidence: list[DebateEvidence] = Field(
+        min_length=1,
+        description="At least one sourced fact supporting the claim.",
+    )
+    rebuttal: str = Field(
+        description="The direct response to the opponent's argument.",
+    )
+    confidence: Literal["low", "medium", "high"] = Field(
+        description="How strongly the evidence supports the claim.",
+    )
+    diverge: str = Field(
+        description="The alternatives or counter-cases the speaker considered.",
+    )
+    converge: str = Field(
+        description="The position the speaker converged on after weighing the alternatives.",
+    )
+
+    @field_validator("claim", "rebuttal", "diverge", "converge")
+    @classmethod
+    def _required_text(cls, value: str) -> str:
+        return _non_empty_text(value)

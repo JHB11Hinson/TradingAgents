@@ -46,6 +46,7 @@ class Propagator:
                     "current_response": "",
                     "count": 0,
                     "turn_digests": [],
+                    "turn_records": [],
                 }
             ),
             "risk_debate_state": RiskDebateState(
@@ -60,6 +61,7 @@ class Propagator:
                     "current_neutral_response": "",
                     "count": 0,
                     "turn_digests": [],
+                    "turn_records": [],
                 }
             ),
             "market_report": "",

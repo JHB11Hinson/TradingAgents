@@ -20,7 +20,7 @@ across two modules, and two elements must not own the same module.
 | Research manager | `src/tradingagents/agents/managers/` | research synthesis and the manager ratings |
 | Trader | `src/tradingagents/agents/trader/` | the trade proposal |
 | Risk management | `src/tradingagents/agents/risk_mgmt/` | the risk discussion |
-| Agent contracts | `src/tradingagents/agents/` (`state.py`, `schemas.py`, `structured.py`, `rating.py`, `context.py`, `tools.py`, `post_screen.py`) | state shape, structured output, the REVIEW sentinel, context assembly, tool surface, post screening |
+| Agent contracts | `src/tradingagents/agents/` (`state.py`, `schemas.py`, `structured.py`, `rating.py`, `context.py`, `tools.py`, `post_screen.py`, `debate.py`) | state shape, structured output, the REVIEW sentinel, context assembly, tool surface, post screening, debate schema and adapter |
 | Safety guardrails | `src/tradingagents/guardrails/` | instruction scrubbing (`SAFE-001`), the strict free-text decision contract (`SAFE-002`) and the position ceiling (`SAFE-003`) |
 | Data access | `src/tradingagents/dataflows/` (+ `vendors/`) | the provider chain, point-in-time rules, vendor errors |
 | Orchestration | `src/tradingagents/graph/` | graph wiring, routing, checkpoints, propagation |
@@ -55,7 +55,7 @@ same pull request.
 
 | Module | ADR | Requirement / invariant it carries |
 |---|---|---|
-| `agents/` | ADR-001 | `CTX-001`/`CTX-003` (layered context, budget), `DEBATE-001` (structured turns), `SAFE-002` (schema failure → REVIEW) |
+| `agents/` | ADR-001, ADR-011 | `CTX-001`/`CTX-003` (layered context, budget), `DEBATE-001`/`DEBATE-002` (structured turns, diverge/converge), `SAFE-002` (schema failure → REVIEW) |
 | `guardrails/` | ADR-010 | `SAFE-001` (instruction scrubbing), `SAFE-002` (strict free-text contract), `SAFE-003` (position ceiling) |
 | `agents/managers/`, `agents/trader/`, `agents/risk_mgmt/` | ADR-001, ADR-003 | `SAFE-002`, `SAFE-003` (authority boundary) |
 | `dataflows/` | ADR-001 | `MEM-003` (point-in-time, no future leakage), `SAFE-001` (external text scrubbed) |

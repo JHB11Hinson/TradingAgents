@@ -16,6 +16,7 @@ class InvestDebateState(TypedDict):
     current_response: Annotated[str, "Latest response"]
     count: Annotated[int, "Length of the current conversation"]
     turn_digests: Annotated[list[str], "One digest per debate turn"]
+    turn_records: Annotated[list[dict], "One structured DebateTurn record per debate turn"]
 
 
 # Risk management team state
@@ -42,6 +43,7 @@ class RiskDebateState(TypedDict):
     ]
     count: Annotated[int, "Length of the current conversation"]
     turn_digests: Annotated[list[str], "One digest per debate turn"]
+    turn_records: Annotated[list[dict], "One structured DebateTurn record per debate turn"]
 
 
 class AgentState(MessagesState):

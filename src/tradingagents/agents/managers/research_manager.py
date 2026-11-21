@@ -119,6 +119,7 @@ Write these sections, in this order, starting with the recommendation on its own
             "current_response": investment_plan,
             "count": investment_debate_state["count"],
             "turn_digests": investment_debate_state.get("turn_digests", []),
+            "turn_records": investment_debate_state.get("turn_records", []),
         }
 
         return {
