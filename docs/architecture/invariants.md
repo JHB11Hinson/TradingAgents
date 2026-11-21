@@ -70,15 +70,19 @@ approval (`AGENTS.md` §11).
   be re-injected **verbatim** after compaction.
 - **Source.** `D1-REQ-CTX-003`, `D1-REQ-COST-003`; ADR-004.
 - **Enforcing component.** `src/tradingagents/context/assembler.py` (`RunBudget`,
-  `run_budget_scope`, `_within_budget`, `_compact`, `_enforce_total`) and `default_config.py`
-  (`context_budget_tokens`, `context_call_budget_tokens`, `context_compaction_threshold`).
+  `run_budget_scope`, `_within_budget`, `_compact`, `_enforce_total`), `default_config.py`
+  (`context_budget_tokens`, `context_call_budget_tokens`, `context_compaction_threshold`) and
+  `graph/trading_graph.py` (`_budget_exhausted_state`, `_run_graph`, `stream_run`).
 - **Verification.** `test/offline/test_context_assembler.py` asserts `assembled_tokens <= budget`;
   a second test hashes the constraint block before and after compaction and asserts it is
   byte-identical; a negative test removes the budget check and turns red.
+  `test/offline/test_budget_degradation.py` proves the fallback on every entry point, including a
+  real one-token budget and a negative test that removes the handler.
 - **Operational fallback.** Compact from the lowest priority upward (P3 → P2 → P1), re-inject P0
-  verbatim, and if the result is still over budget, abort the call with `budget_exceeded` and return
-  `REVIEW`. Never call the provider with an over-budget prompt.
-- **Status.** Implemented (CHG-033).
+  verbatim; if the result is still over budget, abort the call and end the run in `REVIEW` with
+  `termination_reason = "budget_exhausted"`, write the state log, skip the memory log and keep the
+  checkpoint. Never call the provider with an over-budget prompt.
+- **Status.** Implemented (CHG-033); the run-boundary fallback added in CHG-040 (ADR-008).
 
 ### INV-04 — Instruction scrubbing (`D1-REQ-SAFE-001`)
 

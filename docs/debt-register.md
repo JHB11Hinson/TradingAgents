@@ -183,4 +183,9 @@ inventing a ninth.
 - **Trigger to revisit:** the first real run that exhausts the analysis budget, or before
   `context_budget_tokens` is lowered.
 - **Linked requirement:** `D1-REQ-COST-003`, `D1-REQ-TERM-001`.
-- **Status:** open
+- **Status:** mitigated by CHG-040 (2026-11-21): every entry point (`propagate`, debug,
+  `stream_run`, CLI) now ends a budget-exhausted run in `REVIEW` with
+  `termination_reason = "budget_exhausted"`; the state log is written, the memory log is skipped for
+  that non-decision, and the checkpoint is preserved. `test/offline/test_budget_degradation.py`
+  pins each path, the real one-token case and a handler-removal negative test. ADR-008 records the
+  decision.
