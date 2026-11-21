@@ -92,13 +92,15 @@ inventing a ninth.
 
 - **Category:** 8. Human/cognitive debt
 - **What:** the course requires at least five annotated transcripts covering the six supervised
-  stages; `transcripts/` holds one file, and the stages are not all covered.
+  stages; `transcripts/` held one combined file, and the stages were not obviously covered.
 - **Impact:** the "authentic human authorship" evidence is thin, and reviewers cannot see how
   decisions were made.
 - **Owner:** all members (at least one transcript each).
 - **Trigger to revisit:** at the end of every sprint; the count is checked weekly (admin manual 8.2).
 - **Linked requirement:** `D1-REQ-GOV-011`.
-- **Status:** open
+- **Status:** mitigated by CHG-046 (2026-11-21): the combined file is split into 11 session
+  parts plus an index with a six-stage coverage map, the per-change transcripts remain beside
+  them, and `test/offline/test_transcripts_split.py` keeps the set consistent.
 
 ## DEBT-007 — Hallucinated dependencies
 

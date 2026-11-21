@@ -113,7 +113,7 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 | `GOV-006` three-source whitelist | three-way comparison | **partial** — read paths/commands still need alignment (P1-07) |
 | `GOV-008` verification + invariants | this file + `docs/architecture/invariants.md` | **partial** — both files exist; the negative tests for the planned invariants and a missing-entry check are still to land |
 | `GOV-010` QA records | `docs/review-memo/PR-<n>.md`, `debt-register.md`, `bug-diary.md` | **partial** — per-PR records continue |
-| `GOV-011` five transcripts | `transcripts/` coverage check | **partial** — 2 files today (P0-05) |
+| `GOV-011` five transcripts | `test/offline/test_transcripts_split.py` keeps the split index, the per-session parts and the six-stage map consistent | **done** (CHG-046; 11 session parts plus the per-change transcripts) |
 | `GOV-013` rules + covenant | file presence + five clauses | **done** |
 
 A **must** row that is `planned` or `partial` is visible debt, not a completed claim. The owning
