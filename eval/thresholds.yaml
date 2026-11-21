@@ -6,6 +6,8 @@ metrics:
   # D1-REQ-COST-001: at most half of the recorded baseline, in tokens and cost.
   total_tokens_ratio: {max: 0.5}
   est_cost_ratio: {max: 0.5}
+  # DEBT-011: the cap must bind; 1.0 means the capped and uncapped runs are equal.
+  capped_tokens_ratio: {max: 0.98}
   # D1-REQ-COST-003: every case must stay inside its configured run budget.
   budget_respected_rate: {min: 1.0}
   # D1-REQ-QUAL-001: a tight budget must not turn decisions into REVIEW.

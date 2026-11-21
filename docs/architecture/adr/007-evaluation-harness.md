@@ -65,6 +65,11 @@ reason. Live runs keep the telemetry manifest (ADR-005) as the authoritative cos
 
 - `COST-001` is measured: two cases, `total_tokens_ratio 0.374`, `review_rate 0`, `budget_respected_rate
   1.0` on the shipped set; the 50,000 cap binds on the NVDA case (49,912 tokens, 2 compactions).
+- **Amendment (2026-11-21, CHG-039).** The 0.374 is measured against the inherited 120,000 estimate,
+  not a like-for-like run. The harness now replays every case twice: capped 89,858 and uncapped
+  96,820 tokens (`capped_tokens_ratio 0.928093`, threshold 0.98). The uncapped replay is already
+  0.403 of the inherited baseline, so the headline is mechanism evidence, not a production saving
+  claim; a live release run is the remaining trigger in `DEBT-011`.
 - `EVAL-001` is runnable: `python -m eval.run --set eval/fixed-set.json --thresholds eval/thresholds.yaml`
   exits on the verdict. `gate-4-semantic-eval` runs exactly that command on every pull request
   (CHG-037), so a failed threshold blocks the merge.

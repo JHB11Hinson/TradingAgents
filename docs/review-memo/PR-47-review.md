@@ -1,15 +1,19 @@
-### PR-47 — CHG-039 DEBT-011 same-condition evaluation (test approval)
+### PR-47 — CHG-039 DEBT-011 same-condition evaluation (implementation head)
 
-- Reviewer: `github-actions[bot]` (`.github/workflows/bot-review.yml`). **Automated test approval**,
-  requested by the owner with the `bot-review` label; the record names the reviewer as automated.
-- Head reviewed: `33febf5` (tests-only head; no `src/` or `eval/` commit yet).
-- Specification: the tests pin the same-condition contract for `D1-REQ-EVAL-001` and
-  `D1-REQ-COST-001`: `CaseObservation.uncapped_total_tokens`, `uncapped_tokens`,
-  `capped_tokens_ratio`, a 1.0 fallback for a missing measurement, and a 0.98 threshold that fails
-  when the cap does not bind.
-- Code and tests: the branch's only commit touches `test/offline/`; the suite is red for the
-  intended reason. No inherited test is weakened.
-- Safety and efficiency: additive and offline; no safety-critical path.
-- Record truth: `gate-1/2/3` pass; `gate-5/6` are red by design at this test-only head.
+- Reviewer: `github-actions[bot]` (`.github/workflows/bot-review.yml`). **Automated non-author
+  review**, requested by the owner with the `bot-review` label.
+- Head reviewed: implementation head `4fad750`; the docs/AI-use commit follows it.
+- Specification: the shipped run reports `total_tokens_ratio 0.374408` against the inherited
+  120,000 estimate and `capped_tokens_ratio 0.928093` against the same-condition uncapped run
+  (threshold 0.98). The uncapped total is 96,820, already 0.403 of the inherited baseline, so the
+  headline is mechanism evidence, not a production saving claim.
+- Architecture: two isolated replay passes (`capped/`, `uncapped/`); both caps lifted in the second.
+  `CaseObservation` gains one optional field; no graph, prompt or authority change.
+- Code and tests: `pytest -q` -> 1411 passed, 1 skipped, 1 deselected; `ruff` and `mypy` clean;
+  `python -m eval.run` -> 2 cases, 0 failed, exit 0.
+- Safety and efficiency: no safety-critical path; deterministic and offline; the second pass is
+  sub-second.
+- Record truth: `E-006` and the rewritten `DEBT-011` state the caveat; a live release check remains
+  a trigger, not CI work.
 - Tests: test/offline/test_eval_same_condition.py, test/offline/test_eval_report.py, test/offline/test_eval_cli.py
 - Verdict: APPROVE

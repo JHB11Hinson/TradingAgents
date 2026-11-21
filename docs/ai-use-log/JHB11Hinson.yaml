@@ -363,3 +363,35 @@
         hide a leaked rating, and a correct rating would hide an unbounded retry.
   # Transcript pending: the human asked that this session be exported after the change lands.
   transcript: null
+
+- id: AI-2026-11-21-007
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-039 (DEBT-011): the evaluation harness compared a synthetic replay with a recorded
+    120,000-token production estimate. The same replay with the run and call caps lifted is 96,820
+    tokens, already 0.403 of that baseline, so the 0.374 headline did not isolate the budget's
+    effect. The change replays every fixed-set case twice in isolated directories, reports
+    `uncapped_tokens` and `capped_tokens_ratio`, and adds a 0.98 threshold that fails when the cap
+    stops binding. Measured: 89,858 capped / 96,820 uncapped / 0.928093. The debt entry is rewritten
+    to the real defect and marked mitigated; a live release check stays a trigger, not CI work.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required the debt judgment to cite the course PDF, the requirements registry and AGENTS.md
+        rather than the agent's preference.
+      why: >-
+        The team process treats those documents as the authority; a debt that cannot be traced to
+        one of them is scope creep.
+    - type: approve
+      what: >-
+        Approved batch B (DEBT-011, DEBT-012, TERM-001) and authorized the bot-review channel.
+      why: >-
+        The other seven debts are out of this batch, and the agent may not approve or merge.
+    - type: constrain
+      what: >-
+        Chose the faster inline execution over subagent-per-task.
+      why: >-
+        The three changes are sequential and share interfaces; the plan and ledger carry the design.
+  transcript: transcripts/60198818-HaobinJiang-CHG-039-debt-011.md#L1-L110
