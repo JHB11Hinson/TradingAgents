@@ -20,8 +20,9 @@
   `ruff check test/offline/test_transcripts_split.py` -> all checks passed;
   `check-jsonschema` -> validation done; `python -m eval.run ... --budget 40000` -> pass (2 cases,
   0 failed; ratios 0.270625, capped 0.927049, review 0.0, structured 1.0). The new test has three
-  positive checks (index links every part, sessions 01-11 appear once, every part is under
-  1,000,000 bytes) and three negative checks (missing link, duplicate session, oversized part).
+  positive checks (index links every part and keeps the six-stage map, sessions 01-11 appear once,
+  every part is under 1,000,000 bytes) and three negative checks (missing link, duplicate session,
+  oversized part).
 - Runtime metadata: none. No configuration key, dependency, permission or gate changed.
 - Safety and efficiency: the split only moves already-published transcript bytes and adds
   navigational headers, so it introduces no secret or new personal data. Every part is far below

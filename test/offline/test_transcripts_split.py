@@ -61,9 +61,20 @@ def _problems(index_text: str, parts: dict[str, str], max_bytes: int = MAX_BYTES
 
 @pytest.mark.unit
 def test_the_split_index_links_every_part_and_every_session_appears_once():
-    problems = _problems(INDEX.read_text(encoding="utf-8"), _read_parts())
+    index_text = INDEX.read_text(encoding="utf-8")
+    problems = _problems(index_text, _read_parts())
+    stages = (
+        "Requirements classification",
+        "Architecture candidate generation and evaluation",
+        "Plan approval before code",
+        "Build",
+        "Verification compliance",
+        "Architecture revision from test evidence",
+    )
+    missing = [stage for stage in stages if stage not in index_text]
 
     assert problems == []
+    assert missing == []
 
 
 @pytest.mark.unit
