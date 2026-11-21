@@ -63,6 +63,10 @@ def aggregate(
     else:
         est_cost = round(total_tokens * baseline.usd_per_million_input_tokens / 1_000_000, 8)
 
+    uncapped_complete = all(
+        observation.uncapped_total_tokens is not None and observation.uncapped_total_tokens > 0
+        for observation in observations
+    )
     uncapped_tokens = sum(
         observation.uncapped_total_tokens
         if observation.uncapped_total_tokens is not None
@@ -84,7 +88,9 @@ def aggregate(
         "baseline_tokens": baseline_tokens,
         "total_tokens_ratio": _ratio(total_tokens, baseline_tokens),
         "capped_tokens_ratio": (
-            _ratio(total_tokens, uncapped_tokens) if uncapped_tokens else 1.0
+            _ratio(total_tokens, uncapped_tokens)
+            if uncapped_complete and uncapped_tokens
+            else 1.0
         ),
         "est_cost_usd": est_cost,
         "baseline_cost_usd": baseline_cost,
