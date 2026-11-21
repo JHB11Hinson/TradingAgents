@@ -100,6 +100,7 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 | `COST-001` ≤50% baseline | `eval.run` fixed-set totals | **done** (CHG-036; `test/offline/test_eval_*.py`, `python -m eval.run` -> 0.374) |
 | `COST-003` token budget | `test/offline/test_token_budget.py` | **done** (CHG-033/CHG-036; the ledger counts the whole request, `test/offline/test_context_ledger_reserve.py`) |
 | `EVAL-001` fixed set + runner | `python -m eval.run` pass/fail | **done** (CHG-036; `test/offline/test_eval_cli.py`) |
+| `QUAL-001` structured pass rate | `structured_output_pass_rate == 1.0` and `review_rate == 0.0` on the fixed set | **done** (CHG-045; `eval/thresholds.yaml`, `test/offline/test_eval_*.py`) |
 | `SAFE-001` injection scrubbing | adversarial corpus + detector-removal and seam-removal negative tests | **done** (CHG-042; `test/offline/test_guardrails.py`) |
 | `SAFE-002` schema rejection | malformed/ambiguous-decision negative test, including the PM free-text fallback | **done** (CHG-042; the fallback needs one explicit rating) |
 | `SAFE-003` position ceiling | over-ceiling clip + bypass-negative test | **done** (CHG-042; `test/offline/test_guardrails.py`) |

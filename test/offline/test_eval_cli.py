@@ -41,6 +41,7 @@ def test_the_runner_exits_zero_when_every_threshold_passes(tmp_path):
     assert report["metrics"]["est_cost_ratio"] <= 0.5
     assert report["metrics"]["budget_respected_rate"] == 1.0
     assert report["metrics"]["review_rate"] == 0.0
+    assert report["metrics"]["structured_output_pass_rate"] == 1.0
     assert report["metrics"]["uncapped_tokens"] > report["metrics"]["total_tokens"]
     assert report["metrics"]["capped_tokens_ratio"] <= 0.98
     assert "verdict: pass" in proc.stdout

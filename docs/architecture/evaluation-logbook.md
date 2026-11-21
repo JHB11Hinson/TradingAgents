@@ -67,3 +67,15 @@ not evidence; every entry names the command, the date and the result.
   **not** a production saving claim: the uncapped synthetic run already passes the 0.5 threshold
   against the inherited estimate. The new `capped_tokens_ratio` is the mechanism check; a live
   release run remains the only way to quote a production number (`DEBT-011`).
+
+## E-007 — Structured-output pass rate (2026-11-21)
+
+- **Question:** does the shipped pipeline actually use the structured decision path, rather than
+  passing every case through the free-text fallback?
+- **Change:** CHG-045 adds `structured_output_pass_rate` to the report and the fixed thresholds; the
+  replay model now returns deterministic schema instances from `with_structured_output`.
+- **Result:** `structured_output_pass_rate 1.0 (pass; required >= 1)`; `review_rate 0.0`; two cases,
+  zero failed. Capped 83,820 / uncapped 87,883 tokens (ratio 0.953768).
+- **Interpretation:** the fixed set now exercises the structured path. A prompt or provider change
+  that sends one decision through free text lowers the metric and fails gate-4; a crash is still
+  counted by `cases_failed`, not as a silent pass.
