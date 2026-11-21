@@ -29,6 +29,7 @@ class CaseResult:
     case_id: str
     ok: bool
     total_tokens: int = 0
+    uncapped_tokens: int = 0
     budget: int = 0
     compacted_calls: int = 0
     wall_clock_s: float = 0.0
@@ -40,6 +41,7 @@ class CaseResult:
             "case": self.case_id,
             "ok": self.ok,
             "total_tokens": self.total_tokens,
+            "uncapped_tokens": self.uncapped_tokens,
             "budget": self.budget,
             "compacted_calls": self.compacted_calls,
             "wall_clock_s": self.wall_clock_s,
@@ -75,13 +77,17 @@ class EvaluationReport:
             f"  baseline: {self.baseline.total_tokens} tokens / "
             f"${self.baseline.est_cost_usd:.2f} per analysis "
             f"({self.baseline.source})",
+            f"  same condition: {self.metrics.get('total_tokens', 0)} capped / "
+            f"{self.metrics.get('uncapped_tokens', 0)} uncapped "
+            f"(ratio {self.metrics.get('capped_tokens_ratio', 1.0)})",
         ]
         for outcome in self.thresholds:
             lines.append(f"  {outcome.describe()}")
         for case in self.cases:
             if case.ok:
                 lines.append(
-                    f"  {case.case_id}: {case.total_tokens} tokens / budget {case.budget} "
+                    f"  {case.case_id}: {case.total_tokens} tokens "
+                    f"({case.uncapped_tokens} uncapped) / budget {case.budget} "
                     f"({case.compacted_calls} compacted), rating {case.rating or 'n/a'}, "
                     f"{case.wall_clock_s:.2f}s"
                 )
@@ -159,6 +165,7 @@ def evaluate_cases(
                 case_id=case.id,
                 ok=True,
                 total_tokens=observation.total_tokens,
+                uncapped_tokens=observation.uncapped_total_tokens or 0,
                 budget=observation.budget,
                 compacted_calls=observation.compacted_calls,
                 wall_clock_s=round(elapsed, 3),
