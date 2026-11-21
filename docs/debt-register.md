@@ -161,7 +161,9 @@ inventing a ninth.
   two fixtures.
 - **Owner:** admin (context/cost), with member 3 for the evaluation set.
 - **Trigger to revisit:** before quoting a cost figure in `Report.md`; before raising or lowering
-  `context_budget_tokens`; when a key is available for a one-off live release check (not CI).
+  `context_budget_tokens`; when a key is available for a one-off live release check (not CI);
+  **before growing the fixed set** — the aggregate ratio rises toward 1.0 as non-compacting cases
+  are added, so revisit the mechanism metric (for example, a binding rate) at that point.
 - **Linked requirement:** `D1-REQ-EVAL-001`, `D1-REQ-COST-001`, `D1-REQ-COST-003`, `D1-REQ-QUAL-001`.
 - **Status:** mitigated by CHG-039 (2026-11-21): capped 89,858 / uncapped 96,820, ratio 0.928093;
   `eval/thresholds.yaml` fails when the cap stops binding. `E-006` records the numbers and the

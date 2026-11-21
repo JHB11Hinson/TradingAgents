@@ -15,5 +15,8 @@
   sub-second.
 - Record truth: `E-006` and the rewritten `DEBT-011` state the caveat; a live release check remains
   a trigger, not CI work.
+- Fix pass after the fresh whole-branch review: any unmeasured or zero-token uncapped case forces
+  the aggregate ratio to 1.0; pass isolation, uncapped-failure, default-report-path and artifact
+  layout are now pinned by tests. `pytest -q` -> 1416 passed, 1 skipped, 1 deselected.
 - Tests: test/offline/test_eval_same_condition.py, test/offline/test_eval_report.py, test/offline/test_eval_cli.py
 - Verdict: APPROVE

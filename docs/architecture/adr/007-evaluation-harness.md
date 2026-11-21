@@ -85,6 +85,9 @@ reason. Live runs keep the telemetry manifest (ADR-005) as the authoritative cos
   contract.
 - A provider tokenizer replaces the `characters / 4` estimate: the estimator is part of the
   comparison, so both sides change together.
+- The fixed set grows: `capped_tokens_ratio` is an aggregate over cases, so adding non-compacting
+  cases pushes it toward 1.0. Re-evaluate the mechanism metric (a binding rate or a per-case
+  assertion) before the set grows beyond the current two cases.
 - The fixed set grows enough that its runtime stops being negligible in gate-5.
 - Compaction is shown to change decision quality on the fixed set: the reserve and the threshold are
   the first two knobs.

@@ -394,4 +394,4 @@
         Chose the faster inline execution over subagent-per-task.
       why: >-
         The three changes are sequential and share interfaces; the plan and ledger carry the design.
-  transcript: transcripts/60198818-HaobinJiang-CHG-039-debt-011.md#L1-L110
+  transcript: transcripts/60198818-HaobinJiang-CHG-039-debt-011.md#L1-L75
