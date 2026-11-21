@@ -1,8 +1,9 @@
+import json
 import logging
 from collections import Counter
 from typing import Any, TypedDict
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
 
@@ -51,6 +52,44 @@ def _tools_or_done(state) -> str:
     return "tools" if state["messages"][-1].tool_calls else END
 
 
+def identical_call_repeat(messages, limit: int = 2) -> str | None:
+    """Name of the tool whose call repeats in ``limit`` consecutive rounds, or ``None``.
+
+    Implements D1-REQ-TERM-002: a model that asks for the same call with the
+    same arguments again is not making progress, so the analyst loop may wrap
+    up instead of spending every remaining round on it.
+
+    A call is canonicalised as ``(name, json.dumps(args, sort_keys=True))``, so
+    a different key order or a fresh tool-call id cannot hide a repeat. The
+    streak counts consecutive rounds (an ``AIMessage`` turn); tool results
+    between them are ignored, while different arguments or a different call in
+    between start it again. A round may hold several calls, in which case the
+    repeated call's names are returned in sorted order.
+    """
+    if limit < 2:
+        return None
+    previous = None
+    streak = 0
+    for message in messages:
+        if not isinstance(message, AIMessage):
+            continue
+        calls = message.tool_calls or []
+        if not calls:
+            previous, streak = None, 0
+            continue
+        signature = tuple(sorted(
+            (call.get("name", ""), json.dumps(call.get("args", {}), sort_keys=True))
+            for call in calls
+        ))
+        if signature == previous:
+            streak += 1
+        else:
+            previous, streak = signature, 1
+        if streak >= limit:
+            return ", ".join(sorted({name for name, _ in signature}))
+    return None
+
+
 def _traced(name: str, node, phase: str | None = None, kind: str = "agent"):
     """Wrap one graph step so it emits a telemetry span (OBS-001).
 
@@ -91,12 +130,19 @@ def _analyst_graph(spec, agent, max_tool_rounds: int):
         return sum(1 for m in messages if getattr(m, "tool_calls", None))
 
     def more_or_wrap_up(state) -> str:
-        return "wrap_up" if rounds(state["messages"]) >= max_tool_rounds else "agent"
+        if rounds(state["messages"]) >= max_tool_rounds:
+            return "wrap_up"
+        return "wrap_up" if identical_call_repeat(state["messages"]) else "agent"
 
     def wrap_up(state):
         repeated = ", ".join(f"{name} x{n}" for name, n in Counter(calls(state["messages"])).most_common())
-        logger.warning("%s used its %d tool rounds (%s); asking for its report",
-                       spec.agent_node, max_tool_rounds, repeated)
+        stalled_on = identical_call_repeat(state["messages"])
+        if stalled_on is not None:
+            logger.warning("%s repeated the same %s call; asking for its report (%s)",
+                           spec.agent_node, stalled_on, repeated)
+        else:
+            logger.warning("%s used its %d tool rounds (%s); asking for its report",
+                           spec.agent_node, max_tool_rounds, repeated)
         return agent({**state, "messages": [*state["messages"], HumanMessage(WRAP_UP)]})
 
     graph.add_node(

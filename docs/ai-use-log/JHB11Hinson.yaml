@@ -463,3 +463,27 @@
         `gate-1-test-approval` must read a real record before the first `src/` commit, and the
         course requires the test-independence covenant.
   transcript: transcripts/60198818-HaobinJiang-CHG-041-term-001.md#L1-L120
+- id: AI-2026-11-21-012
+  date: 2026-11-21
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-044 (TERM-002): an analyst loop that repeats the same tool call with the same arguments is
+    now forced to write its report at the second consecutive repeat; `max_tool_rounds` remains the
+    backstop. The pure `identical_call_repeat` helper canonicalises name and sorted args, so call ids
+    and dict key order cannot hide a repeat. The inherited `LoopingModel` varies a date each round so
+    its `3 * 3` assertion still tests the hard bound; ADR-012 records that decision.
+  human_interventions:
+    - type: approve
+      what: >-
+        Delegated all implementation decisions except the merge and asked for Bot Review.
+      why: >-
+        The owner accepted the priority order and the concurrent worktree execution.
+    - type: correct
+      what: >-
+        The agent found that the inherited bound test used an identical call every round and decided
+        to vary its argument rather than weaken the assertion.
+      why: >-
+        The test's intent is the hard bound, not the new repeat path; changing the assertion would
+        have removed the bound's only end-to-end evidence.
+  transcript: transcripts/60198818-HaobinJiang-CHG-044-tool-repeat.md#L1-L45
