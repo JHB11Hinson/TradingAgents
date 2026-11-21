@@ -29,12 +29,13 @@ described as if they were.
 
 | Trigger | Detection | Runtime action | User-visible effect | Code | Requirement |
 |---|---|---|---|---|---|
-| Provider lacks structured output | `with_structured_output` raises `NotImplementedError`/`AttributeError` | log a warning and use free-text generation for that agent | a warning in the run log | `agents/structured.py:bind_structured` | `SAFE-002` |
-| Structured call fails (malformed JSON, transient) | exception from the structured invoke | retry once as free text and render the result | a warning; the run continues | `agents/structured.py:invoke_structured` | `SAFE-002` |
-| Decision text has no parseable rating | `extract_rating` returns `None` | emit `REVIEW`, which is not a tradeable position | the report shows `REVIEW`, never a fabricated `Hold` | `agents/rating.py` | `SAFE-002` |
+| Provider lacks structured output | `with_structured_output` raises `NotImplementedError`/`AttributeError` | log a warning and use the strict free-text contract for that agent | a warning in the run log; an ambiguous answer becomes `REVIEW` | `agents/structured.py:bind_structured`, `guardrails/decisions.py` | `SAFE-002` |
+| Structured call fails (malformed JSON, transient) | exception from the structured invoke | retry once as free text; accept only one explicit rating, else `REVIEW` | a warning; no tradeable action from an ambiguous answer | `agents/structured.py:invoke_structured`, `agents/managers/portfolio_manager.py` | `SAFE-002` |
+| Decision text has no single explicit rating | `validate_free_text_decision` returns `None` | emit `REVIEW` and `final_decision_source = "review"` | the report shows `REVIEW`, never a fabricated `Hold` | `guardrails/decisions.py`, `agents/managers/portfolio_manager.py` | `SAFE-002` |
+| External text contains an instruction-like span | `scrub_untrusted` matches a corpus pattern | replace the span with `[blocked instruction]` before the model sees it | the evidence stays; the instruction does not | `guardrails/instructions.py`, `context/agent_layers.py`, `agents/analysts/turn.py` | `SAFE-001` |
 | Context budget exhausted before the Portfolio Manager | `ContextBudgetExceeded` in the PM | return a deterministic `REVIEW` decision that names the cause and sets `termination_reason = "budget_exhausted"`; do not call the model | `REVIEW` with an explanation, no trade | `agents/managers/portfolio_manager.py` | `SAFE-002`, `COST-003` |
 | Context budget exhausted for any other agent | `ContextBudgetExceeded` at the run boundary | return a deterministic `REVIEW`; write the state log; skip the memory log; preserve the checkpoint | `REVIEW` with an explanation, no trade; the run can resume | `graph/trading_graph.py:_run_graph`, `_budget_exhausted_state`, `stream_run`; `cli/run.py` | `COST-003`, `TERM-001`; ADR-008 |
-| A model output tries to set a position directly | the authority boundary | deterministic code owns the decision; the model's text is advisory | never bypassed | ADR-003 | `SAFE-003` *(ceiling planned)* |
+| A model output tries to set a position directly | `enforce_position_ceiling` / `clip_free_text_decision` | clip the claimed size to `max_position_pct` (default 10%) and log the requested/applied values | the rendered decision never exceeds the ceiling | `guardrails/positions.py`, `agents/managers/portfolio_manager.py`, `default_config.py` | `SAFE-003`; ADR-010 |
 
 ### 2.1 Debate termination (`TERM-001`)
 
@@ -95,10 +96,8 @@ described as if they were.
 
 ## 8. Planned policies (not implemented)
 
-| Path | Today | Required action | Requirement |
-|---|---|---|---|
-| Injection scrub before external text reaches a model | not implemented | a deterministic filter with a blocked-sample corpus; zero tolerance | `SAFE-001` |
-| Deterministic position ceiling | not implemented | clip or reject a decision over the ceiling; a test proves the model cannot bypass it | `SAFE-003` |
+None in the `SAFE-001/002/003` area; CHG-042 / ADR-010 shipped them. The guardrail's remaining limit
+is the fixed pattern corpus, recorded in `INV-04` and `DEBT-002`.
 
 A row in section 8 is a gap, not a policy. It is listed so a reader cannot mistake the intended
 behaviour for the shipped one.

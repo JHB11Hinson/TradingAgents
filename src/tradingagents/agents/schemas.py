@@ -181,6 +181,15 @@ class TraderProposal(BaseModel):
         default=None,
         description="Optional sizing guidance, e.g. '5% of portfolio'.",
     )
+    position_pct: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=100.0,
+        description=(
+            "Optional claimed position size as a percentage of the portfolio (0-100). "
+            "The Portfolio Manager applies the deterministic ceiling."
+        ),
+    )
 
     @field_validator("entry_price", "stop_loss", mode="before")
     @classmethod
@@ -206,6 +215,8 @@ def render_trader_proposal(proposal: TraderProposal) -> str:
                          ("Stop Loss", proposal.stop_loss),
                          ("Position Sizing", proposal.position_sizing)):
         parts.extend(["", f"**{label}**: {value if value is not None and value != '' else 'not provided'}"])
+    if proposal.position_pct is not None:
+        parts.extend(["", f"**Position Size**: {_position_pct(proposal.position_pct)}"])
     parts.extend([
         "",
         f"FINAL TRANSACTION PROPOSAL: **{proposal.action.value.upper()}**",
@@ -258,6 +269,15 @@ class PortfolioDecision(BaseModel):
         default=None,
         description="Optional recommended holding period, e.g. '3-6 months'.",
     )
+    position_pct: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=100.0,
+        description=(
+            "Claimed position size as a percentage of the portfolio (0-100). "
+            "Deterministic code clips it to the configured ceiling."
+        ),
+    )
 
     @field_validator("price_target", mode="before")
     @classmethod
@@ -285,7 +305,15 @@ def render_pm_decision(decision: PortfolioDecision) -> str:
     target = decision.price_target if decision.price_target is not None else "not provided"
     parts.extend(["", f"**Price Target**: {target}"])
     parts.extend(["", f"**Time Horizon**: {decision.time_horizon or 'not provided'}"])
+    parts.extend(["", f"**Position Size**: {_position_pct(decision.position_pct)}"])
     return "\n".join(parts)
+
+
+def _position_pct(value: float | None) -> str:
+    """Render a percentage without a trailing ``.0`` for whole numbers."""
+    if value is None:
+        return "not provided"
+    return f"{value:g}%"
 
 
 # ---------------------------------------------------------------------------
