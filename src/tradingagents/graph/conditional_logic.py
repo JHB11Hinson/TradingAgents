@@ -1,4 +1,5 @@
 from tradingagents.agents.state import AgentState
+from tradingagents.agents.termination import detect_termination
 
 
 class ConditionalLogic:
@@ -16,6 +17,10 @@ class ConditionalLogic:
             state["investment_debate_state"]["count"] >= 2 * self.max_debate_rounds
         ):  # max_debate_rounds turns each for bull and bear
             return "Research Manager"
+        if detect_termination(
+            state["investment_debate_state"].get("turn_digests", []), cycle=2
+        ):
+            return "Research Manager"
         if state["investment_debate_state"]["current_response"].startswith("Bull"):
             return "Bear Researcher"
         return "Bull Researcher"
@@ -25,6 +30,10 @@ class ConditionalLogic:
         if (
             state["risk_debate_state"]["count"] >= 3 * self.max_risk_discuss_rounds
         ):  # max_risk_discuss_rounds turns each for the three risk analysts
+            return "Portfolio Manager"
+        if detect_termination(
+            state["risk_debate_state"].get("turn_digests", []), cycle=3
+        ):
             return "Portfolio Manager"
         if state["risk_debate_state"]["latest_speaker"].startswith("Aggressive"):
             return "Conservative Analyst"

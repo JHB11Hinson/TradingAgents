@@ -5,6 +5,7 @@ from tradingagents.agents.context import (
     opponent_argument_or_opening,
     report_or_absent,
 )
+from tradingagents.agents.termination import turn_digest
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
     constraints_block,
@@ -112,6 +113,10 @@ Your task is to challenge both the Aggressive and Conservative Analysts, pointin
             "current_conservative_response": risk_debate_state.get("current_conservative_response", ""),
             "current_neutral_response": argument,
             "count": risk_debate_state["count"] + 1,
+            "turn_digests": [
+                *risk_debate_state.get("turn_digests", []),
+                turn_digest(response.content),
+            ],
         }
 
         return {"risk_debate_state": new_risk_debate_state}
