@@ -25,3 +25,25 @@
 
 Approval scope: this record approves the **test contract only**. The implementation head needs a
 second decision in this same file after the gates are green.
+
+### PR-51 — CHG-044 implementation head (review)
+
+- Reviewer: `github-actions` (`.github/workflows/bot-review.yml`). **Automated non-author review**,
+  requested by the owner with the `bot-review` label.
+- Head reviewed: implementation head `19d210e`; this docs/AI-use commit follows it.
+- Specification: `D1-REQ-TERM-002` wraps up at the second consecutive identical `(name, args)` call;
+  key order and call ids do not hide a repeat; different arguments or an intervening different call
+  reset the streak; the round bound remains the backstop.
+- Architecture: one pure helper in `graph/setup.py`; no new state key, model call or dependency.
+  ADR-012 records the decision and why the inherited `LoopingModel` now varies its date argument.
+- Code and tests: `pytest -q` -> 1466 passed, 1 skipped, 1 deselected; `ruff` clean. The graph-level
+  test wraps at two rounds with `max_tool_rounds=20`; the negative twin removes the detector and runs
+  to twenty, proving the test catches a missing guard. The inherited `3 * 3` assertion is unchanged
+  and now genuinely exercises the hard bound.
+- Runtime metadata: no config, prompt, permission or gate change.
+- Safety and efficiency: the detector stops a repeating loop earlier than the bound and adds no
+  model call.
+- Record truth: the detector and its negative twin are separate tests; the inherited bound test is
+  preserved in intent and assertion.
+- Tests: test/offline/test_repeated_tool_calls.py, test/offline/test_graph_end_to_end.py
+- Verdict: APPROVE
