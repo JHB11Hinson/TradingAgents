@@ -394,6 +394,27 @@ class TradingAgentsGraph:
             rating=run_rating(final_state),
         )
 
+    def _budget_exhausted_state(self, base_state: dict[str, Any], exc: Exception) -> dict[str, Any]:
+        """The deterministic REVIEW state a budget-exhausted run ends in (COST-003).
+
+        Built from the run's initial state so the state log can be written with
+        the same writer as a completed run. The plan fields are empty strings,
+        not missing keys; a later run with a larger budget resumes from the
+        checkpoint instead of quoting this non-decision as a call.
+        """
+        return {
+            **base_state,
+            "final_trade_decision": (
+                "Rating: REVIEW\n\nThe context budget was exhausted before the analysis "
+                "completed; no tradeable decision was produced."
+            ),
+            "final_rating": "REVIEW",
+            "termination_reason": "budget_exhausted",
+            "memory_note": "The context budget ended this run before a decision.",
+            "investment_plan": base_state.get("investment_plan", ""),
+            "trader_investment_plan": base_state.get("trader_investment_plan", ""),
+        }
+
     def _run_graph(self, company_name, trade_date, asset_type: str = "stock",
                    checkpoint_thread_id: str | None = None, portfolio=None):
         """Execute the graph and write the resulting state to disk and memory log."""
