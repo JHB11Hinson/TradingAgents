@@ -100,9 +100,9 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 | `COST-001` ≤50% baseline | `eval.run` fixed-set totals | **done** (CHG-036; `test/offline/test_eval_*.py`, `python -m eval.run` -> 0.374) |
 | `COST-003` token budget | `test/offline/test_token_budget.py` | **done** (CHG-033/CHG-036; the ledger counts the whole request, `test/offline/test_context_ledger_reserve.py`) |
 | `EVAL-001` fixed set + runner | `python -m eval.run` pass/fail | **done** (CHG-036; `test/offline/test_eval_cli.py`) |
-| `SAFE-001` injection scrubbing | adversarial corpus + scrubbing-off negative test | **not implemented** (INV-04) |
-| `SAFE-002` schema rejection | malformed-decision negative test, including the PM free-text fallback | **partial** (INV-05) |
-| `SAFE-003` position ceiling | over-ceiling clip/reject + bypass negative test | **not implemented** (INV-06) |
+| `SAFE-001` injection scrubbing | adversarial corpus + detector-removal and seam-removal negative tests | **done** (CHG-042; `test/offline/test_guardrails.py`) |
+| `SAFE-002` schema rejection | malformed/ambiguous-decision negative test, including the PM free-text fallback | **done** (CHG-042; the fallback needs one explicit rating) |
+| `SAFE-003` position ceiling | over-ceiling clip + bypass-negative test | **done** (CHG-042; `test/offline/test_guardrails.py`) |
 | `GOV-001` layout | src/test present, install green, README states the test commands | **partial** — README reset in CHG-031; verify after merge |
 | `GOV-002` AGENTS.md sections | review checklist | **partial** — the “six required sections” count is being corrected (P1-08) |
 | `GOV-003` six gates | `protection.json` + deliberate-violation records | **done** — six contexts online (CHG-037); red evidence: gate-1 PR #45, gate-2 PR #12/#26, gate-3 PR #4, gate-4 PR #44, gate-5 PR #6, gate-6 PR #5 |
