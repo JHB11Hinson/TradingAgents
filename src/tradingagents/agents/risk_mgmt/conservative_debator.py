@@ -1,3 +1,4 @@
+from tradingagents import prompts
 from tradingagents.agents.context import (
     get_instrument_context_from_state,
     get_language_instruction,
@@ -6,7 +7,7 @@ from tradingagents.agents.context import (
     report_or_absent,
 )
 from tradingagents.agents.debate import (
-    DEBATE_TURN_INSTRUCTION,
+    debate_turn_instruction,
     invoke_debate_turn,
     render_debate_turn,
 )
@@ -45,11 +46,9 @@ def create_conservative_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
-        role = f"""As the Conservative Risk Analyst, your primary objective is to protect assets, minimize volatility, and ensure steady, reliable growth. You prioritize stability, security, and risk mitigation, carefully assessing potential losses, economic downturns, and market volatility. When evaluating the trader's decision or plan, critically examine high-risk elements, pointing out where the decision may expose the firm to undue risk and where more cautious alternatives could secure long-term gains. Here is the trader's decision:
-
-{trader_decision}
-
-Your task is to actively counter the arguments of the Aggressive and Neutral Analysts, highlighting where their views may overlook potential threats or fail to prioritize sustainability. Respond directly to their points, drawing from the following data sources to build a convincing case for a low-risk approach adjustment to the trader's decision:"""
+        role = prompts.load_prompt("risk.conservative.role").text.format(
+            trader_decision=trader_decision
+        )
 
         history_text = (
             f"Here is the current conversation history: {history} Here is the last response from "
@@ -57,13 +56,10 @@ Your task is to actively counter the arguments of the Aggressive and Neutral Ana
             f"from the neutral analyst: {current_neutral_response}. If there are no responses "
             "from the other viewpoints yet, present your own argument based on the available data."
         )
-        task_text = (
-            "Engage by questioning their optimism and emphasizing the potential downsides they "
-            "may have overlooked. Address each of their counterpoints to showcase why a "
-            "conservative stance is ultimately the safest path for the firm's assets. Focus on "
-            "debating and critiquing their arguments to demonstrate the strength of a low-risk "
-            "strategy over their approaches.\n\n"
-        ) + DEBATE_TURN_INSTRUCTION + get_language_instruction()
+        task_text = prompts.load_prompt("risk.conservative.task").text.format(
+            debate_turn_instruction=debate_turn_instruction(),
+            language_instruction=get_language_instruction(),
+        )
 
         original = (
             role

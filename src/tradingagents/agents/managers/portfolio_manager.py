@@ -12,13 +12,14 @@ from __future__ import annotations
 
 import logging
 
+from tradingagents import prompts
 from tradingagents.agents.context import (
     get_instrument_context_from_state,
     get_language_instruction,
     get_portfolio_context_from_state,
 )
 from tradingagents.agents.schemas import PortfolioDecision, render_pm_decision
-from tradingagents.agents.structured import NO_EXTERNAL_TOOLS, bind_structured, invoke_structured
+from tradingagents.agents.structured import bind_structured, invoke_structured, no_external_tools
 from tradingagents.agents.termination import detect_termination
 from tradingagents.context import (
     ContextBudgetExceeded,
@@ -99,29 +100,11 @@ def create_portfolio_manager(
             else ""
         )
 
-        role = """As the Portfolio Manager, synthesize the risk analysts' debate and deliver the final trading decision.
+        role = prompts.load_prompt("manager.portfolio.role").text
 
----
-
-**Rating Scale** (use exactly one):
-- **Buy**: Strong conviction to enter or add to position
-- **Overweight**: Favorable outlook, gradually increase exposure
-- **Hold**: Maintain current position, no action needed
-- **Underweight**: Reduce exposure, take partial profits
-- **Sell**: Exit position or avoid entry
-
----
-
-Ground every conclusion in specific evidence from the analysts. The risk debate always contains conflicting stances; deciding which is stronger is the job, so conflict alone is not a reason to Hold. Commit to the stronger case, sized by how decisively it wins. Choose Hold only when the evidence is still balanced after that weighing, or too thin to support a call; do not force a direction to appear decisive. Weigh the analysts on their merits, independent of speaking order."""
-
-        task_text = (
-            "## Output\n\n"
-            "Write these sections, in this order, starting with the rating on its own line:\n\n"
-            "- **Rating**: exactly one of Buy / Overweight / Hold / Underweight / Sell\n"
-            "- **Executive Summary**: the call and how to act on it\n"
-            "- **Investment Thesis**: the evidence that decided it, and what would change it\n\n"
-            + NO_EXTERNAL_TOOLS
-            + get_language_instruction()
+        task_text = prompts.load_prompt("manager.portfolio.task").text.format(
+            no_external_tools=no_external_tools(),
+            language_instruction=get_language_instruction(),
         )
 
         original = (

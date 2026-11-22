@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from langchain_core.messages import AIMessage
 
+from tradingagents import prompts
 from tradingagents.agents.context import (
     get_instrument_context_from_state,
     get_language_instruction,
@@ -11,9 +12,9 @@ from tradingagents.agents.context import (
 )
 from tradingagents.agents.schemas import TraderProposal, render_trader_proposal
 from tradingagents.agents.structured import (
-    NO_EXTERNAL_TOOLS,
     bind_structured,
     invoke_structured_or_freetext,
+    no_external_tools,
 )
 from tradingagents.context import assemble_context, make_layers
 from tradingagents.context.agent_layers import (
@@ -53,35 +54,20 @@ def create_trader(llm):
             grounding = ""
             report_section = ""
 
-        role = (
-            "You are a trading agent analyzing market data to make investment decisions. "
-            "Based on your analysis, provide a specific recommendation to buy, sell, or hold. "
-            + grounding
-            # Entry/stop are numeric price fields. Asking for concrete
-            # levels invites a percentage ("15%"), which is not a price
-            # and fails the structured parse (#1288).
-            + "State entry price and stop-loss as absolute price levels in the "
-            "instrument's quote currency (for example 189.5), never a percentage "
-            "or a range; convert a percentage distance to the price level it "
-            "implies, or omit the field if you cannot state a number. "
-            + NO_EXTERNAL_TOOLS
-            + get_language_instruction()
+        # Entry/stop are numeric price fields. Asking for concrete levels
+        # invites a percentage ("15%"), which is not a price and fails the
+        # structured parse (#1288).
+        role = prompts.load_prompt("trader.role").text.format(
+            grounding=grounding,
+            no_external_tools=no_external_tools(),
+            language_instruction=get_language_instruction(),
         )
-        task_text = (
-            f"Here is the research team's investment plan for {company_name}. "
-            f"{instrument_context}\n\n"
-            f"{report_section}"
-            f"{portfolio_context}\n\n"
-            f"Proposed Investment Plan:\n{investment_plan}\n\n"
-            "Make an informed, strategic trading decision.\n\n"
-            "## Output\n\n"
-            "Write these sections, in this order, starting with the action "
-            "on its own line:\n\n"
-            "- **Action**: exactly one of Buy / Hold / Sell. A research "
-            "recommendation of Overweight is a Buy and Underweight is a Sell, "
-            "sized by how strong the case is; conflict alone is not a Hold.\n"
-            "- **Reasoning**: why, against the plan and the price structure\n"
-            "- **Entry Price**, **Stop Loss**, **Position Sizing**: when you can state them"
+        task_text = prompts.load_prompt("trader.task").text.format(
+            company_name=company_name,
+            instrument_context=instrument_context,
+            report_section=report_section,
+            portfolio_context=portfolio_context,
+            investment_plan=investment_plan,
         )
         original = role + "\n\n" + task_text
 

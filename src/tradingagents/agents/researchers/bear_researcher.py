@@ -1,3 +1,4 @@
+from tradingagents import prompts
 from tradingagents.agents.context import (
     get_instrument_context_from_state,
     get_language_instruction,
@@ -5,7 +6,7 @@ from tradingagents.agents.context import (
     report_or_absent,
 )
 from tradingagents.agents.debate import (
-    DEBATE_TURN_INSTRUCTION,
+    debate_turn_instruction,
     invoke_debate_turn,
     render_debate_turn,
 )
@@ -43,25 +44,19 @@ def create_bear_researcher(llm):
             else "Asset fundamentals report (may be unavailable for crypto)"
         )
 
-        role = f"""You are a Bear Analyst making the case against investing in the {target_label}. Your goal is to present a well-reasoned argument emphasizing risks, challenges, and negative indicators. Leverage the provided research and data to highlight potential downsides and counter bullish arguments effectively.
-
-Key points to focus on:
-
-- Risks and Challenges: Highlight factors like market saturation, financial instability, or macroeconomic threats that could hinder the stock's performance.
-- Competitive Weaknesses: Emphasize vulnerabilities such as weaker market positioning, declining innovation, or threats from competitors.
-- Negative Indicators: Use evidence from financial data, market trends, or recent adverse news to support your position.
-- Bull Counterpoints: Critically analyze the bull argument with specific data and sound reasoning, exposing weaknesses or over-optimistic assumptions.
-- Engagement: Present your argument in a conversational style, directly engaging with the bull analyst's points and debating effectively rather than simply listing facts."""
+        role = prompts.load_prompt("researcher.bear.role").text.format(
+            target_label=target_label
+        )
 
         history_text = (
             f"Conversation history of the debate: {history}\n"
             f"Last bull argument: {current_response}"
         )
-        task_text = (
-            f"Use this information to deliver a compelling bear argument, refute the bull's "
-            f"claims, and engage in a dynamic debate that demonstrates the risks and weaknesses "
-            f"of investing in the {target_label}.\n\n"
-        ) + DEBATE_TURN_INSTRUCTION + get_language_instruction()
+        task_text = prompts.load_prompt("researcher.bear.task").text.format(
+            target_label=target_label,
+            debate_turn_instruction=debate_turn_instruction(),
+            language_instruction=get_language_instruction(),
+        )
 
         original = (
             role

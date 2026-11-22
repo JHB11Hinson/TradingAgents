@@ -320,14 +320,14 @@ class TestTradingMemoryLogCore:
     # Rotation: opt-in cap on resolved entries
 
     def test_rotation_disabled_by_default(self, tmp_path):
-        """Without max_entries, all resolved entries are kept."""
+        """D1-REQ-MEM-004: without max_entries, all resolved entries are kept."""
         log = make_log(tmp_path)
         for i in range(7):
             _resolve_entry(log, "NVDA", f"2026-01-{i+1:02d}", DECISION_BUY, f"Lesson {i}.")
         assert len(log.load_entries()) == 7
 
     def test_rotation_prunes_oldest_resolved(self, tmp_path):
-        """When max_entries is set and exceeded, oldest resolved entries are pruned."""
+        """D1-REQ-MEM-004: with max_entries set and exceeded, oldest resolved entries are pruned."""
         log = TradingMemoryLog({
             "memory_log_path": str(tmp_path / "trading_memory.md"),
             "memory_log_max_entries": 3,
@@ -342,7 +342,7 @@ class TestTradingMemoryLogCore:
         assert dates == ["2026-01-03", "2026-01-04", "2026-01-05"]
 
     def test_rotation_never_prunes_pending(self, tmp_path):
-        """Pending entries (unresolved) are kept regardless of the cap."""
+        """D1-REQ-MEM-004: pending (unresolved) entries are kept regardless of the cap."""
         log = TradingMemoryLog({
             "memory_log_path": str(tmp_path / "trading_memory.md"),
             "memory_log_max_entries": 2,
@@ -361,7 +361,7 @@ class TestTradingMemoryLogCore:
         assert len(resolved) == 2, f"expected 2 resolved after rotation, got {len(resolved)}"
 
     def test_rotation_under_cap_is_noop(self, tmp_path):
-        """No rotation when resolved count <= max_entries."""
+        """D1-REQ-MEM-004: no rotation when the resolved count is within max_entries."""
         log = TradingMemoryLog({
             "memory_log_path": str(tmp_path / "trading_memory.md"),
             "memory_log_max_entries": 10,

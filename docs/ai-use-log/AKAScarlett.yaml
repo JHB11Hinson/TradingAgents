@@ -27,3 +27,27 @@
         a later one.
       why: >-
         Keeping the log current with the test change avoids a gate-6 block on the branch.
+    Requirement-tag pass on the offline tests (no src change). Added an explicit D1-REQ-DEBATE-004
+    boundary test to test_termination.py that parametrizes max_debate_rounds over 1/2/3 and asserts
+    the debate keeps alternating below 2*N and routes to the Research Manager at exactly 2*N, with
+    advancing digests so the configured bound is isolated from the termination detector. Tagged the
+    existing dedupe and stage-order tests with D1-REQ-CTX-002, the compaction/re-injection and
+    budget-ceiling tests (and the budget-degradation run-boundary fallback) with D1-REQ-CTX-003, and
+    the four rotation tests with D1-REQ-MEM-004, so every fit criterion names the requirement it
+    covers per AGENTS.md section 9.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the branch test/req-tags-debate-004-ctx-002-003-mem-004 and the decision to keep
+        this batch test-only, adding docstrings and one boundary test without touching src/.
+      why: >-
+        The gaps were uncovered fit criteria and unnamed requirements, not missing behavior; a
+        test-only PR keeps gate-1 (tests before code) trivially satisfied and leaves the MEM-003
+        source-attribution implementation to its own PR with an ADR.
+    - type: constrain
+      what: >-
+        Limited the changes to docstrings plus the single DEBATE-004 test; no assertions on
+        existing tests were altered.
+      why: >-
+        Retagging must not silently change what the suite proves.
+  transcript: TBD

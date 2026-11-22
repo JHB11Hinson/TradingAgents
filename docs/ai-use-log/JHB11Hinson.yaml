@@ -663,3 +663,73 @@
       why: >-
         The code shipped in CHG-033; the register was stale and the new check should catch that.
   transcript: transcripts/60198818-HaobinJiang-CHG-048-governance-consistency.md#L1-L60
+
+- id: AI-2026-11-22-004
+  date: 2026-11-22
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    PR-57 review (D1-REQ-DEBATE-004, CTX-002, CTX-003, MEM-004) along the Standards and Spec axes,
+    followed by the fixes on top of the PR head. The blocking findings were evidentiary, not
+    behavioural: a `transcript: TBD`, a missing `Agent-Session:` trailer, docstring tags on an
+    inherited test without an ADR, and no review memo. A mutation probe showed the new DEBATE-004
+    test still passed with the router's `>=` rewritten as `==`, so it did not prove "never exceeds
+    2*N". The fix adds an over-bound assertion and an `_advancing(n)` digest helper that replaces a
+    ten-character slice; the mutant now fails all three parametrized cases. Also named CTX-002 on
+    the under-budget and priority-drop tests, corrected a CTX-003 over-claim to COST-003, added
+    ADR-014 for the inherited-test tags, and pointed the trace-matrix DEBATE-004, CTX-002 and
+    MEM-004 rows and the DEBATE-004 status row at the tests that carry them. A second, independent
+    review of the fix caught three overstated claims — a CTX-002 docstring asserting drops the test
+    never checked, an ADR status naming an approval that did not exist, and a sibling test left on
+    CTX-003 — and the follow-up commit corrects all three.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked for the open pull request to be reviewed, then for the findings to be fixed and the
+        review repeated before merging.
+      why: >-
+        The reviewer is the only member who can act on PR-57 before the merge, and the red
+        bot-review check blocked it.
+    - type: constrain
+      what: >-
+        The agent did not edit docs/ai-use-log/AKAScarlett.yaml, did not write an approving review
+        record, and did not merge.
+      why: >-
+        The AI-use-log README rule 1 reserves that file for its owner, and AGENTS.md section 7 says
+        the agent never approves or merges a change.
+  transcript: transcripts/60198818-HaobinJiang-PR-57-review.md#L1-L122
+
+- id: AI-2026-11-22-005
+  date: 2026-11-22
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-049 (GOV-012): finish the versioned prompt store by making the runtime read it. All twelve
+    agent nodes (analysts, researchers, risk debate, managers, trader) and the three shared
+    instruction fragments now load their text from prompts/prompt_v1.1.yaml at node call time;
+    prompt_v1.0.yaml is untouched and prompts/index.yaml appends the new file hash. The migration is
+    behaviour-preserving: a before/after golden capture of all twelve nodes is identical. A missing
+    or tampered entry raises PromptError with no fallback. DEBT-001 closes. The new runtime test
+    pins every node to its entries, proves fail-closed behaviour, and fails if a migrated prompt
+    reappears in src/tradingagents/agents/**.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked to complete GOV-012 by making analyst/researcher/manager/trader load prompts through
+        load_prompt(), close DEBT-001, and run Bot Review.
+      why: >-
+        The version store existed but the runtime still used embedded literals, so the requirement
+        was only half met.
+    - type: approve
+      what: >-
+        Chose approach A and approved including the three risk debators in scope.
+      why: >-
+        DEBT-001 cannot close while any runtime role prompt remains embedded.
+    - type: constrain
+      what: >-
+        Keep prompt_v1.0.yaml immutable, preserve the prompt text byte-for-byte, and fail closed
+        rather than falling back to a literal.
+      why: >-
+        The change is a sourcing change, not a prompt-quality change; a fallback would hide a
+        missing store.
+  transcript: transcripts/60198818-HaobinJiang-CHG-049-runtime-prompt-store.md#L1-L144

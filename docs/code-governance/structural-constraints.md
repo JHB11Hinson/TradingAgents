@@ -31,7 +31,7 @@ across two modules, and two elements must not own the same module.
 | Reporting | `src/tradingagents/reporting.py`, `src/tradingagents/report_html.py` | report trees and the HTML page |
 | Telemetry | `src/tradingagents/telemetry/` | the in-process event seam, spans, the run trace and the run manifest |
 | Evaluation | `src/tradingagents/evaluation/` | the fixed set, the baseline, the metrics, the thresholds and the verdict (`eval/` is the CLI and the replay backend, not an installed module) |
-| Versioned prompts | `src/tradingagents/prompts/` | the versioned prompt loader and its checksum verification (`GOV-012`) |
+| Versioned prompts | `src/tradingagents/prompts/` | the versioned prompt loader and its checksum verification; the twelve agent nodes load their role, preamble and task text from it at node call time (`GOV-012`) |
 | Configuration | `src/tradingagents/default_config.py` | defaults and `TRADINGAGENTS_*` overrides |
 | CLI | `src/cli/` | interactive and headless entry points, display, preferences |
 
