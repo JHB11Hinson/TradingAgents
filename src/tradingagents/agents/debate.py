@@ -21,6 +21,7 @@ import logging
 import re
 from typing import Any
 
+from tradingagents import prompts
 from tradingagents.agents.schemas import DebateEvidence, DebateTurn
 
 logger = logging.getLogger(__name__)
@@ -37,16 +38,13 @@ _NO_CONVERGENCE = "no convergence stated"
 _NO_OPPONENT = "no opponent spoke"
 _NO_CLAIM = "(no claim provided)"
 
-# Appended to every debate node's task text. Kept here so the five speakers ask
-# for exactly the same shape without editing any prompt file.
-DEBATE_TURN_INSTRUCTION = (
-    "Return your turn as a single JSON object with exactly these fields: "
-    '"claim" (string), "evidence" (a non-empty list of objects with "source" and '
-    '"quote" strings), "rebuttal" (string), "confidence" (one of "low", "medium", '
-    '"high"), "diverge" (string: the alternatives you considered) and "converge" '
-    "(string: the position you settled on). Every field is required and must be "
-    "non-empty.\n\n"
-)
+def debate_turn_instruction() -> str:
+    """The JSON contract appended to every debate task, from the versioned store.
+
+    Kept in one place so the five speakers ask for exactly the same shape
+    (D1-REQ-DEBATE-001, D1-REQ-GOV-012).
+    """
+    return prompts.load_prompt("shared.debate_turn_instruction").text
 
 
 def render_debate_turn(turn: DebateTurn, side: str) -> str:

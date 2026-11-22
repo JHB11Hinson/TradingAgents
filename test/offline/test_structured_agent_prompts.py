@@ -18,8 +18,10 @@ import pytest
 import tradingagents.agents.analysts.sentiment_analyst as sentiment
 from tradingagents.agents.managers.portfolio_manager import create_portfolio_manager
 from tradingagents.agents.managers.research_manager import create_research_manager
-from tradingagents.agents.structured import NO_EXTERNAL_TOOLS
 from tradingagents.agents.trader.trader import create_trader
+from tradingagents.prompts import load_prompt
+
+NO_EXTERNAL_TOOLS = load_prompt("shared.no_external_tools").text
 
 
 def _capturing_llm(captured: dict, result):
@@ -133,11 +135,13 @@ def test_sentiment_prompt_states_constraint(monkeypatch):
 @pytest.mark.unit
 def test_tool_using_analysts_keep_their_date_guidance():
     # The analysts that really do call tools keep the wording that anchors their
-    # tool date ranges (#836) — this fix is scoped to no-tool agents.
+    # tool date ranges (#836) — this fix is scoped to no-tool agents. The wording
+    # lives in the versioned store; the modules must load that entry.
+    assert "tool-call date ranges" in load_prompt("analyst.tool_preamble").text
     import tradingagents.agents.analysts.market_analyst as market
     import tradingagents.agents.analysts.news_analyst as news
     for module in (market, news):
-        assert "tool-call date ranges" in inspect.getsource(module)
+        assert "analyst.tool_preamble" in inspect.getsource(module)
 
 
 @pytest.mark.unit

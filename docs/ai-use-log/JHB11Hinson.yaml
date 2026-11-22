@@ -698,3 +698,38 @@
         The AI-use-log README rule 1 reserves that file for its owner, and AGENTS.md section 7 says
         the agent never approves or merges a change.
   transcript: transcripts/60198818-HaobinJiang-PR-57-review.md#L1-L122
+
+- id: AI-2026-11-22-005
+  date: 2026-11-22
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-049 (GOV-012): finish the versioned prompt store by making the runtime read it. All twelve
+    agent nodes (analysts, researchers, risk debate, managers, trader) and the three shared
+    instruction fragments now load their text from prompts/prompt_v1.1.yaml at node call time;
+    prompt_v1.0.yaml is untouched and prompts/index.yaml appends the new file hash. The migration is
+    behaviour-preserving: a before/after golden capture of all twelve nodes is identical. A missing
+    or tampered entry raises PromptError with no fallback. DEBT-001 closes. The new runtime test
+    pins every node to its entries, proves fail-closed behaviour, and fails if a migrated prompt
+    reappears in src/tradingagents/agents/**.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked to complete GOV-012 by making analyst/researcher/manager/trader load prompts through
+        load_prompt(), close DEBT-001, and run Bot Review.
+      why: >-
+        The version store existed but the runtime still used embedded literals, so the requirement
+        was only half met.
+    - type: approve
+      what: >-
+        Chose approach A and approved including the three risk debators in scope.
+      why: >-
+        DEBT-001 cannot close while any runtime role prompt remains embedded.
+    - type: constrain
+      what: >-
+        Keep prompt_v1.0.yaml immutable, preserve the prompt text byte-for-byte, and fail closed
+        rather than falling back to a literal.
+      why: >-
+        The change is a sourcing change, not a prompt-quality change; a fallback would hide a
+        missing store.
+  transcript: transcripts/60198818-HaobinJiang-CHG-049-runtime-prompt-store.md#L1-L144

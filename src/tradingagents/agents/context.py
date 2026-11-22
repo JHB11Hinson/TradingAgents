@@ -5,6 +5,7 @@ import logging
 from collections.abc import Mapping
 from typing import Any
 
+from tradingagents import prompts
 from tradingagents.dataflows.date_window import is_historical
 from tradingagents.dataflows.vendors.yahoo.fundamentals import get_company_profile
 
@@ -27,11 +28,7 @@ def get_language_instruction() -> str:
     # The labelled lines are read by the program, so they keep their English
     # label and value: a translated rating line leaves the reader prose to
     # search, where a negated rating ("not a Sell") reads as the call (#1435).
-    return (
-        f" Write your entire response in {lang}, except the labelled lines the format"
-        f" asks for (the \"**Rating**:\" line, \"FINAL TRANSACTION PROPOSAL:\"):"
-        f" keep their label and value in English, exactly as specified."
-    )
+    return prompts.load_prompt("shared.language_instruction").text.format(language=lang)
 
 
 def opponent_argument_or_opening(text: str, opponent: str) -> str:
