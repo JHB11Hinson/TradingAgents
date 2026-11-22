@@ -176,12 +176,12 @@ def _state(**overrides):
     return state
 
 
-def _prepare(module_name, module):
+def _prepare(monkeypatch, module_name, module):
     if module_name.endswith("sentiment_analyst"):
-        module.fetch_stocktwits_messages = lambda *a, **k: "st"
-        module.fetch_reddit_posts = lambda *a, **k: "rd"
-        module.get_news.func = lambda *a, **k: "news"
-        module.jev_screen = lambda *a, **k: None
+        monkeypatch.setattr(module, "fetch_stocktwits_messages", lambda *a, **k: "st")
+        monkeypatch.setattr(module, "fetch_reddit_posts", lambda *a, **k: "rd")
+        monkeypatch.setattr(module.get_news, "func", lambda *a, **k: "news")
+        monkeypatch.setattr(module, "jev_screen", lambda *a, **k: None)
 
 
 def _sentinel_loader(monkeypatch):
@@ -200,7 +200,7 @@ def _sentinel_loader(monkeypatch):
 
 
 def _run_agent(monkeypatch, module_name, module, llm):
-    _prepare(module_name, module)
+    _prepare(monkeypatch, module_name, module)
     factory = AGENT_FACTORIES[module_name]
     getattr(module, factory)(llm)(_state())
     return "\n".join(llm.prompts)
@@ -232,7 +232,7 @@ def test_a_missing_prompt_fails_the_node_closed(monkeypatch, module_name):
 
     monkeypatch.setattr(prompts, "load_prompt", missing)
     module = importlib.import_module(module_name)
-    _prepare(module_name, module)
+    _prepare(monkeypatch, module_name, module)
 
     with pytest.raises(PromptError):
         getattr(module, AGENT_FACTORIES[module_name])(_RecordingLLM())(_state())
@@ -260,10 +260,10 @@ def test_a_braced_report_value_is_inserted_verbatim(monkeypatch):
     sentiment = importlib.import_module(
         "tradingagents.agents.analysts.sentiment_analyst"
     )
-    sentiment.fetch_stocktwits_messages = lambda *a, **k: "st"
-    sentiment.fetch_reddit_posts = lambda *a, **k: "rd"
-    sentiment.get_news.func = lambda *a, **k: braced
-    sentiment.jev_screen = lambda *a, **k: None
+    monkeypatch.setattr(sentiment, "fetch_stocktwits_messages", lambda *a, **k: "st")
+    monkeypatch.setattr(sentiment, "fetch_reddit_posts", lambda *a, **k: "rd")
+    monkeypatch.setattr(sentiment.get_news, "func", lambda *a, **k: braced)
+    monkeypatch.setattr(sentiment, "jev_screen", lambda *a, **k: None)
     llm = _RecordingLLM()
     sentiment.create_sentiment_analyst(llm)(_state())
     assert braced in "\n".join(llm.prompts)
