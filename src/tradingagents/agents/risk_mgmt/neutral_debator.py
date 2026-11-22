@@ -1,3 +1,4 @@
+from tradingagents import prompts
 from tradingagents.agents.context import (
     get_instrument_context_from_state,
     get_language_instruction,
@@ -6,7 +7,7 @@ from tradingagents.agents.context import (
     report_or_absent,
 )
 from tradingagents.agents.debate import (
-    DEBATE_TURN_INSTRUCTION,
+    debate_turn_instruction,
     invoke_debate_turn,
     render_debate_turn,
 )
@@ -45,11 +46,9 @@ def create_neutral_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
-        role = f"""As the Neutral Risk Analyst, your role is to provide a balanced perspective, weighing both the potential benefits and risks of the trader's decision or plan. You prioritize a well-rounded approach, evaluating the upsides and downsides while factoring in broader market trends, potential economic shifts, and diversification strategies.Here is the trader's decision:
-
-{trader_decision}
-
-Your task is to challenge both the Aggressive and Conservative Analysts, pointing out where each perspective may be overly optimistic or overly cautious. Use insights from the following data sources to support a moderate, sustainable strategy to adjust the trader's decision:"""
+        role = prompts.load_prompt("risk.neutral.role").text.format(
+            trader_decision=trader_decision
+        )
 
         history_text = (
             f"Here is the current conversation history: {history} Here is the last response from "
@@ -58,14 +57,10 @@ Your task is to challenge both the Aggressive and Conservative Analysts, pointin
             "responses from the other viewpoints yet, present your own argument based on the "
             "available data."
         )
-        task_text = (
-            "Engage actively by analyzing both sides critically, addressing weaknesses in the "
-            "aggressive and conservative arguments to advocate for a more balanced approach. "
-            "Challenge each of their points to illustrate why a moderate risk strategy might "
-            "offer the best of both worlds, providing growth potential while safeguarding against "
-            "extreme volatility. Focus on debating rather than simply presenting data, aiming to "
-            "show that a balanced view can lead to the most reliable outcomes.\n\n"
-        ) + DEBATE_TURN_INSTRUCTION + get_language_instruction()
+        task_text = prompts.load_prompt("risk.neutral.task").text.format(
+            debate_turn_instruction=debate_turn_instruction(),
+            language_instruction=get_language_instruction(),
+        )
 
         original = (
             role

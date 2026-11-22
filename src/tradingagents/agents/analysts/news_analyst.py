@@ -1,5 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
+from tradingagents import prompts
 from tradingagents.agents.analysts.turn import take_turn
 from tradingagents.agents.context import get_instrument_context_from_state, get_language_instruction
 from tradingagents.agents.tools import (
@@ -27,17 +28,6 @@ TOOLS = (
     get_prediction_markets,
 )
 
-_PREAMBLE = (
-    "You are a helpful AI assistant, collaborating with other assistants."
-    " Use the provided tools to progress towards answering the question."
-    " If you are unable to fully answer, that's OK; another assistant with different tools"
-    " will help where you left off. Execute what you can to make progress."
-    " Report what your tools support; another agent decides the trade."
-    " You have access to the following tools: {tool_names}."
-    " Today's date is {current_date}; treat it as 'now' for all analysis and tool-call date ranges. {instrument_context}"
-)
-
-
 def create_news_analyst(llm):
     def news_analyst_node(state):
         current_date = state["trade_date"]
@@ -45,24 +35,24 @@ def create_news_analyst(llm):
         asset_label = "company" if asset_type == "stock" else "asset"
         instrument_context = get_instrument_context_from_state(state)
 
-        system_message = (
-            f"You are a news researcher tasked with analyzing recent news and trends over the past week. Please write a comprehensive report of the current state of the world that is relevant for trading and macroeconomics. Use the available tools: get_news(start_date, end_date) for news about the {asset_label} under analysis, get_global_news(curr_date, look_back_days, limit) for broader macroeconomic news, get_macro_indicators(indicator, curr_date, look_back_days) to ground macro commentary in actual data from FRED (e.g. 'cpi', 'core_pce', 'unemployment', 'fed_funds_rate', '10y_treasury', 'yield_curve'), and get_prediction_markets(topic, limit) for live market-implied probabilities of forward-looking events (e.g. 'Fed rate cut', 'recession 2026', geopolitical or sector events). Provide specific, actionable insights with supporting evidence to help traders make informed decisions."
-            + """ Make sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read."""
-            + get_language_instruction()
+        preamble = prompts.load_prompt("analyst.tool_preamble").text
+        system_message = prompts.load_prompt("analyst.news.system").text.format(
+            asset_label=asset_label,
+            language_instruction=get_language_instruction(),
         )
 
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    _PREAMBLE + "\n{system_message}",
+                    preamble + "\n{system_message}",
                 ),
                 MessagesPlaceholder(variable_name="messages"),
             ]
         )
 
         tool_names = ", ".join([tool.name for tool in TOOLS])
-        original = _PREAMBLE.format(
+        original = preamble.format(
             tool_names=tool_names,
             current_date=current_date,
             instrument_context=instrument_context,
