@@ -95,9 +95,10 @@ def test_the_initial_state_names_no_termination(tmp_path, monkeypatch):
 
 @pytest.mark.unit
 def test_a_tiny_budget_returns_review_instead_of_raising(tmp_path, monkeypatch):
-    """The normal ``propagate()`` path degrades instead of failing (COST-003).
+    """The normal ``propagate()`` path degrades instead of failing (D1-REQ-COST-003).
 
-    D1-REQ-CTX-003: the run-boundary fallback when assembled context would exceed the budget.
+    D1-REQ-CTX-003 owns the budget itself; this asserts its run-boundary fallback, where
+    the assembled context would exceed the cap and the run ends in REVIEW instead.
     """
     graph = _graph(tmp_path, monkeypatch)
     statuses: list[str] = []

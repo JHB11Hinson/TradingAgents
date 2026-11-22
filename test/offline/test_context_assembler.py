@@ -100,6 +100,7 @@ def test_pipeline_records_each_stage_in_order():
 
 @pytest.mark.unit
 def test_under_budget_returns_the_agent_prompt_unchanged():
+    """D1-REQ-CTX-002: a request inside the budget drops nothing and keeps the prompt."""
     original = "Legacy prompt built by the agent."
     result = assemble_context(layers(), original=original, budget=RunBudget(10_000))
 
@@ -171,6 +172,7 @@ def test_history_is_compacted_to_its_ceiling_before_retrieved_knowledge():
 
 @pytest.mark.unit
 def test_retrieved_knowledge_is_trimmed_only_after_history_is_within_its_ceiling():
+    """D1-REQ-CTX-002: the pipeline drops only what the budget forces, in priority order."""
     request = layers(
         retrieved=[block(Layer.RETRIEVED, "state.market_report", "r" * 2400)],  # 600 tokens
         history=[block(Layer.HISTORY, "state.messages", "h" * 400)],  # 100 tokens
