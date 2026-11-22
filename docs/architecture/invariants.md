@@ -22,8 +22,8 @@ approval (`AGENTS.md` §11).
 | ID | Invariant | Source | Enforcing component | Current status |
 |---|---|---|---|---|
 | `INV-01` | A loop must stop itself on oscillation, stalled progress or budget exhaustion | `D1-REQ-TERM-001` | `src/tradingagents/agents/termination.py`, `src/tradingagents/graph/conditional_logic.py`, `setup.py` | **implemented** (CHG-041) — hard bounds first, then the detector |
-| `INV-02` | Every model call is assembled from the six context layers | `D1-REQ-CTX-001` | `src/tradingagents/context/` *(planned assembler)* | **planned** |
-| `INV-03` | Assembled context stays within the token budget; critical constraints are re-injected verbatim | `D1-REQ-CTX-003` | `src/tradingagents/context/` *(planned assembler)*, `default_config.py` | **planned** |
+| `INV-02` | Every model call is assembled from the six context layers | `D1-REQ-CTX-001` | `src/tradingagents/context/assembler.py`, `context/agent_layers.py` | **implemented** (CHG-033) — the twelve report agents declare their layers |
+| `INV-03` | Assembled context stays within the token budget; critical constraints are re-injected verbatim | `D1-REQ-CTX-003` | `src/tradingagents/context/assembler.py`, `default_config.py`, `graph/trading_graph.py` | **implemented** (CHG-033) — the run-boundary fallback added in CHG-040 |
 | `INV-04` | External and retrieved text is scrubbed of instructions; hostile samples are blocked | `D1-REQ-SAFE-001` | `src/tradingagents/guardrails/instructions.py`, `context/agent_layers.py`, `agents/analysts/turn.py` | **implemented** (CHG-042) |
 | `INV-05` | A decision that fails schema validation is rejected/degraded, never emitted as tradeable | `D1-REQ-SAFE-002` | `src/tradingagents/agents/structured.py`, `rating.py`, `guardrails/decisions.py`, `managers/portfolio_manager.py` | **implemented** (CHG-042) — the free-text path needs one explicit rating |
 | `INV-06` | A deterministic position ceiling constrains the decision; model output cannot bypass it | `D1-REQ-SAFE-003` | `src/tradingagents/guardrails/positions.py`, `agents/managers/`, `default_config.py` | **implemented** (CHG-042) |

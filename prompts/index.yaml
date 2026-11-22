@@ -1,0 +1,5 @@
+# Append-only checksum ledger for prompts/prompt_vX.Y.yaml.
+files:
+- file: prompt_v1.0.yaml
+  version: '1.0'
+  sha256: 07b4f07ef92c513940acd5fd92e5d1e8fc76cf1d52887fda9ba2e60f25ef6def
