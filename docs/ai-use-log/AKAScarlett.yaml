@@ -1,2 +1,29 @@
 # AI use log for @AKAScarlett.
 # Append new entries below. The legacy docs/ai-use-log.yaml is a historical archive.
+
+- id: AI-2026-11-22-003
+  date: 2026-11-22
+  members: ["AKAScarlett"]
+  agent: opencode
+  summary: >-
+    CHG-050 (D1-REQ-MEM-003): memory source attribution. Added the failing tests and ADR-014 for an
+    explicit source_id (<trade_date>/<ticker>) on every injected memory item, so load_entries() and
+    the rendered past-context tag can be attributed to a specific stored decision. The tests are
+    RED because src/tradingagents/memory/log.py has no source_id yet; the implementation, the
+    mypy-legacy de-list and the trace-matrix/memory-design updates follow in later commits. No src
+    change in this commit.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the derived source_id design (date/ticker, no on-disk change, no migration), the
+        new ADR-014, and landing the tests plus the ADR only in the first commit.
+      why: >-
+        A derived id attributes legacy entries without a schema change; separating the RED tests
+        from the implementation keeps gate-1 (tests before code) and the safety-critical review
+        clear.
+    - type: constrain
+      what: >-
+        Required the mandatory gate-6 AI-use-log update to land in the same first commit rather than
+        a later one.
+      why: >-
+        Keeping the log current with the test change avoids a gate-6 block on the branch.
