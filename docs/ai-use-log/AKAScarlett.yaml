@@ -30,3 +30,33 @@
       why: >-
         Retagging must not silently change what the suite proves.
   transcript: TBD
+
+- id: AI-2026-11-22-004
+  date: 2026-11-22
+  members: ["AKAScarlett"]
+  agent: opencode
+  summary: >-
+    CHG-050 (D1-REQ-MEM-003): memory source attribution. Added four tests and ADR-014 for an explicit
+    source_id (<trade_date>/<ticker>) on every injected memory item, then implemented it in
+    src/tradingagents/memory/log.py: _parse_entry exposes source_id, a single _source_id helper
+    derives it, and both formatters render | src:<id>. The on-disk format and the point-in-time
+    filter are unchanged (no migration). mypy 2.4.1 still reports the three pre-existing errors in
+    log.py (implicit-Optional config default and two unannotated lists), so the module stays
+    quarantined in mypy-legacy.txt and DEBT-009 is not lowered.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the derived source_id design (date/ticker, no on-disk change, no migration), the
+        new ADR-014, and landing the tests plus the ADR only in the first commit.
+      why: >-
+        A derived id attributes legacy entries without a schema change; separating the RED tests
+        from the implementation keeps gate-1 (tests before code) and the safety-critical review
+        clear.
+    - type: constrain
+      what: >-
+        Required the mandatory gate-6 AI-use-log update to land in the first commit, and kept the
+        mypy quarantine in place because the module is not type-clean.
+      why: >-
+        Keeping the log current avoids a gate-6 block; de-listing a module that still fails mypy
+        would hide the pre-existing errors instead of fixing them.
+  transcript: TBD

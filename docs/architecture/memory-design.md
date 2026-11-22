@@ -63,8 +63,11 @@ instead of a second system that would duplicate it.
 
 - `TradingMemoryLog.get_past_context(ticker, as_of)` reads the entries for the ticker and filters
   out anything resolved **after** `as_of`. A backdated run therefore sees only what was known on its
-  date (`D1-REQ-MEM-003`, point-in-time). The filter is a string compare on the stored dates; the
-  entry carries its source id by construction (the tag line).
+  date (`D1-REQ-MEM-003`, point-in-time). The filter is a string compare on the stored dates.
+- Every injected block carries an explicit `source_id` of the form `<trade_date>/<ticker>`, derived
+  on read from the tag line (`_source_id`; ADR-014) and rendered as `| src:<id>`. The id is stable and
+  unique because the idempotency guard forbids two entries for one ticker and date, and it needs no
+  migration: the on-disk log format is unchanged.
 - The graph's Memory Log step runs beside the analysts (`graph/trading_graph.py:_memory_step`),
   settles every due decision, then injects the ticker's lessons into the Portfolio Manager's context
   as the `retrieved` layer, under the assembler's budget (ADR-004).
