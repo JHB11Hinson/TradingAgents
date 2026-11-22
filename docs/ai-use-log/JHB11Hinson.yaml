@@ -630,3 +630,36 @@
       why: >-
         This is housekeeping, not product behaviour, and transcripts are append-only evidence.
   transcript: transcripts/60198818-HaobinJiang-CHG-047-cleanup.md#L1-L56
+
+- id: AI-2026-11-22-002
+  date: 2026-11-22
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-048 (GOV-006, GOV-008, GOV-012): add three offline governance checks and the first versioned
+    prompt store. The permission check parses permissions.jsonc, permission-model.md and AGENTS.md
+    section 13 and fails on any read/write path missing from one source; the registry check fails on
+    a missing requirement, invariant, trace row, required invariant field, status disagreement or
+    must-status row; the prompt check verifies entry SHA-256s and the file-hash index, resolves the
+    highest version and rejects tampering. INV-02 and INV-03 move to implemented (CHG-033), and the
+    remaining runtime prompts are recorded as DEBT-001 batch work.
+  human_interventions:
+    - type: approve
+      what: >-
+        Asked for GOV-006, GOV-008 and GOV-012 and for Bot Review.
+      why: >-
+        The three governance requirements were the remaining checkable gaps before the freeze.
+    - type: constrain
+      what: >-
+        Limited GOV-012 to the loader, prompt_v1.0.yaml and checksum tests first, with agent
+        migration in later batches.
+      why: >-
+        A one-shot rewrite of every runtime prompt would be too large to review and would couple
+        unrelated agents in one change.
+    - type: constrain
+      what: >-
+        Required the existing INV-02/INV-03 detail blocks to be reflected as implemented in the
+        register rather than changing the context behavior.
+      why: >-
+        The code shipped in CHG-033; the register was stale and the new check should catch that.
+  transcript: transcripts/60198818-HaobinJiang-CHG-048-governance-consistency.md#L1-L60
