@@ -95,7 +95,10 @@ def test_the_initial_state_names_no_termination(tmp_path, monkeypatch):
 
 @pytest.mark.unit
 def test_a_tiny_budget_returns_review_instead_of_raising(tmp_path, monkeypatch):
-    """The normal ``propagate()`` path degrades instead of failing (COST-003)."""
+    """The normal ``propagate()`` path degrades instead of failing (COST-003).
+
+    D1-REQ-CTX-003: the run-boundary fallback when assembled context would exceed the budget.
+    """
     graph = _graph(tmp_path, monkeypatch)
     statuses: list[str] = []
     monkeypatch.setattr(graph, "_write_telemetry", lambda *a, **k: statuses.append(a[3]))
@@ -110,7 +113,7 @@ def test_a_tiny_budget_returns_review_instead_of_raising(tmp_path, monkeypatch):
 
 @pytest.mark.unit
 def test_a_real_tiny_budget_degrades_before_any_model_call(tmp_path, monkeypatch):
-    """A genuine cap (not a patched exception) ends the analyse step in REVIEW."""
+    """A genuine cap (not a patched exception) ends the analyse step in REVIEW (D1-REQ-CTX-003)."""
     graph = _graph(
         tmp_path,
         monkeypatch,

@@ -178,6 +178,25 @@ def test_a_normal_investment_debate_keeps_alternating():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("rounds", [1, 2, 3])
+def test_the_debate_ends_exactly_at_2n_turns(rounds):
+    """D1-REQ-DEBATE-004: with max_debate_rounds=N the debate ends at 2*N turns.
+
+    ``max_debate_rounds`` is one turn each for bull and bear, so the router must
+    keep alternating while ``count < 2*N`` and route to the manager at exactly
+    ``count == 2*N``. The digests advance (no oscillation) so this isolates the
+    configured bound from the termination detector.
+    """
+    logic = ConditionalLogic(max_debate_rounds=rounds)
+    bound = 2 * rounds
+    under = _state(investment=_investment(count=bound - 1, digests=_digests("abcdefghij"[:bound - 1])))
+    at = _state(investment=_investment(count=bound, digests=_digests("abcdefghij"[:bound])))
+
+    assert logic.should_continue_debate(under) in ("Bull Researcher", "Bear Researcher")
+    assert logic.should_continue_debate(at) == "Research Manager"
+
+
+@pytest.mark.unit
 def test_an_oscillating_risk_debate_routes_to_the_portfolio_manager():
     logic = ConditionalLogic(max_risk_discuss_rounds=3)
     state = _state(
