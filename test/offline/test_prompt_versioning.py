@@ -81,6 +81,30 @@ def test_prompt_v1_0_exists_and_loads_its_entries():
 
 
 @pytest.mark.unit
+def test_prompt_v1_1_exists_and_loads_its_entries():
+    assert (PROMPTS / "prompt_v1.1.yaml").is_file()
+
+    loaded = load_all(version="1.1")
+
+    assert "analyst.sentiment.system" in loaded
+    assert loaded["analyst.sentiment.system"].version == "1.1"
+    assert "shared.language_instruction" in loaded
+
+
+@pytest.mark.unit
+def test_v1_0_keeps_only_its_five_fragments():
+    loaded = load_all(version="1.0")
+
+    assert set(loaded) == {
+        "analyst.tool_preamble",
+        "analyst.sentiment_preamble",
+        "analyst.market.system",
+        "analyst.news.system",
+        "analyst.fundamentals.system",
+    }
+
+
+@pytest.mark.unit
 def test_every_prompt_text_matches_its_recorded_checksum():
     for path in prompt_files():
         data = yaml.safe_load(path.read_text(encoding="utf-8"))

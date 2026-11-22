@@ -4,12 +4,10 @@ The prompt used to advertise ``get_news(query, ...)``, tricking the LLM into
 hallucinating free-text query calls. The instrument now comes from the run's
 state, so the model passes only the window.
 """
-import inspect
-
 import pytest
 
-import tradingagents.agents.analysts.news_analyst as na
 from tradingagents.agents.tools import get_news
+from tradingagents.prompts import load_prompt
 
 
 @pytest.mark.unit
@@ -20,6 +18,6 @@ def test_get_news_takes_the_window_not_a_query():
 
 @pytest.mark.unit
 def test_news_prompt_matches_get_news_signature():
-    src = inspect.getsource(na)
-    assert "get_news(start_date, end_date)" in src
-    assert "get_news(query" not in src
+    text = load_prompt("analyst.news.system").text
+    assert "get_news(start_date, end_date)" in text
+    assert "get_news(query" not in text
