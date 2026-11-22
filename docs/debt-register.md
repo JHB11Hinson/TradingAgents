@@ -1,7 +1,8 @@
 # Technical debt register
 
 **Deliverable:** D4. **Requirement:** `D1-REQ-GOV-010`.
-**Owner:** the whole team (rotating maintenance). **Status values:** `open`, `mitigated`, `accepted`.
+**Owner:** the whole team (rotating maintenance). **Status values:** `open`, `mitigated`, `accepted`,
+`closed` (kept as history, with the change that closed it).
 
 The course names eight AI-era debt categories. Every entry below belongs to exactly one of them, and
 an entry that does not fit a category is a sign the category list or the entry is wrong — ask before
@@ -33,11 +34,13 @@ inventing a ninth.
 - **Owner:** Member 1 (prompt versioning).
 - **Trigger to revisit:** before the first change to a runtime prompt.
 - **Linked requirement:** `D1-REQ-GOV-012` (versioned runtime prompts), `D1-REQ-EVAL-002`.
-- **Status:** mitigated by CHG-048 (2026-11-22): `prompts/prompt_v1.0.yaml` baselines the five
-  analyst prompt fragments, `src/tradingagents/prompts/loader.py` verifies each entry's SHA-256,
-  `prompts/index.yaml` locks each file hash, and `test/offline/test_prompt_versioning.py` covers
-  version pinning, highest-version resolution and tampering. The remaining runtime prompts still
-  live in `src/` until their batch lands as a new version file.
+- **Status:** closed by CHG-049 (2026-11-22): all twelve agent role/task prompts and the three
+  shared instruction fragments load from `prompts/prompt_v1.1.yaml` at node call time;
+  `test/offline/test_prompt_runtime.py` pins each node to its entries, fails when an entry is
+  missing, and fails when a migrated prompt reappears in `src/tradingagents/agents/**`. The
+  before/after golden capture of all twelve nodes is identical. Deterministic context builders
+  (`build_instrument_context`, the "not part of this run" markers) and the optional TypeSafe
+  post-screen classifier prompts remain in `src/` as data-producing code, not agent role prompts.
 
 ## DEBT-002 — Safety guardrails are now implemented but pattern-bounded
 

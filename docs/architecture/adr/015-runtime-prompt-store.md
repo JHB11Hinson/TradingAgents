@@ -1,7 +1,8 @@
 # ADR-015: Runtime prompts load from the versioned store
 
-- **Status:** proposed (CHG-049, 2026-11-22). The coding agent applies the change; a human or the
-  automated non-author review approves it; the agent does not approve or merge.
+- **Status:** accepted (CHG-049, PR-58, 2026-11-22). The coding agent applied the change; the
+  automated non-author review approved it via the `bot-review` workflow; the agent did not approve
+  or merge.
 - **Requirement:** `D1-REQ-GOV-012`; related `D1-REQ-EVAL-002`, `D1-REQ-GOV-010`.
 - **Related:** ADR-001 (baseline extension), PR-56 / CHG-048 (the loader and `prompt_v1.0.yaml`),
   `DEBT-001`.

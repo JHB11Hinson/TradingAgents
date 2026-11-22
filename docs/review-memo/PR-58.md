@@ -29,8 +29,13 @@
   migrated prompt reappears in `src/`, checks braced report values are inserted verbatim, and checks
   that import does not read the store. `test_prompt_versioning.py` adds the v1.1 assertions. Four
   existing tests that asserted prompt text in module source now read the store instead; none is an
-  inherited test. The final suite, ruff, mypy, schema and gate-4 results are recorded in the
-  documentation commit.
+  inherited test. Final verification: `pytest -q` -> 1611 passed, 1 skipped, 1 deselected, 99
+  subtests passed in 34.03 s; `ruff check` on the changed files -> all checks passed;
+  `mypy --follow-imports=silent` on the fifteen changed source files -> no issues;
+  `check-jsonschema` -> validation done; `python -m eval.run --set eval/fixed-set.json
+  --thresholds eval/thresholds.yaml --budget 40000` -> pass (2 cases, 0 failed; total token ratio
+  0.270625, capped 0.927049, review 0.0, structured 1.0). The before/after golden capture of all
+  twelve nodes is identical, so the change moves the prompt source, not the text.
 - Runtime metadata: no new dependency, model, permission, gate or environment variable. The
   existing `TRADINGAGENTS_PROMPTS_DIR` override is unchanged.
 - Safety and efficiency: the loader is read-only and fails closed. The migration preserves the

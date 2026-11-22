@@ -89,7 +89,8 @@ test/
 This table is a **status snapshot**, not a second registry. The IDs, statements and fit criteria are
 in `docs/req/requirements.yaml`; the per-row mapping is `docs/architecture/trace-matrix.md`. Status
 is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20, the GOV-006/GOV-008
-rows updated by CHG-048 on 2026-11-22, and the DEBATE-004 row updated by PR-57 on 2026-11-22.
+rows updated by CHG-048 on 2026-11-22, the DEBATE-004 row updated by PR-57 on 2026-11-22, and the
+GOV-012 evidence updated by CHG-049 on 2026-11-22.
 
 | Requirement | Evidence today | Status |
 |---|---|---|
@@ -117,9 +118,13 @@ rows updated by CHG-048 on 2026-11-22, and the DEBATE-004 row updated by PR-57 o
 | `GOV-011` five transcripts | `test/offline/test_transcripts_split.py` keeps the split index, the per-session parts and the six-stage map consistent | **done** (CHG-046; 11 session parts plus the per-change transcripts) |
 | `GOV-013` rules + covenant | file presence + five clauses | **done** |
 
-The versioned prompt store is covered by `test/offline/test_prompt_versioning.py`
-(`D1-REQ-GOV-012`, a `should` requirement): the loader verifies each entry's SHA-256 and
-`prompts/index.yaml` locks each file's hash, so an in-place edit fails the check.
+`D1-REQ-GOV-012` is a `should` requirement, so it has no row in the must table. Its evidence is the
+runtime, not the loader alone: all twelve agent nodes load their role, preamble and task text from
+`prompts/prompt_v1.1.yaml` at node call time, and `test/offline/test_prompt_runtime.py` pins every
+node to its entries, fails when an entry is missing, and fails when a migrated prompt reappears in
+`src/tradingagents/agents/**`. The loader verifies each entry's SHA-256 and `prompts/index.yaml`
+locks each file's hash, so an in-place edit fails the check. A missing store fails the node closed;
+there is no embedded fallback. **Done** (CHG-049).
 
 A **must** row that is `planned` or `partial` is visible debt, not a completed claim. The owning
 change updates this table and the trace matrix together.
