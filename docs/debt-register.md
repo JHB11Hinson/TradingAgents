@@ -33,7 +33,11 @@ inventing a ninth.
 - **Owner:** Member 1 (prompt versioning).
 - **Trigger to revisit:** before the first change to a runtime prompt.
 - **Linked requirement:** `D1-REQ-GOV-012` (versioned runtime prompts), `D1-REQ-EVAL-002`.
-- **Status:** open
+- **Status:** mitigated by CHG-048 (2026-11-22): `prompts/prompt_v1.0.yaml` baselines the five
+  analyst prompt fragments, `src/tradingagents/prompts/loader.py` verifies each entry's SHA-256,
+  `prompts/index.yaml` locks each file hash, and `test/offline/test_prompt_versioning.py` covers
+  version pinning, highest-version resolution and tampering. The remaining runtime prompts still
+  live in `src/` until their batch lands as a new version file.
 
 ## DEBT-002 — Safety guardrails are now implemented but pattern-bounded
 

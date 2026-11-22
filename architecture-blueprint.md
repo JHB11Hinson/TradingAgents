@@ -62,6 +62,7 @@ bound are the two levers; both are configuration, not hard-coded constants.
 | Orchestration | `src/tradingagents/graph/` | graph wiring, routing, checkpoints, propagation |
 | LLM access | `src/tradingagents/llm_clients/` | provider clients, model catalog, key handling |
 | Memory | `src/tradingagents/memory/` | decision log, reflection, settlement |
+| Versioned prompts | `src/tradingagents/prompts/` | read-only versioned prompt store; each entry is SHA-256 checked and a change adds a new version |
 | Configuration | `src/tradingagents/default_config.py` | defaults and `TRADINGAGENTS_*` overrides |
 | CLI | `src/cli/` | interactive and headless entry points, display, preferences |
 

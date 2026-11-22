@@ -106,5 +106,7 @@ for key in ('read', 'write'):
 PY
 ```
 
-The check is a review step, not a gate yet; `verification-constraints.md` records it as a
-`D1-REQ-GOV-006` check when that file lands.
+The authoritative check is `test/offline/test_permission_consistency.py`: it parses all three sources,
+compares the read and write path sets, and fails when a path is present in one and absent from
+another or when default-deny is missing. It runs in `gate-5-regression`; the snippet above is a
+manual aid, not the gate.

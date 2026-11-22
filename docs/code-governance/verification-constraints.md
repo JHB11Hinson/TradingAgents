@@ -62,7 +62,7 @@ when the environment has keys.
 
 | Tier | What it covers | Evidence today |
 |---|---|---|
-| **Structural** | imports, module boundaries, permissions, architectural fitness functions | `test/offline/test_layering.py`; the module table in `docs/code-governance/structural-constraints.md`; the three-way permission check |
+| **Structural** | imports, module boundaries, permissions, architectural fitness functions | `test/offline/test_layering.py`; `test/offline/test_permission_consistency.py` (the three-way permission check); the module table in `docs/code-governance/structural-constraints.md` |
 | **Regression** | all prior suites, zero regressions | `pytest -q` (gate-5); inherited 1262-passed baseline |
 | **Behavioral** | quality thresholds, zero safety escapes | `eval/fixed-set.json`, `eval/thresholds.yaml`, `python -m eval.run`; **gate-4** runs it on every pull request (CHG-037) |
 
@@ -88,7 +88,8 @@ test/
 
 This table is a **status snapshot**, not a second registry. The IDs, statements and fit criteria are
 in `docs/req/requirements.yaml`; the per-row mapping is `docs/architecture/trace-matrix.md`. Status
-is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
+is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20 and the
+GOV-006/GOV-008 rows updated by CHG-048 on 2026-11-22.
 
 | Requirement | Evidence today | Status |
 |---|---|---|
@@ -110,11 +111,15 @@ is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20.
 | `GOV-003` six gates | `protection.json` + deliberate-violation records | **done** — six contexts online (CHG-037); red evidence: gate-1 PR #45, gate-2 PR #12/#26, gate-3 PR #4, gate-4 PR #44, gate-5 PR #6, gate-6 PR #5 |
 | `GOV-004` trace matrix | 40 rows for 40 requirements | **done** |
 | `GOV-005` tool manifest | manifest vs permission model | **done** (review check) |
-| `GOV-006` three-source whitelist | three-way comparison | **partial** — read paths/commands still need alignment (P1-07) |
-| `GOV-008` verification + invariants | this file + `docs/architecture/invariants.md` | **partial** — both files exist; the negative tests for the planned invariants and a missing-entry check are still to land |
+| `GOV-006` three-source whitelist | `test/offline/test_permission_consistency.py`: the three sources must list the same read/write sets; default deny is checked; a missing path fails | **done** (CHG-048) |
+| `GOV-008` verification + invariants | this file + `docs/architecture/invariants.md`; `test/offline/test_governance_registry.py` fails on a missing requirement, invariant, trace row, required invariant field or must-status row | **done** (CHG-048) |
 | `GOV-010` QA records | `docs/review-memo/PR-<n>.md`, `debt-register.md`, `bug-diary.md` | **partial** — per-PR records continue |
 | `GOV-011` five transcripts | `test/offline/test_transcripts_split.py` keeps the split index, the per-session parts and the six-stage map consistent | **done** (CHG-046; 11 session parts plus the per-change transcripts) |
 | `GOV-013` rules + covenant | file presence + five clauses | **done** |
+
+The versioned prompt store is covered by `test/offline/test_prompt_versioning.py`
+(`D1-REQ-GOV-012`, a `should` requirement): the loader verifies each entry's SHA-256 and
+`prompts/index.yaml` locks each file's hash, so an in-place edit fails the check.
 
 A **must** row that is `planned` or `partial` is visible debt, not a completed claim. The owning
 change updates this table and the trace matrix together.

@@ -31,6 +31,7 @@ across two modules, and two elements must not own the same module.
 | Reporting | `src/tradingagents/reporting.py`, `src/tradingagents/report_html.py` | report trees and the HTML page |
 | Telemetry | `src/tradingagents/telemetry/` | the in-process event seam, spans, the run trace and the run manifest |
 | Evaluation | `src/tradingagents/evaluation/` | the fixed set, the baseline, the metrics, the thresholds and the verdict (`eval/` is the CLI and the replay backend, not an installed module) |
+| Versioned prompts | `src/tradingagents/prompts/` | the versioned prompt loader and its checksum verification (`GOV-012`) |
 | Configuration | `src/tradingagents/default_config.py` | defaults and `TRADINGAGENTS_*` overrides |
 | CLI | `src/cli/` | interactive and headless entry points, display, preferences |
 
@@ -65,6 +66,7 @@ same pull request.
 | `backtest.py`, `portfolio.py`, `reporting.py`, `report_html.py` | ADR-001 | reporting and evaluation; no invariant of their own |
 | `telemetry/` | ADR-005 | `OBS-001`/`OBS-002` (trace, manifest), `OBS-003` (subscriber isolation); `INV-07` (telemetry never fails a run) |
 | `evaluation/` | ADR-007 | `EVAL-001` (fixed set, thresholds, verdict), `COST-001` (tokens and cost against the baseline); the ledger it reads is `COST-003`/`CTX-003` |
+| `prompts/` | ADR-001 (baseline extension) | `GOV-012` (versioned runtime prompts); no invariant of its own |
 | `default_config.py`, `cli/` | ADR-001, ADR-002 | `GOV-001` (layout), configuration surface |
 
 The **authoritative** requirement-to-component mapping is `docs/architecture/trace-matrix.md`; this
