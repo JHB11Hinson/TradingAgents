@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from tradingagents.prompts.loader import (
     PromptError,
     checksum_text,
