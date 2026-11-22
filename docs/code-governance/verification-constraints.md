@@ -88,14 +88,14 @@ test/
 
 This table is a **status snapshot**, not a second registry. The IDs, statements and fit criteria are
 in `docs/req/requirements.yaml`; the per-row mapping is `docs/architecture/trace-matrix.md`. Status
-is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20 and the
-GOV-006/GOV-008 rows updated by CHG-048 on 2026-11-22.
+is as of 2026-11-17, with the COST/EVAL rows updated by CHG-036 on 2026-11-20, the GOV-006/GOV-008
+rows updated by CHG-048 on 2026-11-22, and the DEBATE-004 row updated by PR-57 on 2026-11-22.
 
 | Requirement | Evidence today | Status |
 |---|---|---|
 | `DEBATE-001` structured turns | schema validator: JSON and prose paths, one record per turn | **done** (CHG-043; `test/offline/test_debate_turns.py`) |
 | `DEBATE-002` diverge/converge | explicit fields; empty convergence rejects | **done** (CHG-043; `test/offline/test_debate_turns.py`) |
-| `DEBATE-004` round bound | `graph/conditional_logic.py` bound; `test/offline/test_risk_router_path_map.py` reaches the terminal at the bound | **done** (existing bound + router case) |
+| `DEBATE-004` round bound | `graph/conditional_logic.py` bound; `test/offline/test_termination.py` pins the exact 2*N boundary and the over-bound cases; `test/offline/test_risk_router_path_map.py` reaches the terminal at the bound | **done** (bound + router case; PR-57 added the explicit boundary) |
 | `TERM-001` self-termination | oscillation/stall cases + detector-removal negative test | **partial** — round bounds exist; detectors planned (INV-01) |
 | `CTX-001` six layers | assembler unit test | **done** (CHG-033; `test/offline/test_context_assembler.py`) |
 | `CTX-003` budget + re-injection | budget and byte-identical re-injection tests | **done** (CHG-033; `test/offline/test_token_budget.py`) |

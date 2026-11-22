@@ -102,6 +102,11 @@ def _digests(text: str) -> list[str]:
     return [turn_digest(ch) for ch in text]
 
 
+def _advancing(n: int) -> list[str]:
+    """``n`` distinct digests, so the detector never fires and only the bound can end it."""
+    return [turn_digest(f"turn-{index}") for index in range(n)]
+
+
 # --- the pure detector -----------------------------------------------------------
 
 
@@ -175,6 +180,29 @@ def test_a_normal_investment_debate_keeps_alternating():
     )
 
     assert logic.should_continue_debate(state) == "Bear Researcher"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("rounds", [1, 2, 3])
+def test_the_debate_ends_exactly_at_2n_turns(rounds):
+    """D1-REQ-DEBATE-004: with max_debate_rounds=N the debate ends at 2*N turns.
+
+    ``max_debate_rounds`` is one turn each for bull and bear, so the router keeps
+    alternating while ``count < 2*N`` and routes to the manager from ``count == 2*N``
+    onward: the bound is never exceeded. The digests advance (no oscillation) so this
+    isolates the configured bound from the termination detector. The over-bound cases
+    pin the ``>=``: an ``==`` would still pass the exact-bound assertion but let the
+    debate run unbounded once the counter overshoots.
+    """
+    logic = ConditionalLogic(max_debate_rounds=rounds)
+    bound = 2 * rounds
+    under = _state(investment=_investment(count=bound - 1, digests=_advancing(bound - 1)))
+    at = _state(investment=_investment(count=bound, digests=_advancing(bound)))
+    over = _state(investment=_investment(count=bound + 3, digests=_advancing(bound + 3)))
+
+    assert logic.should_continue_debate(under) == "Bear Researcher"
+    assert logic.should_continue_debate(at) == "Research Manager"
+    assert logic.should_continue_debate(over) == "Research Manager"
 
 
 @pytest.mark.unit
