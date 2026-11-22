@@ -1,4 +1,9 @@
-"""The memory log: an append-only markdown record of each decision and, once settled, its outcome."""
+"""The memory log: an append-only markdown record of each decision and, once settled, its outcome.
+
+Implements ``D1-REQ-MEM-003``: retrieval is point-in-time safe, and every injected
+item carries a source id (``<trade_date>/<ticker>``) so a lesson is attributable to
+the stored decision it came from (ADR-014).
+"""
 
 import contextlib
 import re
@@ -101,6 +106,10 @@ class TradingMemoryLog:
         ``as_of``. This keeps a historical/backtest run from learning from
         outcomes that had not happened yet (#1251). ``as_of=None`` disables the
         filter, so live runs and pre-migration entries are unaffected.
+
+        Every injected block carries its ``source_id`` (``<trade_date>/<ticker>``)
+        in the tag, rendered as ``| src:<id>``, so each lesson is source-attributable
+        (``D1-REQ-MEM-003``; ADR-014).
         """
         entries = [e for e in self.load_entries() if not e.get("pending")]
         if as_of is not None:
@@ -256,6 +265,11 @@ class TradingMemoryLog:
     # --- Helpers ---
 
     @staticmethod
+    def _source_id(entry: dict) -> str:
+        """The entry's source id: ``<trade_date>/<ticker>`` (D1-REQ-MEM-003, ADR-014)."""
+        return f"{entry['date']}/{entry['ticker']}"
+
+    @staticmethod
     def _resolved_tag(
         trade_date, ticker, rating, raw_pct, alpha_pct, holding_days, resolution_date
     ) -> str:
@@ -332,6 +346,9 @@ class TradingMemoryLog:
             "alpha": fields[4] if len(fields) > 4 else None,
             "holding": fields[5] if len(fields) > 5 else None,
             "resolved": resolved,
+            # Derived, not stored: the id is stable because the idempotency guard
+            # forbids two entries for one ticker and date (D1-REQ-MEM-003, ADR-014).
+            "source_id": f"{fields[0]}/{fields[1]}",
         }
         body = "\n".join(lines[1:]).strip()
         decision_match = self._DECISION_RE.search(body)
@@ -344,14 +361,20 @@ class TradingMemoryLog:
         raw = e["raw"] or "n/a"
         alpha = e["alpha"] or "n/a"
         holding = e["holding"] or "n/a"
-        tag = f"[{e['date']} | {e['ticker']} | {e['rating']} | {raw} | {alpha} | {holding}]"
+        tag = (
+            f"[{e['date']} | {e['ticker']} | {e['rating']} | {raw} | {alpha} | {holding}"
+            f" | src:{self._source_id(e)}]"
+        )
         parts = [tag, f"DECISION:\n{e['decision']}"]
         if e["reflection"]:
             parts.append(f"REFLECTION:\n{e['reflection']}")
         return "\n\n".join(parts)
 
     def _format_reflection_only(self, e: dict) -> str:
-        tag = f"[{e['date']} | {e['ticker']} | {e['rating']} | {e['raw'] or 'n/a'}]"
+        tag = (
+            f"[{e['date']} | {e['ticker']} | {e['rating']} | {e['raw'] or 'n/a'}"
+            f" | src:{self._source_id(e)}]"
+        )
         if e["reflection"]:
             return f"{tag}\n{e['reflection']}"
         text = e["decision"][:300]

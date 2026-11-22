@@ -1,7 +1,8 @@
 # ADR-014: Explicit memory source attribution for injected lessons
 
-- **Status:** proposed (CHG-050, 2026-11-22). Awaiting human review; the coding agent wrote
-  the draft and does not approve or merge it.
+- **Status:** accepted (CHG-050, 2026-11-22). Test stage approved by the automated non-author
+  reviewer (`github-actions[bot]`, PR #59); the coding agent applied the edit and did not approve or
+  merge.
 - **Requirements:** `D1-REQ-MEM-003`.
 - **Related:** ADR-001 (adopt inherited architecture), `docs/architecture/memory-design.md` §4,
   `DEBT-009` (mypy quarantine).
