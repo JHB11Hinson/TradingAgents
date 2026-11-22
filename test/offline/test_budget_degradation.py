@@ -114,7 +114,7 @@ def test_a_tiny_budget_returns_review_instead_of_raising(tmp_path, monkeypatch):
 
 @pytest.mark.unit
 def test_a_real_tiny_budget_degrades_before_any_model_call(tmp_path, monkeypatch):
-    """A genuine cap (not a patched exception) ends the analyse step in REVIEW (D1-REQ-CTX-003)."""
+    """A genuine cap (not a patched exception) ends the analyse step in REVIEW (D1-REQ-COST-003)."""
     graph = _graph(
         tmp_path,
         monkeypatch,

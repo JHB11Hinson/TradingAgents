@@ -100,13 +100,14 @@ def test_pipeline_records_each_stage_in_order():
 
 @pytest.mark.unit
 def test_under_budget_returns_the_agent_prompt_unchanged():
-    """D1-REQ-CTX-002: a request inside the budget drops nothing and keeps the prompt."""
+    """D1-REQ-CTX-002: a request inside the budget drops and trims nothing."""
     original = "Legacy prompt built by the agent."
     result = assemble_context(layers(), original=original, budget=RunBudget(10_000))
 
     assert result.text == original
     assert result.compacted is False
     assert result.tokens == estimate_tokens(original)
+    assert result.dropped == ()
 
 
 @pytest.mark.unit
@@ -172,7 +173,7 @@ def test_history_is_compacted_to_its_ceiling_before_retrieved_knowledge():
 
 @pytest.mark.unit
 def test_retrieved_knowledge_is_trimmed_only_after_history_is_within_its_ceiling():
-    """D1-REQ-CTX-002: the pipeline drops only what the budget forces, in priority order."""
+    """D1-REQ-CTX-002: history inside its ceiling stays whole; only retrieved is trimmed."""
     request = layers(
         retrieved=[block(Layer.RETRIEVED, "state.market_report", "r" * 2400)],  # 600 tokens
         history=[block(Layer.HISTORY, "state.messages", "h" * 400)],  # 100 tokens
@@ -180,8 +181,8 @@ def test_retrieved_knowledge_is_trimmed_only_after_history_is_within_its_ceiling
 
     result = assemble_context(request, budget=RunBudget(800))
 
-    assert result.layer_tokens[Layer.HISTORY] <= 100
-    assert result.layer_tokens[Layer.RETRIEVED] <= 360
+    assert result.layer_tokens[Layer.HISTORY] == 100  # untouched, it already fitted
+    assert result.layer_tokens[Layer.RETRIEVED] == 360  # trimmed to its 45% ceiling
 
 
 @pytest.mark.unit

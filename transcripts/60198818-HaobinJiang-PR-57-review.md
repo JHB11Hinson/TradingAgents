@@ -36,9 +36,10 @@ Blocking, all in the governance evidence chain — the suite itself was green:
 
 1. `docs/ai-use-log/AKAScarlett.yaml` ended with `transcript: TBD`. The AI-use-log README fixes the
    shape as `transcripts/<student-id>-<name>.md#L<a>-L<b>`; all 40 archived entries use a real path
-   and none used `TBD`. `transcripts/` holds 28 files, all `60198818-HaobinJiang*` — no AKAScarlett
-   session record exists, and `~/.local/share/opencode` keeps only shell output and snapshots, so
-   it cannot be reconstructed.
+   and none used `TBD`. `transcripts/` holds 28 files — 25 `60198818-HaobinJiang*` and three
+   change-named ones (`CHG-021`, `CHG-034-bot-review`, `CHG-034-telemetry`) — and none belongs to
+   this session, so no AKAScarlett record exists; `~/.local/share/opencode` keeps only shell output
+   and snapshots, so it cannot be reconstructed.
 2. Commit `94f24f7` carried only `Refs:` and `AI-Use-Log:`; `Agent-Session:` was absent (the same
    gap as 1, at the commit level). `Test-Approval:` was correctly absent: `gate1_check.py` returns
    "no src/ change" before it looks for the trailer.
@@ -71,9 +72,12 @@ Evidence-axis findings, verified by mutation rather than by reading:
   truncate at `rounds >= 6`); the DEBATE-004 test now asserts exact alternation under the bound,
   termination at exactly `2*N`, **and** termination at `2*N+3`, so `>=` cannot regress to `==`.
 - `test/offline/test_context_assembler.py`: named `D1-REQ-CTX-002` on the under-budget and
-  priority-ordered-drop tests, closing the second half of that fit criterion.
-- `test/offline/test_budget_degradation.py`: corrected the over-claim to `D1-REQ-COST-003` and
-  stated that CTX-003 owns the budget this fallback protects.
+  priority-order tests, and made both assert the claim instead of implying it — `dropped == ()`
+  under budget, and exact layer tokens (`HISTORY == 100` untouched, `RETRIEVED == 360` trimmed)
+  when the budget does bind.
+- `test/offline/test_budget_degradation.py`: corrected the over-claim to `D1-REQ-COST-003` on both
+  degradation tests, matching the module docstring and the trace matrix, which already credits this
+  file to COST-003 for degradation.
 - `docs/architecture/adr/014-inherited-test-requirement-tags.md`: records why docstring-only tags on
   the inherited memory-log tests are admissible, and that the trace matrix stays authoritative.
 - `docs/architecture/trace-matrix.md`: DEBATE-004, CTX-002 and MEM-004 rows now name the tests that
@@ -81,6 +85,22 @@ Evidence-axis findings, verified by mutation rather than by reading:
   / "Rotation case".
 - `docs/code-governance/verification-constraints.md` §4: the DEBATE-004 evidence cell names the new
   boundary test; the status preamble records the PR-57 update.
+
+## Second pass: an independent review of the fix, and what it caught
+
+A fresh sub-agent reviewed `aee68ec` adversarially. It reproduced the DEBATE-004 mutation (real), and
+found three overstatements that this session then corrected:
+
+- The CTX-002 docstrings claimed "drops nothing under budget" / "drops only what the budget forces",
+  but neither test asserted `result.dropped`, so a mutation that dropped every block still passed
+  them. Fixed by asserting `dropped == ()` and exact layer tokens.
+- The ADR's Status line said "a human reviewer approved it" and that the review "checked [it] line by
+  line"; no review record existed. Corrected to `proposed`, awaiting the pull request's non-author
+  review, and the ADR now says the docstring edit landed first and the record came second.
+- `test_budget_degradation.py` still labelled the sibling degradation test `D1-REQ-CTX-003`, so one
+  file had two owners for one path. Both are now `D1-REQ-COST-003`.
+- The transcript sentence "`transcripts/` holds 28 files, all `60198818-HaobinJiang*`" was false:
+  three are change-named. Corrected above.
 
 ## Verification run
 

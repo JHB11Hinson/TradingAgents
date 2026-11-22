@@ -1,7 +1,8 @@
 # ADR-014: Requirement tags on the inherited memory-log tests
 
-- **Status:** accepted (PR-57, 2026-11-22). The coding agent applied the edit; a human reviewer
-  approved it and the agent did not approve or merge.
+- **Status:** proposed (PR-57, 2026-11-22) — awaiting the non-author review of the pull request,
+  which is what turns it into `accepted`. The coding agent applied the edit; the agent did not
+  approve or merge.
 - **Requirement:** `D1-REQ-MEM-004`; traceability duty `D1-REQ-GOV-008`.
 - **Related:** `docs/code-governance/verification-constraints.md` Rule 3 (inherited-test exception),
   `AGENTS.md` §5 (frozen inherited tests), ADR-012 (the precedent for adjusting an inherited test).
@@ -24,8 +25,11 @@ approval. Without this record the docstring tags would be an unrecorded edit to 
 
 - Add one docstring line naming `D1-REQ-MEM-004` to each of the four rotation tests.
 - Change **nothing else**: no assertion, test name, marker, fixture, import or line of setup is
-  altered. The four hunks are docstring text only, which is what the review of PR-57 checked line by
-  line.
+  altered. `git diff` over the module adds exactly four docstring lines and removes two, which is
+  what a reviewer can check mechanically.
+- The docstring edit landed in `94f24f7` and this record came afterwards, so the record explains a
+  decision that was already in the branch rather than authorising it in advance. It is written now
+  so the review of the pull request sees the reasoning next to the edit.
 - Tagging the other three files in the same pull request (`test_termination.py`,
   `test_context_assembler.py`, `test_budget_degradation.py`) needs no ADR: those modules were
   authored here (CHG-041, CHG-033, CHG-040), not inherited.

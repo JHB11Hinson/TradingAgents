@@ -678,7 +678,10 @@
     ten-character slice; the mutant now fails all three parametrized cases. Also named CTX-002 on
     the under-budget and priority-drop tests, corrected a CTX-003 over-claim to COST-003, added
     ADR-014 for the inherited-test tags, and pointed the trace-matrix DEBATE-004, CTX-002 and
-    MEM-004 rows at the tests that carry them.
+    MEM-004 rows and the DEBATE-004 status row at the tests that carry them. A second, independent
+    review of the fix caught three overstated claims — a CTX-002 docstring asserting drops the test
+    never checked, an ADR status naming an approval that did not exist, and a sibling test left on
+    CTX-003 — and the follow-up commit corrects all three.
   human_interventions:
     - type: approve
       what: >-
@@ -694,4 +697,4 @@
       why: >-
         The AI-use-log README rule 1 reserves that file for its owner, and AGENTS.md section 7 says
         the agent never approves or merges a change.
-  transcript: transcripts/60198818-HaobinJiang-PR-57-review.md#L1-L102
+  transcript: transcripts/60198818-HaobinJiang-PR-57-review.md#L1-L122
