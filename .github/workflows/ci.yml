@@ -44,6 +44,16 @@ jobs:
       - run: pip install -e . ruff "mypy==2.4.1"
       - name: Dependency consistency (D7 gate 2)
         run: pip check
+      - name: The mypy quarantine list may only shrink (ADR-016)
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "not a pull request; no base to compare against"
+            exit 0
+          fi
+          base_ref="${{ github.base_ref || 'main' }}"
+          git fetch origin "$base_ref"
+          python .github/scripts/gate2_check.py \
+            --base "origin/$base_ref" --head HEAD
       - name: Lint only the python files this PR touches
         run: |
           base=origin/${{ github.base_ref || 'main' }}
