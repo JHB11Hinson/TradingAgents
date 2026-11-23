@@ -1,4 +1,4 @@
-# ADR-014: Requirement tags on the inherited memory-log tests
+# ADR-017: Requirement tags on the inherited memory-log tests
 
 - **Status:** proposed (PR-57, 2026-11-22) — awaiting the non-author review of the pull request,
   which is what turns it into `accepted`. The coding agent applied the edit; the agent did not
