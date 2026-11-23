@@ -78,7 +78,9 @@ Evidence-axis findings, verified by mutation rather than by reading:
 - `test/offline/test_budget_degradation.py`: corrected the over-claim to `D1-REQ-COST-003` on both
   degradation tests, matching the module docstring and the trace matrix, which already credits this
   file to COST-003 for degradation.
-- `docs/architecture/adr/014-inherited-test-requirement-tags.md`: records why docstring-only tags on
+- `docs/architecture/adr/017-inherited-test-requirement-tags.md` (filed as `014-` in PR #57;
+  renumbered by CHG-053 because that number was already taken by the accepted
+  `014-memory-source-attribution.md`): records why docstring-only tags on
   the inherited memory-log tests are admissible, and that the trace matrix stays authoritative.
 - `docs/architecture/trace-matrix.md`: DEBATE-004, CTX-002 and MEM-004 rows now name the tests that
   carry them instead of "Round upper-bound case" / "Pipeline unit test shows stage order and drops"

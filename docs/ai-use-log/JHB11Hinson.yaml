@@ -763,3 +763,32 @@
         when a second checkout shares the editable install, which is how the survey worktree hit it.
       why: >-
         The README must describe the real trigger, not the one that happened to be observed first.
+
+- id: AI-2026-11-23-003
+  date: 2026-11-23
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-053: resolve the duplicate `014` in `docs/architecture/adr/`. PR #59 introduced
+    `014-memory-source-attribution.md` and PR #57 introduced
+    `014-inherited-test-requirement-tags.md`; both were merged, so `ADR-014` named two decisions and
+    a reader could not tell which one a citation meant. The later, still-`proposed` record is
+    renumbered to `017` (the next free number), its heading follows, and the one transcript that
+    names the old path is updated. The accepted record keeps `014` because `src/tradingagents/memory/
+    log.py`, `docs/architecture/memory-design.md` and the `MEM-003` trace-matrix row all cite it.
+    `test/offline/test_adr_numbering.py` pins uniqueness, gaplessness, heading/filename agreement and
+    the resolvability of every `ADR-<n>` citation; three of its six tests were RED before the move.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose PR-3 (ADR numbering) as the next item after PR-7, before the larger documentation and
+        report work.
+      why: >-
+        It is a small, fully verifiable defect with no dependency on content the owner must write.
+    - type: constrain
+      what: >-
+        Renumbered the later, `proposed` record rather than the accepted one, so no `src/` citation
+        or review record changes meaning.
+      why: >-
+        The accepted ADR is cited from runtime code and three documents; moving it would rewrite
+        evidence for a decision already in force.
