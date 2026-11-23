@@ -60,3 +60,31 @@
         Keeping the log current avoids a gate-6 block; de-listing a module that still fails mypy
         would hide the pre-existing errors instead of fixing them.
   transcript: TBD
+
+- id: AI-2026-11-23-001
+  date: 2026-11-23
+  members: ["AKAScarlett"]
+  agent: opencode
+  summary: >-
+    CHG-051 (D1-REQ-GOV-003, D1-REQ-GOV-007): enforce a one-way ratchet on the gate-2 mypy quarantine
+    list. Added ADR-016, the offline tests test/offline/test_gate2_check.py (new line fails, deletion
+    passes, no change passes, comment-only passes, missing base passes), and the implementation
+    .github/scripts/gate2_check.py that compares docs/code-governance/mypy-legacy.txt between the base
+    branch and HEAD and fails when a path was added. Wired one extra step into gate-2-static-analysis;
+    the job name and the six required status-check contexts are unchanged.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved using ADR number 016 (015 was already taken by 015-runtime-prompt-store.md) and the
+        AKAScarlett.yaml AI-use-log file, and approved landing the ADR plus the RED tests first.
+      why: >-
+        The ADR numbering collision would otherwise overwrite an existing decision, and separating
+        the RED tests and the ADR from the implementation keeps gate-1 (tests before code) clear.
+    - type: constrain
+      what: >-
+        Limited the change to the guard itself: no de-listing of any real module, no change to the
+        gate name or branch-protection contexts, and a stop after the RED stage until the PR existed.
+      why: >-
+        Guarding the exemption boundary must not alter what gate-2 type-checks or what protection
+        requires; DEBT-009 stays open and its count can only go down.
+  transcript: TBD
