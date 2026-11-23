@@ -830,3 +830,29 @@
         under the project's state-transition rules.
       why: >-
         Flipping a status records an approval that has not been established.
+
+- id: AI-2026-11-24-002
+  date: 2026-11-24
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-055 (record fix): ADR-016's status line named "PR-3", which is the unrelated 2026-10-12
+    governance PR. Verified before editing that PR #60 is the record to cite: its title is
+    "test: CHG-051 add RED tests for gate-2 mypy quarantine guard", it merged 2026-11-23 by
+    `@AKAScarlett`, its file list contains
+    `docs/architecture/adr/016-gate2-mypy-quarantine-guard.md` and
+    `.github/scripts/gate2_check.py`, and the decision text (one-way ratchet on
+    `mypy-legacy.txt`) matches that checker. The edit changes the citation only; the status stays
+    `proposed` and no technical decision text is touched.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the citation correction in principle, conditional on verifying the PR title, the
+        merge record, the CHG id and that the described change matches PR #60.
+      why: >-
+        Correcting a record is only legitimate when the target is identified beyond doubt.
+    - type: constrain
+      what: >-
+        Required the correction to be a separate commit that changes no decision content.
+      why: >-
+        A historical reference fix must not be confusable with an amendment of the decision.
