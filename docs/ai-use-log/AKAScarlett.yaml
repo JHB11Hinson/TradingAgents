@@ -88,3 +88,37 @@
         Guarding the exemption boundary must not alter what gate-2 type-checks or what protection
         requires; DEBT-009 stays open and its count can only go down.
   transcript: TBD
+
+- id: AI-2026-11-23-002
+  date: 2026-11-23
+  members: ["AKAScarlett"]
+  agent: opencode
+  summary: >-
+    CHG-054 (D1-REQ-GOV-003, resolving DEBT-010 and DEBT-004): completed gate-2's second half. Added
+    ADR-018, the safety-path list docs/code-governance/safety-paths.txt, two RED test modules, and two
+    pure-stdlib CI-glue checkers. gate2_safety_check.py fails a pull request that changes a
+    safety-critical path without an accompanying ADR under docs/architecture/adr/. gate2_deps_check.py
+    parses every src/ import with ast and fails any third-party root not declared in pyproject.toml,
+    resolving module-to-distribution mismatches (yaml->PyYAML, dotenv->python-dotenv,
+    dateutil->python-dateutil, markdown_it->markdown-it-py, PIL->Pillow) through a mapping dict. The
+    real tree surfaced three transitive-only deps (prompt-toolkit, pydantic, python-dateutil) now
+    declared in pyproject.toml. Both steps run inside gate-2-static-analysis; no gate name or
+    protection context changed.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Required a pure-Python custom dependency checker (no deptry or other third-party tool), a
+        data-file safety-path list so the team edits text not code, and explicit handling of the
+        import-name vs distribution-name mismatch via a mapping dictionary.
+      why: >-
+        A third-party dependency checker would itself be an undeclared dependency; a data file keeps
+        the safety list reviewable in one place; a mapping dict prevents false positives on yaml,
+        Pillow and similar.
+    - type: approve
+      what: >-
+        Approved declaring the three newly surfaced dependencies in pyproject.toml so the real tree
+        passes the new check, and keeping both steps inside the existing gate-2 job.
+      why: >-
+        The deps check is only meaningful if the current tree is clean; declaring the genuine runtime
+        imports closes the DEBT-004 hidden-dependency class without changing the gate contexts.
+  transcript: TBD

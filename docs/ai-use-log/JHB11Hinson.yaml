@@ -733,3 +733,62 @@
         The change is a sourcing change, not a prompt-quality change; a fallback would hide a
         missing store.
   transcript: transcripts/60198818-HaobinJiang-CHG-049-runtime-prompt-store.md#L1-L144
+
+- id: AI-2026-11-23-002
+  date: 2026-11-23
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-052: document the evaluator's installed-package failure mode in the README. The offline
+    tests import `tradingagents` from `src/` because `pyproject.toml` sets `pythonpath = ["src"]`,
+    but the evaluator runs as a subprocess (`python -m eval.run`) and therefore imports whatever
+    the editable install resolves to. Two checkouts sharing one install disagree, and
+    `test/offline/test_eval_cli.py` fails with `ModuleNotFoundError: No module named
+    'tradingagents.evaluation'` while the source on disk is correct. The new Troubleshooting
+    section names the fix (`pip install -e ".[dev]"`) and the one command that reveals which
+    package a subprocess sees. `test/offline/test_readme_environment_trap.py` pins the section,
+    the fix and the `pythonpath` dependency; five tests, three of them RED before the README edit.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose PR-7 from the read-only survey as the first execution item, ahead of the higher-value
+        documentation and report work.
+      why: >-
+        It is the only candidate with no approval gate beyond itself, so it establishes the
+        tests-first and gate cycle at the lowest cost.
+    - type: correct
+      what: >-
+        The first diagnosis said the trap affects a normal single checkout. Re-testing in the
+        owner's own tree showed `pytest -q` green there (1626 passed); the failure only reproduces
+        when a second checkout shares the editable install, which is how the survey worktree hit it.
+      why: >-
+        The README must describe the real trigger, not the one that happened to be observed first.
+
+- id: AI-2026-11-23-003
+  date: 2026-11-23
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-053: resolve the duplicate `014` in `docs/architecture/adr/`. PR #59 introduced
+    `014-memory-source-attribution.md` and PR #57 introduced
+    `014-inherited-test-requirement-tags.md`; both were merged, so `ADR-014` named two decisions and
+    a reader could not tell which one a citation meant. The later, still-`proposed` record is
+    renumbered to `017` (the next free number), its heading follows, and the one transcript that
+    names the old path is updated. The accepted record keeps `014` because `src/tradingagents/memory/
+    log.py`, `docs/architecture/memory-design.md` and the `MEM-003` trace-matrix row all cite it.
+    `test/offline/test_adr_numbering.py` pins uniqueness, gaplessness, heading/filename agreement and
+    the resolvability of every `ADR-<n>` citation; three of its six tests were RED before the move.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose PR-3 (ADR numbering) as the next item after PR-7, before the larger documentation and
+        report work.
+      why: >-
+        It is a small, fully verifiable defect with no dependency on content the owner must write.
+    - type: constrain
+      what: >-
+        Renumbered the later, `proposed` record rather than the accepted one, so no `src/` citation
+        or review record changes meaning.
+      why: >-
+        The accepted ADR is cited from runtime code and three documents; moving it would rewrite
+        evidence for a decision already in force.

@@ -1,0 +1,29 @@
+# Safety-critical paths (ADR-018, gate-2 safety-path guard).
+#
+# A pull request that changes any path below must also add or modify an ADR under
+# docs/architecture/adr/ in the same diff (AGENTS.md section 11: a change to a
+# safety-critical path needs human review with an accompanying architecture decision).
+#
+# A trailing slash matches every file under that directory. Blank lines and lines
+# starting with '#' are ignored. Add a path here by editing this text — no code change.
+#
+# Sources: AGENTS.md section 8 (integration contracts) and section 11 (safety-critical
+# paths: module contracts, permission model, safety guardrails).
+
+# Integration contracts (AGENTS.md section 8)
+src/tradingagents/agents/state.py
+src/tradingagents/graph/setup.py
+src/tradingagents/graph/conditional_logic.py
+src/tradingagents/dataflows/router.py
+
+# Authority boundary and configuration single source (D1-REQ-SAFE-002, SAFE-003)
+src/tradingagents/default_config.py
+src/tradingagents/agents/schemas.py
+
+# Safety guardrails (D1-REQ-SAFE-001/002/003)
+src/tradingagents/guardrails/
+src/tradingagents/agents/managers/
+
+# Permission model (D1-REQ-GOV-006) — the three sources that must agree
+.opencode/permissions.jsonc
+docs/architecture/permission-model.md
