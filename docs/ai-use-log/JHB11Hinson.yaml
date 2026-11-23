@@ -733,3 +733,33 @@
         The change is a sourcing change, not a prompt-quality change; a fallback would hide a
         missing store.
   transcript: transcripts/60198818-HaobinJiang-CHG-049-runtime-prompt-store.md#L1-L144
+
+- id: AI-2026-11-23-002
+  date: 2026-11-23
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-052: document the evaluator's installed-package failure mode in the README. The offline
+    tests import `tradingagents` from `src/` because `pyproject.toml` sets `pythonpath = ["src"]`,
+    but the evaluator runs as a subprocess (`python -m eval.run`) and therefore imports whatever
+    the editable install resolves to. Two checkouts sharing one install disagree, and
+    `test/offline/test_eval_cli.py` fails with `ModuleNotFoundError: No module named
+    'tradingagents.evaluation'` while the source on disk is correct. The new Troubleshooting
+    section names the fix (`pip install -e ".[dev]"`) and the one command that reveals which
+    package a subprocess sees. `test/offline/test_readme_environment_trap.py` pins the section,
+    the fix and the `pythonpath` dependency; five tests, three of them RED before the README edit.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose PR-7 from the read-only survey as the first execution item, ahead of the higher-value
+        documentation and report work.
+      why: >-
+        It is the only candidate with no approval gate beyond itself, so it establishes the
+        tests-first and gate cycle at the lowest cost.
+    - type: correct
+      what: >-
+        The first diagnosis said the trap affects a normal single checkout. Re-testing in the
+        owner's own tree showed `pytest -q` green there (1626 passed); the failure only reproduces
+        when a second checkout shares the editable install, which is how the survey worktree hit it.
+      why: >-
+        The README must describe the real trigger, not the one that happened to be observed first.
