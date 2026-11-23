@@ -1,6 +1,6 @@
 # ADR-016: Enforce a one-way ratchet on the gate-2 mypy quarantine list
 
-- **Status:** proposed (PR-3, 2026-11-23) — awaiting the non-author review of the pull request,
+- **Status:** proposed (PR #60, 2026-11-23) — awaiting the non-author review of the pull request,
   which is what turns it into `accepted`. The coding agent applied the edit; the agent did not
   approve or merge.
 - **Requirement:** `D1-REQ-GOV-003` (the blocking gates) and `D1-REQ-GOV-007` (guard against
