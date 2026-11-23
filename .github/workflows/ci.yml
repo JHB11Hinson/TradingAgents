@@ -54,6 +54,18 @@ jobs:
           git fetch origin "$base_ref"
           python .github/scripts/gate2_check.py \
             --base "origin/$base_ref" --head HEAD
+      - name: A safety-critical path needs an ADR (ADR-018)
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "not a pull request; no base to compare against"
+            exit 0
+          fi
+          base_ref="${{ github.base_ref || 'main' }}"
+          git fetch origin "$base_ref"
+          python .github/scripts/gate2_safety_check.py \
+            --base "origin/$base_ref" --head HEAD
+      - name: Every third-party import is declared (ADR-018)
+        run: python .github/scripts/gate2_deps_check.py
       - name: Lint only the python files this PR touches
         run: |
           base=origin/${{ github.base_ref || 'main' }}
