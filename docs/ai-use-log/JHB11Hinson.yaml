@@ -792,3 +792,41 @@
       why: >-
         The accepted ADR is cited from runtime code and three documents; moving it would rewrite
         evidence for a decision already in force.
+
+- id: AI-2026-11-24-001
+  date: 2026-11-24
+  members: ["JHB11Hinson"]
+  agent: deepseek-harness
+  summary: >-
+    CHG-055: add a validator that an `accepted` ADR citing a pull request cites one that has a
+    review record under `docs/review-memo/`. The rule is deliberately narrow after a read-only
+    survey showed the broad version would misfire on this corpus: status lines use five shapes
+    (`- Status:` and `- **Status:**`), ten inherited ADRs name no PR at all, and ADR-016 names
+    "PR-3" while PR #60 actually merged it. So only `accepted` records are checked, an accepted
+    record that cites nothing is exempt, `proposed` records are never verified, and only the two
+    explicit citation forms `PR #<n>` and `PR-<n>` are parsed. The PR-existence predicate is
+    injected, so the tests need no network. `.github/scripts/adr_status_check.py` holds the check
+    and `test/offline/test_adr_status.py` loads it by path, matching how `test_gate2_check.py`
+    loads `gate2_check.py`.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Rejected the broad rule ("every accepted ADR must cite an existing approving PR") after
+        the analysis showed it would red on ADR-016 and on ten inherited records; required the
+        exemption and the accepted-only scope instead.
+      why: >-
+        A gate that fails on correct history trains people to ignore it, which is worse than a
+        narrower gate that only catches real breakage.
+    - type: approve
+      what: >-
+        Approved correcting ADR-016's "PR-3" to PR #60 as a separate historical-record commit,
+        conditional on verifying the title, the merge record, the CHG id and the described change.
+      why: >-
+        The citation points at an unrelated 2026-10-12 PR, so the traceability chain was broken;
+        the fix must not alter the technical decision.
+    - type: constrain
+      what: >-
+        Left ADR-017 at `proposed`. Its PR #57 merge does not by itself prove a non-author approval
+        under the project's state-transition rules.
+      why: >-
+        Flipping a status records an approval that has not been established.
