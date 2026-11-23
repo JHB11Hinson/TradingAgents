@@ -14,8 +14,6 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / ".github" / "scripts" / "gate2_safety_check.py"
 SAFETY_FILE = "docs/code-governance/safety-paths.txt"
@@ -33,8 +31,10 @@ class FakeGit:
         return list(self._changed)
 
 
-def run(changed, base="origin/main", head="HEAD"):
-    return safety.check(FakeGit(changed), base, head)
+def run(changed, base="origin/main", head="HEAD", safety_file=None):
+    if safety_file is None:
+        return safety.check(FakeGit(changed), base, head)
+    return safety.check(FakeGit(changed), base, head, safety_file=safety_file)
 
 
 PATHS = "# safety-critical paths\nsrc/tradingagents/default_config.py\nsrc/tradingagents/guardrails/\n"
