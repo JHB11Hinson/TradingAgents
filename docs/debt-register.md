@@ -80,7 +80,11 @@ inventing a ninth.
 - **Owner:** Admin (environment), all members when reporting results.
 - **Trigger to revisit:** a clean install that fails, or a skip count that changes between machines.
 - **Linked requirement:** `D1-REQ-GOV-001`, `D1-REQ-GOV-011`.
-- **Status:** open
+- **Status:** mitigated by CHG-054 (2026-11-23): the `pyproject.toml` dependency declaration now
+  names every third-party import the tree actually uses (`prompt-toolkit`, `pydantic`,
+  `python-dateutil` were transitive-only and are now declared), and gate-2 fails any future
+  undeclared import (`gate2_deps_check.py`, ADR-018). `langchain_aws` stays an optional `[bedrock]`
+  extra and one inherited test still skips without it.
 
 ## DEBT-005 — The graph wiring has no team walkthrough
 
@@ -158,7 +162,12 @@ inventing a ninth.
 - **Trigger to revisit:** before the first change to a safety-critical path and before Sprint 3
   safety work; do not describe gate 2 as fully implementing the course gate until then.
 - **Linked requirement:** `D1-REQ-GOV-003`, `D1-REQ-SAFE-002`, `D1-REQ-SAFE-003`.
-- **Status:** open
+- **Status:** mitigated by CHG-054 (2026-11-23): gate-2 now also runs a safety-path guard
+  (`gate2_safety_check.py`, ADR-018) that fails a pull request touching a safety-critical path
+  without an accompanying ADR, and a dependency-declaration checker (`gate2_deps_check.py`,
+  ADR-018, pure standard library) that fails any `src/` import not backed by a `pyproject.toml`
+  declaration. The safety-path list is `docs/code-governance/safety-paths.txt`. Both steps live
+  inside `gate-2-static-analysis`, so the gate name and the six protection contexts are unchanged.
 
 ## DEBT-011 — The evaluation baseline was not like-for-like
 
