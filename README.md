@@ -141,7 +141,33 @@ ruff check src
 check-jsonschema --schemafile docs/req/req-schema.json docs/req/requirements.yaml
 ```
 
-## 6. Blocking gates
+## 6. Troubleshooting
+
+### `test/offline/test_eval_cli.py` fails with `ModuleNotFoundError: No module named 'tradingagents.evaluation'`
+
+This is an **installed-package** problem, not a missing module. The offline tests import
+`tradingagents` from `src/` because `pyproject.toml` sets `pythonpath = ["src"]`, but the evaluator
+runs as a subprocess (`python -m eval.run`, see the gate-4 command in section 7) and therefore
+imports whatever the **installed** package resolves to. When the install points at a different
+checkout, or at a checkout that predates the evaluator, the test fails while the source on disk
+looks correct.
+
+```bash
+pip install -e ".[dev]"   # re-point the editable install at this checkout
+pytest -q test/offline/test_eval_cli.py
+```
+
+Check which package a subprocess actually sees before changing anything else:
+
+```bash
+python -c "import tradingagents; print(tradingagents.__file__)"
+```
+
+The path it prints must be the `src/` directory of the checkout you are testing. If you use a second
+checkout, such as a Git worktree, either give it its own virtual environment or re-run
+`pip install -e ".[dev]"` there: one editable install cannot serve two working trees.
+
+## 7. Blocking gates
 
 The workflow `.github/workflows/ci.yml` is named `gates`. The gate name must match the
 branch-protection `contexts` character for character.
@@ -165,7 +191,7 @@ Branch protection on `main`:
 The committed baseline is `docs/code-governance/protection.json`. The live setting is the fact;
 if this file and the live setting disagree, fix this file.
 
-## 7. Documentation map
+## 8. Documentation map
 
 | Question | File |
 |---|---|
@@ -179,7 +205,7 @@ if this file and the live setting disagree, fix this file.
 | What are the permissions? | `.opencode/permissions.jsonc`, `docs/architecture/permission-model.md`, `AGENTS.md` §13 |
 | What was reviewed, and what did the AI do? | `docs/review-memo/`, `docs/ai-use-log/`, `transcripts/` |
 
-## 8. Baseline and licence
+## 9. Baseline and licence
 
 This repository is a graded fork of `TauricResearch/TradingAgents` (Apache-2.0), baseline commit
 `1394a3f72aa4393e1a98f51b382434c4b4c2d972` (v0.6.0, 2026-10-03). The inherited packages were moved
@@ -188,7 +214,7 @@ synced into `main`; upstream updates are handled as separate reviewed changes.
 
 The licence is Apache-2.0; see `LICENSE`.
 
-## 9. Team
+## 10. Team
 
 | Member | Primary responsibility |
 |---|---|
