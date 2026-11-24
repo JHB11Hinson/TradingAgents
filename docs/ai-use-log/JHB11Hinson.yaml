@@ -856,3 +856,45 @@
         Required the correction to be a separate commit that changes no decision content.
       why: >-
         A historical reference fix must not be confusable with an amendment of the decision.
+
+- id: AI-2026-11-25-001
+  date: 2026-11-25
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-056: draft the D6 process report and the working papers behind it. The report was
+    re-derived from the repository rather than rewritten from the previous draft: 55 merged pull
+    requests, 50 change ids, 18 ADRs with 15 accepted, 1,672 passing tests, and the six
+    deliberate-violation probes that each turned their target gate red.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Refused to fill the contribution table with the pasted 34/33/33 percentages and their work
+        descriptions, because those descriptions (Qdrant index, NLI layer, citation spans) do not
+        exist anywhere in this repository.
+      why: >-
+        A contribution table that describes another project's work is a false claim an assessor
+        can disprove from the git history. A blank table is honest; a wrong one is not.
+    - type: constrain
+      what: >-
+        Left the contribution hours, the three reflections and the two missing transcripts empty,
+        marked as blockers, instead of estimating or drafting them.
+      why: >-
+        The course treats transcripts and reflections as evidence of authentic human authorship.
+        Agent-written reflections would undermine the exact property they are meant to show.
+    - type: correct
+      what: >-
+        Corrected two findings from the earlier review round: deliberate-violation probe pull
+        requests do exist (#4, #5, #6, #12, #26, #44, #45), and the transcripts carry a
+        "Human interventions" table with a rationale column.
+      why: >-
+        The earlier method grepped for markers that the files do not use; finding "no evidence" from
+        a method that could not find it is a false negative and must not reach the report.
+    - type: approve
+      what: >-
+        Approved writing the report and its working papers into the repository as a draft that
+        states its own open items.
+      why: >-
+        The report is clearer to review as a pull request than as a file outside version control,
+        provided it does not present itself as submission-ready.
+  transcript: docs/report/Report-Review.md
