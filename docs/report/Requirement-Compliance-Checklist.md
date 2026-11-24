@@ -64,11 +64,20 @@ The report must reproduce this shape with the team's own agreed measure.
 
 ## F. Summary
 
+Counted from the four tables above: **26 checked items.**
+
 | Status | Count | Items |
 |---|---:|---|
-| satisfied | 12 | A3, A5, A7, A9, B5, C1, C2, C3, C5, D4, plus A8-partial counted under partial |
-| partial | 5 | A8, B4, B6, C4, D1, D2, D5 (7) |
-| blocked (student-supplied only) | 5 | A1, A2, A6, B1, B2, B3 |
-| unverifiable / missing | 3 | A4, C6, D3 |
+| satisfied | 11 | A3, A5, A7, A9, B5, C1, C2, C3, C5, **A1 (Filled: names/IDs supplied)**, D4 |
+| partial | 7 | A8, B4, B6, D1, D2, D5, C4 |
+| blocked (student-supplied only) | 5 | A2, B1, B2, B3, A6 |
+| unverifiable | 2 | A4, C6 |
+| missing | 1 | D3 |
 
-**The report is not submission-ready.** Nine of the twenty-five checked items cannot be closed by editing: they need student names and numbers, agreed contribution hours, three written reflections, and either two more members' transcripts or an explicit disclosure. Everything else is either satisfied or honestly marked.
+**The report is not submission-ready.** Six of the twenty-six checked items cannot be closed by
+editing the document: the agreed contribution hours, the three student-written reflections, and either
+two more members' transcripts or an explicit disclosure. Everything else is either satisfied or honestly
+marked.
+
+*A1 was recorded as blocked in the first pass; the team supplied the three names and student numbers, so
+it is now satisfied.*
