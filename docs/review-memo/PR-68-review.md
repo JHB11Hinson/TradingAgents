@@ -1,4 +1,4 @@
-### Review of PR-68 — CHG-058/059 real-name rename, Haobin reflection, and signature-field cleanup
+### Review of PR-68 — CHG-058/059 real-name rename, Haobin reflection, signature-field cleanup, and contribution shares
 
 **Reviewer:** `github-actions[bot]` (`.github/workflows/bot-review.yml`). **Automated non-author review.**
 The text below is committed before the `bot-review` label is applied, so the approval is reproducible.
@@ -31,8 +31,10 @@ Checked against the D6 wording (project.pdf p. 6–7):
 - **No invented fields** — the PDF asks for the reflection, the name and the student ID. It does not
   ask for a signature, a date, a stated word count or an authorship declaration. Those fields are
   removed from the three worksheets, the team sheet and the compliance checklist.
-- **Relative contribution** — not changed by this PR; the report's §10 remains the team-supplied
-  section.
+- **Relative contribution** — §10.1 now carries the team-supplied 34 / 33 / 33 normalized share,
+  converted to the course weights 1.02 / 0.99 / 0.99 (mean 1.0). §10.2 records the agreed division of
+  work. No sprint-by-sprint split is claimed. The values are team-attested, not repository-derived,
+  and co-member confirmation remains open in the team sheet.
 - **Process-quality evidence** — not changed by this PR.
 
 #### Record truth
@@ -49,8 +51,10 @@ handle still names the account.
 #### Verification
 
 - `git diff --check` — clean.
-- `docs/ai-use-log/HaobinJiang.yaml` — parses; 30 entries; the new entry is `AI-2026-11-25-003`.
+- `docs/ai-use-log/HaobinJiang.yaml` — parses; 31 entries; the new entries are
+  `AI-2026-11-25-002` (contribution shares) and `AI-2026-11-25-003` (reflection/signature cleanup).
 - `grep -rn 'Signed:\|Signature\|Sign-off\|Word count' docs/report` — no matches.
+- Contribution arithmetic — `(1.02 + 0.99 + 0.99) / 3 = 1.00`.
 - `.venv/bin/python -m pytest -q` — **1672 passed, 1 skipped, 1 deselected** in 37.63 s.
 
 **Verdict:** APPROVE
