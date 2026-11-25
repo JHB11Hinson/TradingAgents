@@ -5,7 +5,7 @@
 > account. Do not copy the evidence summaries; they are there so your reflection can be specific.
 
 **Name:** ZHONG Junqiong **Student number:** 60907770
-**Word target:** 300–500 **Written:** ☑
+**Length:** 300–500 words (the course's example)
 
 ---
 
@@ -155,5 +155,3 @@ a green run until I know where it ran and what it had installed. Second, treat t
 commit messages and the logs as a report to a stranger who was not in the room — because that stranger
 is exactly who will grade the work, and exactly who needs to be able to check it without me.
 ```
-
-**Word count of your text:** 481  **Signed:** ZhongJunqiong  **Date:** 25 November 2026

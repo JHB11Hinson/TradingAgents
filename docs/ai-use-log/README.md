@@ -4,7 +4,7 @@
 file per active member:
 
 ```text
-docs/ai-use-log/JHB11Hinson.yaml
+docs/ai-use-log/HaobinJiang.yaml
 docs/ai-use-log/60907770-ZhongJunqiong.yaml
 docs/ai-use-log/SY1433.yaml
 ```
