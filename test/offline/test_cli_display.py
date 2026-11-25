@@ -94,6 +94,29 @@ def test_the_state_log_names_each_field_as_the_state_does(tmp_path):
 
 
 @pytest.mark.unit
+def test_the_state_log_records_decision_source_memory_and_turn_records(tmp_path):
+    """`inspect` replays a finished run from the log, so the log carries the
+    decision source, the memory note/sources and both debates' turn records."""
+    state = _state("NVDA")
+    state.update({
+        "final_decision_source": "structured",
+        "memory_note": "1 future item withheld",
+        "past_context": "lesson\n| src:2026-10-01/NVDA |",
+    })
+    state["investment_debate_state"]["turn_records"] = [{"claim": "c"}]
+    state["risk_debate_state"]["turn_records"] = [{"claim": "r"}]
+
+    _bare_graph(tmp_path)._log_state("2026-09-01", state)
+
+    logged = json.loads(next(tmp_path.rglob("full_states_log*.json")).read_text(encoding="utf-8"))
+    assert logged["final_decision_source"] == "structured"
+    assert logged["memory_note"] == "1 future item withheld"
+    assert logged["memory_sources"] == ["2026-10-01/NVDA"]
+    assert logged["investment_debate_state"]["turn_records"] == [{"claim": "c"}]
+    assert logged["risk_debate_state"]["turn_records"] == [{"claim": "r"}]
+
+
+@pytest.mark.unit
 def test_the_live_display_does_not_scroll_the_terminal():
     """A layout taller than the window makes rich redraw by scrolling, which
     reads as flicker; the alternate screen holds it in place (#784). The final

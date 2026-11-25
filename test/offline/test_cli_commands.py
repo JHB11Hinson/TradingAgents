@@ -6,6 +6,8 @@ has to stay the default action while a second command exists alongside it.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from typer.testing import CliRunner
 
@@ -180,3 +182,48 @@ def test_backtest_refuses_a_selection_before_the_sweep(runner, monkeypatch, args
     result = runner.invoke(m.app, ["backtest", "NVDA", "--start", "2026-06-01", "--end", "2026-06-01", *args])
 
     assert result.exit_code == 1
+
+
+@pytest.mark.unit
+def test_help_lists_the_inspect_command(runner):
+    assert "inspect" in runner.invoke(m.app, ["--help"]).output
+
+
+@pytest.mark.unit
+def test_inspect_renders_a_saved_run(runner, tmp_path):
+    log_dir = tmp_path / "NVDA" / "TradingAgentsStrategy_logs"
+    log_dir.mkdir(parents=True)
+    (log_dir / "full_states_log_2026-11-20.json").write_text(
+        json.dumps({
+            "company_of_interest": "NVDA",
+            "trade_date": "2026-11-20",
+            "final_trade_decision": "**Rating**: Hold",
+            "final_rating": "Hold",
+            "final_decision_source": "structured",
+            "termination_reason": "",
+            "context_usage": {
+                "budget": 50000, "total_tokens": 12000,
+                "compacted_calls": 0, "max_call_tokens": 4000,
+            },
+            "memory_note": "",
+            "memory_sources": [],
+            "investment_debate_state": {"turn_records": []},
+            "risk_debate_state": {"turn_records": []},
+        }),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(m.app, ["inspect", "NVDA", "2026-11-20", "--results-dir", str(tmp_path)])
+
+    assert result.exit_code == 0, result.output
+    assert "Run Evidence" in result.output
+    assert "Hold" in result.output
+
+
+@pytest.mark.unit
+def test_inspect_reports_a_missing_run_in_one_line(runner, tmp_path):
+    result = runner.invoke(m.app, ["inspect", "NVDA", "2026-11-20", "--results-dir", str(tmp_path)])
+
+    assert result.exit_code == 1
+    assert "full_states_log" in result.output
+    assert "Traceback" not in result.output
