@@ -3,9 +3,10 @@
 A run already writes a state log, a telemetry trace and a manifest. This module
 reads them back into one :class:`Evidence` record and renders it as a compact
 Rich panel in the inherited style. It is purely additive: the live layout, the
-graph and the report-save flow are untouched, and a missing or malformed file
-degrades to ``not written`` / ``not recorded`` rather than raising, so evidence
-can never fail a run.
+graph and the report-save flow are untouched. On the run path a missing or
+malformed file degrades to ``not written`` / ``not recorded`` rather than
+raising, so evidence can never fail a run; ``inspect`` reports a corrupt saved
+trace as one error line instead of showing it as an empty run.
 
 The same collector serves the post-run panel (``collect_evidence`` on the
 in-memory final state) and the ``inspect`` command (``collect_from_log`` on a
@@ -112,7 +113,7 @@ def _read_json(path: str | Path) -> Any:
     """Read a JSON file; a missing or malformed file is ``None``, never a raise."""
     try:
         return json.loads(Path(path).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except (OSError, ValueError, RecursionError):
         return None
 
 
@@ -128,10 +129,18 @@ def _parse_sources(past_context: Any) -> list[str]:
     return sorted(set(_SRC_RE.findall(str(past_context or ""))))
 
 
-def _load_events(path: Path) -> list[TelemetryEvent]:
+def _load_events(path: Path, *, strict: bool = False) -> list[TelemetryEvent]:
+    """Load a trace's spans; a malformed trace is ``[]`` unless ``strict``.
+
+    The post-run panel degrades a corrupt trace so evidence can never fail a
+    run. ``inspect`` passes ``strict`` because a saved trace that cannot be read
+    is a real error there, not an empty run.
+    """
     try:
         return load_trace(path)
-    except (OSError, ValueError, KeyError, TypeError):
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, RecursionError):
+        if strict:
+            raise ValueError(f"trace is not a readable telemetry trace: {path}") from None
         return []
 
 
@@ -197,9 +206,18 @@ def _validate_date(value: Any) -> str:
 
 
 def collect_evidence(
-    final_state: dict, config: dict, ticker: str, trade_date: str
+    final_state: dict,
+    config: dict,
+    ticker: str,
+    trade_date: str,
+    *,
+    strict_trace: bool = False,
 ) -> Evidence:
-    """Build the evidence record from a finished run's state and its files."""
+    """Build the evidence record from a finished run's state and its files.
+
+    ``strict_trace`` is off for the post-run panel, which must never fail a
+    finished run; ``inspect`` turns it on so a corrupt saved trace is reported.
+    """
     final_state = final_state or {}
     context = final_state.get("context_usage") or {}
     if not isinstance(context, dict):
@@ -243,7 +261,7 @@ def collect_evidence(
         candidate_manifest = directory / f"manifest_{trade_date}.json"
         if candidate_trace.exists():
             trace_path = candidate_trace
-            events = _load_events(candidate_trace)
+            events = _load_events(candidate_trace, strict=strict_trace)
             status = _trace_status(candidate_trace)
         if candidate_manifest.exists():
             manifest_path = candidate_manifest
@@ -266,7 +284,12 @@ def collect_evidence(
 def collect_from_log(
     log_path: str | Path, config: dict, ticker: str, trade_date: str
 ) -> Evidence:
-    """Rebuild the evidence record from a saved state log (for ``inspect``)."""
+    """Rebuild the evidence record from a saved state log (for ``inspect``).
+
+    Raises ``ValueError``/``FileNotFoundError`` for an unreadable state log and
+    ``ValueError`` for a saved trace that exists but cannot be read, so the
+    command can print one red line.
+    """
     path = Path(log_path)
     data = _read_json(path)
     if data is None:
@@ -292,7 +315,7 @@ def collect_from_log(
         },
         "risk_debate_state": {"turn_records": _turn_records(data.get("risk_debate_state"))},
     }
-    return collect_evidence(final_state, config, ticker, trade_date)
+    return collect_evidence(final_state, config, ticker, trade_date, strict_trace=True)
 
 
 def find_state_log(ticker: str, date: str | None, results_dir: str | Path) -> StateLogRef:
