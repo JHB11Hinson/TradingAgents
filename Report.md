@@ -636,7 +636,17 @@ is exactly who will grade the work, and exactly who needs to be able to check it
 
 ### 11.3 Reflection — WANG Songyan (60847491), `@SY1433`
 
-_To be supplied by WANG Songyan (300–500 words, first person)._
+This project taught me that software development is not simply about solving technical problems, but also about making reliable decisions and working responsibly within a team.
+
+One important lesson came from a diagnosis I initially got wrong. I believed an evaluator's environment issue affected an ordinary checkout, but further testing showed that it only occurred when two checkouts shared one editable installation. I corrected the explanation in both the README and the AI-use log, rather than hiding the original mistake. This experience taught me that a technical explanation should be treated as a hypothesis until it has been properly reproduced and verified. More importantly, documenting corrections is part of maintaining trust in a collaborative project.
+
+I also learned the importance of respecting existing decisions. When I discovered conflicting ADR numbers, I checked which record was already accepted and referenced by the implementation before making changes. Instead of rewriting an established decision, I corrected the proposed record and added automated checks to prevent similar problems. This showed me that in team development, consistency and traceability are often more important than making individual changes look cleaner. I also learned that not every issue should be fixed immediately. Some changes require separate discussion and review, and leaving them visible is better than making unapproved adjustments.
+
+Beyond these technical experiences, the project helped me understand the challenges of collaborative software development. Different team members work on different components, maintain different responsibilities, and may have different interpretations of requirements. Without clear documentation, shared conventions, and review procedures, even a small change can create unexpected problems elsewhere. I realised that good collaboration does not mean everyone works independently and simply combines their results at the end. It requires continuous communication, clear ownership, respect for other members' work, and evidence-based decisions.
+
+Working with AI tools also taught me that efficiency should not replace critical thinking. AI can help identify problems and accelerate implementation, but its suggestions still need human verification and accountability.
+
+Overall, I have become more aware of my responsibility not only for the code I change, but also for the reliability of the shared project. My biggest takeaway is to verify before concluding, document mistakes honestly, and consider how every individual change affects the whole team.
 
 ---
 
