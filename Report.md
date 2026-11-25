@@ -278,7 +278,7 @@ specific changes. But a structured rotation is not evidenced, and the report doe
 
 The distribution is informative: the largest category after approvals is **constrain** — cases where a human refused something that would have crossed a boundary. That is the supervision the course asks to see.
 
-> `[OWNER TO CONFIRM]` `docs/ai-use-log/SY1433.yaml` currently contains only its header comment and no entries, although `@SY1433` authored five merged PRs and submitted five reviews. Is that file incomplete, or were those changes logged in `JHB11Hinson.yaml`? The report should not describe a per-member log as maintained when one member's file is empty.
+> `[OWNER TO CONFIRM]` `docs/ai-use-log/SY1433.yaml` currently contains only its header comment and no entries, although `@SY1433` authored five merged PRs and submitted five reviews. Is that file incomplete, or were those changes logged in `HaobinJiang.yaml`? The report should not describe a per-member log as maintained when one member's file is empty.
 
 ---
 
@@ -662,7 +662,7 @@ Review was a real, uneven load; the contribution table should reflect it rather 
 - Set the project frame: adopted the inherited baseline, fixed the authority boundary, and wrote `AGENTS.md` as the single agent entry point.
 - Built and grew the gates, including the three-stage growth of gate-2 under a stable name (§5.4).
 - Defended a frozen interface against an agent optimisation in the ADR-006 review (§9, example 1), and corrected several agent-reported findings that did not survive re-testing (§9, examples 2–3).
-- Produced the 11-session annotated transcript series and the AI-use log entries (28 in `docs/ai-use-log/JHB11Hinson.yaml`).
+- Produced the 11-session annotated transcript series and the AI-use log entries (28 in `docs/ai-use-log/HaobinJiang.yaml`).
 - Orchestrated a very high share of the merged work (45 of 55 merged PRs were opened by this account), which is itself worth reflecting on: how much was co-ordination, and how much would have been better distributed?
 
 **Questions to answer in your own words:**

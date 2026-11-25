@@ -17,7 +17,7 @@ wrong before it goes into the report.
 | Area | Evidence |
 |---|---|
 | Project frame | Adopted the inherited baseline (ADR-001), `src/` layout (ADR-002), authority boundary (ADR-003) |
-| Context and cost | ADR-004 layered context with a budget; ADR-005 telemetry that never fails a run; 28 AI-use-log entries in `docs/ai-use-log/JHB11Hinson.yaml` |
+| Context and cost | ADR-004 layered context with a budget; ADR-005 telemetry that never fails a run; 28 AI-use-log entries in `docs/ai-use-log/HaobinJiang.yaml` |
 | Gates | Six gates in `.github/workflows/ci.yml`; gate-2 grew in three stages (lint → mypy quarantine → safety/deps checks) |
 | Verification | Fixed evaluation set, `eval/thresholds.yaml`, gate-4 |
 | Transcripts | 11 annotated sessions, 27 recorded interventions, all six D5 stages covered |
@@ -42,7 +42,7 @@ convenience change.
 
 ### Incident 2 — The environment-bug misdiagnosis
 
-**Evidence:** `docs/ai-use-log/JHB11Hinson.yaml` records a `correct` entry; `README.md` (CHG-052)
+**Evidence:** `docs/ai-use-log/HaobinJiang.yaml` records a `correct` entry; `README.md` (CHG-052)
 documents the installed-package trap. The agent's claimed "affects every checkout" was narrowed to one
 stale editable install after re-testing.
 **Why it matters:** it shows the difference between accepting a plausible diagnosis and reproducing it.

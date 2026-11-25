@@ -44,7 +44,7 @@ PR #57 touches ten files. The overlap with CHG-049 is three documentation files 
 
 | File | PR #57 | CHG-049 | Resolution |
 |---|---|---|---|
-| `docs/ai-use-log/JHB11Hinson.yaml` | appends `AI-2026-11-22-004` | appends `AI-2026-11-22-005` | rebase after #57 merges; keep both entries |
+| `docs/ai-use-log/HaobinJiang.yaml` | appends `AI-2026-11-22-004` | appends `AI-2026-11-22-005` | rebase after #57 merges; keep both entries |
 | `docs/architecture/trace-matrix.md` | DEBATE-004/CTX-002/MEM-004 rows | GOV-012 row | different rows; expected to merge cleanly |
 | `docs/code-governance/verification-constraints.md` | status-table intro and DEBATE-004 row | GOV-012 paragraph | different sections; expected to merge cleanly |
 

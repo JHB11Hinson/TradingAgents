@@ -125,7 +125,7 @@ ADR-005. Verdict: no Critical findings, five Important:
 ## Human question (verbatim)
 
 ```text
-导出本会话 transcript，替换 docs/ai-use-log/JHB11Hinson.yaml 与 PR 正文里的 transcripts/pending，再提交一个小 docs commit。??什么意思，ai-use-log你没写吗？
+导出本会话 transcript，替换 docs/ai-use-log/HaobinJiang.yaml 与 PR 正文里的 transcripts/pending，再提交一个小 docs commit。??什么意思，ai-use-log你没写吗？
 ```
 
 ### Agent finding

@@ -1,9 +1,9 @@
-# AI use log for @JHB11Hinson.
+# AI use log for HaobinJiang.
 # Append new entries below. The legacy docs/ai-use-log.yaml is a historical archive.
 
 - id: AI-2026-11-15-002
   date: 2026-11-15
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-029: shard the append-only records. Each member writes their own
@@ -28,7 +28,7 @@
 
 - id: AI-2026-11-15-003
   date: 2026-11-15
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-030: add gate-1-test-approval. The checker reads the Test-Approval trailer, requires the
@@ -52,7 +52,7 @@
 
 - id: AI-2026-11-17-001
   date: 2026-11-17
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-030 documentation alignment: describe gate-1 as the actual checker (Test-Approval trailer,
@@ -79,7 +79,7 @@
 
 - id: AI-2026-11-17-002
   date: 2026-11-17
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-031 P0 artifacts: reset README.md to the team project (purpose, architecture, file
@@ -107,7 +107,7 @@
 
 - id: AI-2026-11-17-003
   date: 2026-11-17
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-032: defer six low-value requirements to `wont` (DEBATE-003, MEM-001, MEM-002, COST-002,
@@ -135,7 +135,7 @@
 
 - id: AI-2026-11-17-004
   date: 2026-11-17
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-033 implementation: add `src/tradingagents/context/` (six-layer `Layer`, `ContextBlock`,
@@ -164,7 +164,7 @@
 
 - id: AI-2026-11-20-001
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-034 implementation: add `src/tradingagents/telemetry/` (the in-process `Telemetry` hub,
@@ -193,7 +193,7 @@
 
 - id: AI-2026-11-20-002
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     PR-39 non-author review, written by the bot. `.github/workflows/bot-review.yml` replaces the
@@ -223,7 +223,7 @@
 
 - id: AI-2026-11-20-003
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-036: add the deterministic evaluation harness (`src/tradingagents/evaluation/` and `eval/`) so
@@ -257,7 +257,7 @@
 
 - id: AI-2026-11-20-004
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-037: bring `gate-4-semantic-eval` online. The job installs the package and runs
@@ -285,7 +285,7 @@
 
 - id: AI-2026-11-20-005
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-038: write the six D2 architecture artifacts the registry names — memory/state design,
@@ -315,7 +315,7 @@
 
 - id: AI-2026-11-20-006
   date: 2026-11-20
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-035: read-only triage of `main` at `e49cea2` (a P0-P3 issue list and a three-task plan) and
@@ -366,7 +366,7 @@
 
 - id: AI-2026-11-21-007
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-039 (DEBT-011): the evaluation harness compared a synthetic replay with a recorded
@@ -398,7 +398,7 @@
 
 - id: AI-2026-11-21-008
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-040 (DEBT-012): a budget-exhausted run used to fail unless the Portfolio Manager itself was
@@ -437,7 +437,7 @@
 
 - id: AI-2026-11-21-009
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-041 (TERM-001): both debate loops had configurable round bounds but no oscillation, stall
@@ -466,7 +466,7 @@
 
 - id: AI-2026-11-21-010
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-042 (SAFE-001/002/003): the last three unimplemented must requirements. A new pure
@@ -495,7 +495,7 @@
 
 - id: AI-2026-11-21-011
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-043 (DEBATE-001/002): every debate turn is now a schema-valid `DebateTurn` with claim,
@@ -523,7 +523,7 @@
 
 - id: AI-2026-11-21-012
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-044 (TERM-002): an analyst loop that repeats the same tool call with the same arguments is
@@ -548,7 +548,7 @@
 
 - id: AI-2026-11-21-013
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-045 (QUAL-001): the evaluation reported `review_rate` but not the structured-output pass
@@ -572,7 +572,7 @@
 
 - id: AI-2026-11-21-014
   date: 2026-11-21
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-046 (D5, GOV-011): split the 30,569-line / 1.2 MB combined transcript into one part per
@@ -606,7 +606,7 @@
 
 - id: AI-2026-11-22-001
   date: 2026-11-22
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-047: post-merge housekeeping. Pruned the stale `origin/docs/CHG-046-transcript-split`
@@ -633,7 +633,7 @@
 
 - id: AI-2026-11-22-002
   date: 2026-11-22
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-048 (GOV-006, GOV-008, GOV-012): add three offline governance checks and the first versioned
@@ -666,7 +666,7 @@
 
 - id: AI-2026-11-22-004
   date: 2026-11-22
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     PR-57 review (D1-REQ-DEBATE-004, CTX-002, CTX-003, MEM-004) along the Standards and Spec axes,
@@ -701,7 +701,7 @@
 
 - id: AI-2026-11-22-005
   date: 2026-11-22
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-049 (GOV-012): finish the versioned prompt store by making the runtime read it. All twelve
@@ -736,7 +736,7 @@
 
 - id: AI-2026-11-23-002
   date: 2026-11-23
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-052: document the evaluator's installed-package failure mode in the README. The offline
@@ -766,7 +766,7 @@
 
 - id: AI-2026-11-23-003
   date: 2026-11-23
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-053: resolve the duplicate `014` in `docs/architecture/adr/`. PR #59 introduced
@@ -795,7 +795,7 @@
 
 - id: AI-2026-11-24-001
   date: 2026-11-24
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-055: add a validator that an `accepted` ADR citing a pull request cites one that has a
@@ -833,7 +833,7 @@
 
 - id: AI-2026-11-24-002
   date: 2026-11-24
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: deepseek-harness
   summary: >-
     CHG-055 (record fix): ADR-016's status line named "PR-3", which is the unrelated 2026-10-12
@@ -859,7 +859,7 @@
 
 - id: AI-2026-11-25-001
   date: 2026-11-25
-  members: ["JHB11Hinson"]
+  members: ["HaobinJiang"]
   agent: opencode
   summary: >-
     CHG-056: draft the D6 process report and the working papers behind it. The report was
