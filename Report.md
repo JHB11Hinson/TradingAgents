@@ -650,7 +650,7 @@ Review was a real, uneven load; the contribution table should reflect it rather 
 > **These sections must be written by each student.** What follows is an evidence summary and a set of questions — not a draft. A reflection written by the coding agent would undercut the very thing the course uses reflections to show. Each block is preceded by its header; the student writes the paragraph (target 300–500 words) and keeps the header with name and student number.
 >
 > Each member has a matching worksheet — `docs/report/Reflection-JHB11Hinson.md`,
-> `docs/report/Reflection-AKAScarlett.md`, `docs/report/Reflection-SY1433.md` — that repeats this
+> `docs/report/Reflection-60907770-ZhongJunqiong.md`, `docs/report/Reflection-SY1433.md` — that repeats this
 > evidence, adds two or three specific incidents with the file or commit that proves them, and leaves
 > space for the text. The worksheet is the working copy; this section is where the finished paragraph
 > is pasted.

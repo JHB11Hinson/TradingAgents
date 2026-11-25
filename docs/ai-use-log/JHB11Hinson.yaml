@@ -692,7 +692,7 @@
         bot-review check blocked it.
     - type: constrain
       what: >-
-        The agent did not edit docs/ai-use-log/AKAScarlett.yaml, did not write an approving review
+        The agent did not edit docs/ai-use-log/60907770-ZhongJunqiong.yaml, did not write an approving review
         record, and did not merge.
       why: >-
         The AI-use-log README rule 1 reserves that file for its owner, and AGENTS.md section 7 says
