@@ -8,7 +8,7 @@ from .callback import TelemetryCallback
 from .events import SAFE_ATTRIBUTE_KEYS, Telemetry, TelemetryEvent
 from .manifest import build_manifest, write_manifest
 from .pricing import DEFAULT_PRICING, estimate_cost
-from .spans import Span, current_span, current_telemetry, span, telemetry_scope
+from .spans import Span, current_span, current_telemetry, guardrail_event, span, telemetry_scope
 from .trace import load_trace, write_trace
 from .wiring import run_output_dir, write_run_telemetry
 
@@ -23,6 +23,7 @@ __all__ = [
     "current_span",
     "current_telemetry",
     "estimate_cost",
+    "guardrail_event",
     "load_trace",
     "run_output_dir",
     "span",

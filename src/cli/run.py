@@ -9,6 +9,7 @@ from pathlib import Path
 
 import typer
 from rich.live import Live
+from rich.text import Text
 
 from cli.display import (
     ANALYST_ORDER,
@@ -22,6 +23,7 @@ from cli.display import (
     update_display,
     update_research_team_status,
 )
+from cli.evidence import collect_evidence, render_evidence
 from cli.selections import depth_from_env, get_user_selections, unattended_gaps
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.agents.rating import is_review, run_rating
@@ -380,6 +382,17 @@ def run_analysis(checkpoint: bool | None = None, portfolio=None, flags=None):
 
     # Post-analysis prompts (outside Live context for clean interaction)
     console.print("\n[bold cyan]Analysis Complete![/bold cyan]\n")
+
+    # The run's evidence (budget, debate, guardrails, memory, telemetry) as one
+    # panel. Advisory only: a failure here must never fail the finished run.
+    try:
+        evidence = collect_evidence(
+            final_state, config, selections["ticker"], selections["analysis_date"]
+        )
+        console.print(render_evidence(evidence))
+    except Exception as exc:  # evidence must never fail the run
+        # Text bypasses markup parsing: exception text may contain stray tags.
+        console.print(Text(f"Run evidence unavailable: {exc}", style="yellow"))
 
     # A decision nobody can read is not a position. Say so here rather than
     # leaving the run to look like a normal result.

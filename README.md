@@ -118,6 +118,24 @@ python3 -m venv .venv
 pip install -e ".[dev]"
 ```
 
+### 4.1 Run the CLI
+
+`tradingagents` starts the interactive analysis. When a run finishes it prints a **Run
+Evidence** panel: the decision and its source, the context budget, short excerpts of the
+structured research and risk debates, the guardrail actions taken, the memory source ids, and
+the paths of the telemetry trace and manifest.
+
+The same evidence can be read back from a saved run without starting an analysis:
+
+```bash
+tradingagents inspect NVDA 2026-11-20   # one saved run
+tradingagents inspect NVDA              # omit the date for the newest state log
+tradingagents inspect NVDA --results-dir /path/to/results
+```
+
+`inspect` is read-only: it needs no API key and does not change the live layout or any saved
+file.
+
 ## 5. Run the tests
 
 ```bash

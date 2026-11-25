@@ -1,8 +1,10 @@
 import sys
 
 import typer
+from rich.text import Text
 
 from cli.display import console
+from cli.evidence import collect_from_log, find_state_log, render_evidence
 from cli.models import AnalystType, AssetType
 from cli.prompts import filter_analysts_for_asset_type, parse_analysts
 from cli.run import run_analysis
@@ -154,6 +156,31 @@ def backtest(
         console.print(f"[yellow]failed:[/yellow] {ticker} {date}: {reason}")
     for ticker, reason in result.settlement_failures:
         console.print(f"[yellow]unsettled:[/yellow] {ticker}: {reason}")
+
+
+@app.command("inspect")
+def inspect_run(
+    ticker: str = typer.Argument(..., help="Ticker symbol, e.g. NVDA"),
+    date: str = typer.Argument(None, help="Trade date YYYY-MM-DD; omit for the latest run"),
+    results_dir: str = typer.Option(None, "--results-dir", help="Results directory"),
+):
+    """Show the recorded evidence for a finished run."""
+    results_dir = results_dir or DEFAULT_CONFIG["results_dir"]
+    try:
+        ref = find_state_log(ticker, date, results_dir)
+        evidence = collect_from_log(
+            ref.path, {"results_dir": results_dir}, ref.ticker, ref.trade_date
+        )
+    except (OSError, ValueError, RecursionError) as exc:
+        # FileNotFoundError is an OSError; RecursionError guards pathological JSON.
+        # Text bypasses Rich markup, so a crafted ticker/date cannot break the line.
+        console.print(Text(str(exc), style="red"))
+        raise typer.Exit(code=1) from None
+    try:
+        console.print(render_evidence(evidence))
+    except Exception as exc:  # a malformed artifact is one red line, not a traceback
+        console.print(Text(str(exc), style="red"))
+        raise typer.Exit(code=1) from None
 
 
 if __name__ == "__main__":
