@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import datetime
@@ -60,6 +61,14 @@ def _validate_trade_date(trade_date) -> str:
 _NOT_IN_SIGNATURE = frozenset({
     "results_dir", "data_cache_dir", "memory_log_path", "checkpoint_enabled", "llm_max_retries",
 })
+
+# Memory lessons cite their origin as ``src:<date>/<ticker>`` (D1-REQ-MEM-003).
+_SRC_RE = re.compile(r"src:([^\s|]+)")
+
+
+def _memory_sources(past_context: str) -> list[str]:
+    """The sorted distinct ``src:`` ids injected into this run's context."""
+    return sorted(set(_SRC_RE.findall(past_context or "")))
 
 
 class TradingAgentsGraph:
@@ -629,6 +638,7 @@ class TradingAgentsGraph:
                 "current_response": final_state["investment_debate_state"][
                     "current_response"
                 ],
+                "turn_records": final_state["investment_debate_state"].get("turn_records", []),
             },
             "trader_investment_plan": final_state["trader_investment_plan"],
             "risk_debate_state": {
@@ -636,11 +646,15 @@ class TradingAgentsGraph:
                 "conservative_history": final_state["risk_debate_state"]["conservative_history"],
                 "neutral_history": final_state["risk_debate_state"]["neutral_history"],
                 "history": final_state["risk_debate_state"]["history"],
+                "turn_records": final_state["risk_debate_state"].get("turn_records", []),
             },
             "investment_plan": final_state["investment_plan"],
             "final_trade_decision": final_state["final_trade_decision"],
             "final_rating": run_rating(final_state),
+            "final_decision_source": final_state.get("final_decision_source", ""),
             "termination_reason": final_state.get("termination_reason", ""),
+            "memory_note": final_state.get("memory_note", ""),
+            "memory_sources": _memory_sources(final_state.get("past_context", "")),
             "context_usage": getattr(self, "_context_usage", {}),
             "run_settings": self.run_settings(),
         }

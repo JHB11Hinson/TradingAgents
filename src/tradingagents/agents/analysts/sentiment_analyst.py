@@ -46,10 +46,23 @@ from tradingagents.dataflows.vendors.reddit import (
 )
 from tradingagents.dataflows.vendors.stocktwits import fetch_stocktwits_messages
 from tradingagents.guardrails.instructions import scrub_untrusted
+from tradingagents.telemetry import guardrail_event
 
 
 def _seven_days_back(trade_date: str) -> str:
     return (datetime.strptime(trade_date, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
+
+
+def _scrub_source(name: str, text: str) -> str:
+    """SAFE-001 scrub one pre-fetched feed; report blocked spans to telemetry.
+
+    The event reason carries only the pattern names, never the feed text
+    (D1-REQ-OBS-003).
+    """
+    scrubbed = scrub_untrusted(text)
+    if scrubbed.blocked:
+        guardrail_event("guardrail.instruction_blocked", ",".join(scrubbed.matches), node=name)
+    return scrubbed.text
 
 
 def create_sentiment_analyst(llm):
@@ -84,9 +97,9 @@ def create_sentiment_analyst(llm):
         )
         # SAFE-001: these three blocks are external text embedded in the prompt
         # template, so they do not pass through the context assembler.
-        news_block = scrub_untrusted(news_block).text
-        stocktwits_block = scrub_untrusted(stocktwits_block).text
-        reddit_block = scrub_untrusted(reddit_block).text
+        news_block = _scrub_source("news", news_block)
+        stocktwits_block = _scrub_source("stocktwits", stocktwits_block)
+        reddit_block = _scrub_source("reddit", reddit_block)
 
         preamble = prompts.load_prompt("analyst.sentiment_preamble").text.format(
             current_date=end_date,

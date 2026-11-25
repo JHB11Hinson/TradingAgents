@@ -1,9 +1,10 @@
 """The run scope and the span context manager (D1-REQ-OBS-001/003).
 
 ``telemetry_scope`` opens the run's hub; ``span`` measures one agent or tool
-step and emits it when the step finishes, including when it raises. Outside an
-enabled scope both are no-ops, so a caller that switches telemetry off pays
-nothing and writes nothing.
+step and emits it when the step finishes, including when it raises.
+``guardrail_event`` emits one advisory guardrail action as a span. Outside an
+enabled scope all three are no-ops, so a caller that switches telemetry off
+pays nothing and writes nothing.
 """
 
 from __future__ import annotations
@@ -139,3 +140,22 @@ def span(
         record.ended_at = utc_now()
         _ACTIVE.reset(token)
         hub.emit(record.to_event())
+
+
+def guardrail_event(name: str, reason: str, *, node: str | None = None) -> None:
+    """Emit an advisory guardrail span; no-op outside a telemetry scope.
+
+    The span joins the active step's phase so the manifest's phase table stays
+    the run's own; only the attributes ``node`` and ``reason`` are carried, and
+    the reason must name patterns or percentages, never raw external text
+    (D1-REQ-OBS-003, D1-REQ-SAFE-001/002/003).
+    """
+    parent = current_span()
+    phase = parent.phase if parent is not None else "guardrail"
+    with span(
+        name,
+        phase=phase,
+        kind="guardrail",
+        attributes={"node": node or "run", "reason": reason},
+    ):
+        pass

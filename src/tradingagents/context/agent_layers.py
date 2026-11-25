@@ -11,6 +11,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
 from tradingagents.guardrails.instructions import scrub_untrusted
+from tradingagents.telemetry import guardrail_event
 
 from .assembler import ContextBlock, Layer, estimate_tokens
 
@@ -40,9 +41,13 @@ def retrieved_block(source: str, text: str, *, render: bool = True) -> ContextBl
 
     Retrieved text can be vendor or social content, so SAFE-001 scrubs
     instruction-like spans here, at the one seam every report, memory lesson and
-    manager plan passes through.
+    manager plan passes through. A blocked span is reported as an advisory
+    guardrail event carrying only the pattern names (OBS-003).
     """
-    return ContextBlock(Layer.RETRIEVED, source, scrub_untrusted(text).text, render=render)
+    scrubbed = scrub_untrusted(text)
+    if scrubbed.blocked:
+        guardrail_event("guardrail.instruction_blocked", ",".join(scrubbed.matches), node=source)
+    return ContextBlock(Layer.RETRIEVED, source, scrubbed.text, render=render)
 
 
 def history_block(

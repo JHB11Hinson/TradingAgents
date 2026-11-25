@@ -5,6 +5,7 @@ import json
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from tradingagents.guardrails.instructions import scrub_untrusted
+from tradingagents.telemetry import guardrail_event
 
 WRAP_UP = (
     "You have used every tool round this report allows. Write your final report "
@@ -16,12 +17,23 @@ def sanitize_messages(messages):
     """Replace every tool result with its SAFE-001-scrubbed copy.
 
     Tool results are external text. The copy keeps the tool-call id and order, so
-    the provider still sees a valid history.
+    the provider still sees a valid history. A blocked span is reported once per
+    tool-call id as an advisory guardrail event (OBS-003); the reason carries
+    only the pattern names, never the tool output itself.
     """
     cleaned = []
+    reported = set()
     for message in messages:
         if isinstance(message, ToolMessage) and isinstance(message.content, str):
-            cleaned.append(message.model_copy(update={"content": scrub_untrusted(message.content).text}))
+            scrubbed = scrub_untrusted(message.content)
+            if scrubbed.blocked and message.tool_call_id not in reported:
+                reported.add(message.tool_call_id)
+                guardrail_event(
+                    "guardrail.instruction_blocked",
+                    ",".join(scrubbed.matches),
+                    node=message.name or "tool",
+                )
+            cleaned.append(message.model_copy(update={"content": scrubbed.text}))
         else:
             cleaned.append(message)
     return cleaned

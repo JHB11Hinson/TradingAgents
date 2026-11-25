@@ -41,7 +41,7 @@ from tradingagents.guardrails.positions import (
     clip_free_text_decision,
     enforce_position_ceiling,
 )
-from tradingagents.telemetry import span
+from tradingagents.telemetry import guardrail_event, span
 
 logger = logging.getLogger(__name__)
 
@@ -150,6 +150,9 @@ def create_portfolio_manager(
             # SAFE-002: the decision is deterministic and authoritative; without
             # its full constraints no tradeable rating may be emitted.
             logger.warning("Portfolio Manager call aborted: %s", exc)
+            guardrail_event(
+                "guardrail.budget_review", "context budget exhausted", node="Portfolio Manager"
+            )
             return {
                 "risk_debate_state": new_risk_debate_state,
                 "final_trade_decision": (
@@ -169,6 +172,9 @@ def create_portfolio_manager(
             decision, ceiling_warning = enforce_position_ceiling(decision, max_position_pct)
             if ceiling_warning:
                 logger.warning("Portfolio Manager: %s", ceiling_warning)
+                guardrail_event(
+                    "guardrail.position_clipped", ceiling_warning, node="Portfolio Manager"
+                )
             final_trade_decision = render_pm_decision(decision)
             final_rating = decision.rating.value
             final_decision_source = "structured"
@@ -178,6 +184,11 @@ def create_portfolio_manager(
             free_text = llm.invoke(assembled.text).content
             rating = validate_free_text_decision(free_text)
             if rating is None:
+                guardrail_event(
+                    "guardrail.decision_review",
+                    "no single explicit rating",
+                    node="Portfolio Manager",
+                )
                 final_trade_decision = review_decision(
                     "the free-text answer had no single explicit rating"
                 )
@@ -189,6 +200,9 @@ def create_portfolio_manager(
                 )
                 if ceiling_warning:
                     logger.warning("Portfolio Manager: %s", ceiling_warning)
+                    guardrail_event(
+                        "guardrail.position_clipped", ceiling_warning, node="Portfolio Manager"
+                    )
                 final_rating = rating
                 final_decision_source = "free_text"
 
