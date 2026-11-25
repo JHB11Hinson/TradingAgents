@@ -980,3 +980,30 @@
         D6 requires each student's own reflection; an agent-written one would undercut the evidence
         of authorship.
   transcript: null
+
+- id: AI-2026-11-25-005
+  date: 2026-11-25
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-061: insert WANG Songyan's reflection into Report.md section 11.3, which until now held the
+    placeholder "_To be supplied by WANG Songyan (300-500 words, first person)._". The reflection
+    text was written by WANG Songyan; the agent only placed it and verified that no other line in
+    the report changed. The edit is one deleted line and eleven inserted lines in Report.md.
+  human_interventions:
+    - type: constrain
+      what: >-
+        Inserted the reflection verbatim as supplied, without editing its wording, length or
+        structure, and without removing or reordering any other section of the report.
+      why: >-
+        The course treats a reflection as evidence of authentic authorship. Rewriting a student's
+        reflection, even to improve it, would make the document the agent's text rather than the
+        student's, and would undermine the property the reflection is meant to demonstrate.
+    - type: constrain
+      what: >-
+        Recorded the change in this member's log rather than in docs/ai-use-log/SY1433.yaml.
+      why: >-
+        The README rule is that a member edits only their own file, and an entry in SY1433.yaml
+        would attribute the AI's contribution to WANG Songyan. The reflection is his; the editing
+        work was done on this branch by the author of this log.
+  transcript: null
