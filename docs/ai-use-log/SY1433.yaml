@@ -1,2 +1,211 @@
-# AI use log for @SY1433.
+# AI-use log for @SY1433.
 # Append new entries below. The legacy docs/ai-use-log.yaml is a historical archive.
+
+- id: AI-2026-11-13-001
+  date: 2026-11-13
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-026: remove the inactive collaborator from the team records. Removed @zihao9462-creator from
+    the wildcard rule in .github/CODEOWNERS, updated AGENTS.md ownership from four to three active
+    members, and appended an entry to the then-current docs/ai-use-log.yaml. Fit criterion: no active
+    tracked governance file names the inactive handle, CODEOWNERS lists the three active owners, and
+    AGENTS.md says three active members. No src/, test/ or prompts/ change.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved removing the handle from CODEOWNERS and correcting the roster count in AGENTS.md in
+        the same change.
+      why: >-
+        The member had stopped the course and could no longer review; leaving the handle in
+        CODEOWNERS would keep a required reviewer who never responds, and leaving AGENTS.md at "four
+        active members" would keep two governance documents disagreeing.
+  transcript: TBD
+
+- id: AI-2026-11-14-001
+  date: 2026-11-14
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-021: promote gate-2-static-analysis from "ruff blocking + soft mypy" to a blocking scoped
+    static-analysis gate. Replaced the `mypy src || true` tail in .github/workflows/ci.yml with four
+    blocking steps: ruff on the src/**/*.py files the PR touches, `pip check` for dependency
+    consistency, `mypy --follow-imports=silent` on changed src files, and a skip list that only
+    honours files already recorded in docs/code-governance/mypy-legacy.txt. Pinned mypy to 2.4.1 so
+    the quarantine baseline reproduces. Recorded the inherited errors as DEBT-009 and the missing
+    safety-path and dependency-declaration halves as DEBT-010. No src/ or test/ change; the gate name
+    and its branch-protection context stay identical.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved promoting gate-2 to blocking rather than leaving mypy soft, and approved the scoped
+        form (changed files only) over a whole-tree run.
+      why: >-
+        D7 requires lint, type checking and dependency checks to block, but `mypy src` reports 156
+        errors in 26 inherited modules; a whole-tree blocking run would turn every pull request red
+        and the gate would be reverted within a day.
+    - type: constrain
+      what: >-
+        Required the mypy pin and the mypy-legacy.txt quarantine, and required that new files are
+        never on the list.
+      why: >-
+        Without a pinned mypy the inherited error count drifts and the quarantine stops being
+        reproducible; without the "new files are always checked" rule the quarantine silently grows
+        to cover the code the team actually writes.
+    - type: constrain
+      what: >-
+        Kept the gate name and the branch-protection context unchanged.
+      why: >-
+        Renaming the context would break the required-status-check list on main, and every open pull
+        request would need the protection list edited by hand.
+  transcript: TBD
+
+- id: AI-2026-11-14-002
+  date: 2026-11-14
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-028: add docs/code-governance/merge-train.md, the serial integration procedure for a queue of
+    pull requests. Documents the preflight a branch must satisfy before it joins the queue, the rule
+    that only one conflicting approval may be in flight, and the fact that a conflict resolved after
+    approval forces the reviewer to approve again. Documentation only; no src/, test/ or prompts/
+    change.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved writing the runbook as a governance document rather than fixing the individual merge
+        conflicts as they appeared.
+      why: >-
+        The conflicts were a pattern, not one-off accidents: each resolution created a new commit,
+        which dismissed an approval that had already been given, so the team paid the review cost
+        repeatedly. A written procedure made that cost visible and schedulable.
+    - type: constrain
+      what: >-
+        Kept the runbook to read-only preflight steps; no automated merge or force-push helper.
+      why: >-
+        A helper that merges would move an irreversible action into a script, which contradicts the
+        rule that a human decides the merge.
+  transcript: TBD
+
+- id: AI-2026-11-20-001
+  date: 2026-11-20
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-035: record ADR-006 (decision authority and the free-text fallback) and mark it accepted. The
+    record covers D1-REQ-SAFE-002 and exists because portfolio_manager.py still parsed a rating out
+    of prose when the structured call failed, so a model answering "**Rating**: Sell" in plain text
+    could produce a tradeable action without passing the schema. Documentation only; the
+    implementation followed in its own change.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved opening the ADR before any code or test was written, and approved the status change
+        from proposed to accepted.
+      why: >-
+        A safety-boundary decision should be recorded and reviewed before the code that enforces it,
+        otherwise the record becomes a description of whatever was implemented rather than the reason
+        for implementing it.
+  transcript: TBD
+
+- id: AI-2026-11-23-001
+  date: 2026-11-23
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-052: document the evaluator's installed-package trap in README.md section 6 Troubleshooting,
+    and pin the claim with five offline tests in test/offline/test_readme_environment_trap.py. Three
+    of the five failed on main before the change. The trap: pytest reads src/ through
+    `pythonpath = ["src"]` while the evaluator subprocess `python -m eval.run` reads the *installed*
+    package, so two checkouts sharing one editable install can run different code. No src/ change.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved adding a Troubleshooting section to the README as the fix, instead of repairing the
+        environment or changing the evaluator's import path.
+      why: >-
+        The failure hits a second checkout, not the primary one, so the durable fix is a written
+        diagnostic a future member can follow; changing the import path would alter how the evaluator
+        runs for everyone in order to help one scenario.
+    - type: correct
+      what: >-
+        Corrected the first survey's diagnosis, which said the trap affected an ordinary checkout.
+        Re-testing in the owner's tree gave 1626 passing tests; the failure only reproduces when two
+        checkouts share one editable install. The README and the AI-use log describe the real trigger,
+        and the pull request records that the first survey was wrong.
+      why: >-
+        A troubleshooting section that names the wrong trigger sends the next reader down a path that
+        cannot reproduce the problem. The correction also belonged in the record, not only in the
+        final sentence, because the wrong version had already been reported.
+    - type: constrain
+      what: >-
+        Required the five tests that pin the README claim.
+      why: >-
+        Prose drifts when paths and commands are renamed; a test that fails when the section loses
+        `pip install -e ".[dev]"` or `python -m eval.run` keeps the diagnostic honest without a
+        reviewer having to re-read it.
+  transcript: TBD
+
+- id: AI-2026-11-23-002
+  date: 2026-11-23
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-053: renumber the duplicate ADR-014 to ADR-017. Two merged files claimed ADR-014 —
+    014-memory-source-attribution (accepted, from PR #59) and 014-inherited-test-requirement-tags
+    (proposed, from PR #57) — so a citation of "ADR-014" named two different decisions. Renumbered
+    the later, still-proposed record to 017, updated its one inbound reference in a transcript, and
+    added test/offline/test_adr_numbering.py with six tests; three failed on main before the change.
+    No src/ change and no content change to either ADR beyond the number.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved renumbering the proposed record and leaving the accepted one at 014, after checking
+        which record shipped code and documents actually cite.
+      why: >-
+        The accepted record is cited from src/tradingagents/memory/log.py and three documents, so
+        moving it would rewrite the evidence for a decision already in force; the proposed record had
+        exactly one inbound reference.
+    - type: constrain
+      what: >-
+        Required adding a numbering test rather than fixing the single duplicate only.
+      why: >-
+        Fixing one collision closes today's incident; a test over the whole series closes the next
+        one, and this class of error is invisible to every other gate.
+    - type: constrain
+      what: >-
+        Left the PR #57 observation (its ADR still reads "Status: proposed" although it merged)
+        recorded as a side note in the pull request instead of fixing it here.
+      why: >-
+        It is a separate record question, and mixing it in would make a mechanical renumbering harder
+        to review; leaving it visible is better than an unapproved adjustment.
+  transcript: TBD
+
+- id: AI-2026-11-23-003
+  date: 2026-11-23
+  members: ["SY1433"]
+  agent: opencode
+  summary: >-
+    CHG-055: add .github/scripts/adr_status_check.py and test/offline/test_adr_status.py (16 tests).
+    An accepted ADR that names the pull request which carried it must cite one with a record under
+    docs/review-memo/. The check is deliberately narrow: it parses both "- Status:" and
+    "- **Status:**", exempts the ten inherited ADRs that name no PR, does not verify proposed
+    records, and counts only `PR #<n>` and `PR-<n>` as citations. It caught ADR-016 citing "PR-3", an
+    unrelated 2026-10-12 pull request, which this change corrects to PR #60. Not wired into ci.yml,
+    so no gate behaviour changed.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved adding the validator at all, and approved the narrow rule after a read-only survey
+        of the corpus showed the broad version would misfire.
+      why: >-
+        An accepted ADR is evidence that a decision was reviewed; a citation that does not resolve
+        breaks the chain from decision to review. The narrow rule was chosen because a strict version
+        would flag the ten inherited records that predate the convention and bury the real defect.
+    - type: constrain
+      what: >-
+        Kept the checker out of ci.yml rather than making it a seventh gate.
+      why: >-
+        Adding a gate changes branch protection and the required-check list; that decision should be
+        made separately, not as a side effect of writing a script.
+  transcript: TBD

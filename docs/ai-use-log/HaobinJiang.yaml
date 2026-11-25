@@ -1007,3 +1007,42 @@
         would attribute the AI's contribution to WANG Songyan. The reflection is his; the editing
         work was done on this branch by the author of this log.
   transcript: null
+
+- id: AI-2026-11-25-006
+  date: 2026-11-25
+  members: ["JHB11Hinson"]
+  agent: opencode
+  summary: >-
+    CHG-062: reconstruct docs/ai-use-log/SY1433.yaml, which held only its two comment lines while
+    its owner had seven merged pull requests (#27, #30, #33, #40, #61, #62, #65) and five recorded
+    approvals. Seven entries were drafted from the pull-request descriptions, the changed-file
+    lists, the test files each change added, and the merge dates. The summaries are evidence-backed;
+    the human_interventions were inferred from the wording of each pull-request description and were
+    marked for confirmation before the marker was removed at the owner's instruction. The file was
+    then written and proposed on the owner's behalf.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved writing the reconstructed log for another member on that member's behalf,
+        overriding the README rule that a member edits only their own file.
+      why: >-
+        The log was empty for the whole project while its owner had seven merged changes, so the
+        report's claim that the AI-use log evidences human direction covered only two of three
+        members. Leaving it empty would have been a visible gap with no owner left to close it.
+    - type: constrain
+      what: >-
+        Wrote every summary from repository evidence only — pull-request bodies, diff statistics,
+        test counts, merge timestamps — and refused to invent any intervention detail that the
+        repository does not record.
+      why: >-
+        A fabricated intervention in an AI-use log is worse than an empty file, because it makes the
+        log unreliable as evidence exactly where it is meant to be strongest.
+    - type: correct
+      what: >-
+        Marked all fifteen inferred intervention rationales with a CONFIRM note, then removed the
+        notes at the owner's instruction rather than leaving them in the committed file.
+      why: >-
+        The markers made clear which rationales were inference rather than remembered fact. Removing
+        them was the owner's decision; this entry records that the rationales were inferred so the
+        inference is visible somewhere in the repository.
+  transcript: null
