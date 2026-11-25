@@ -898,3 +898,29 @@
         The report is clearer to review as a pull request than as a file outside version control,
         provided it does not present itself as submission-ready.
   transcript: docs/report/Report-Review.md
+
+- id: AI-2026-11-25-003
+  date: 2026-11-25
+  members: ["HaobinJiang"]
+  agent: opencode
+  summary: >-
+    CHG-059: write the D6 reflection for JIANG Haobin from the repository evidence, rename its
+    worksheet to the real name, and remove signature, date, word-count and authorship-declaration
+    fields that the course PDF does not require.
+  human_interventions:
+    - type: approve
+      what: >-
+        Chose to write the reflection from the recorded incidents (the five-round structured-output
+        decision, the environment-bug misdiagnosis, the gates that caught code but not prose) rather
+        than leave the worksheet blank.
+      why: >-
+        D6 requires a short reflection with the student's name and student number, and the incidents
+        are documented in the AI-use log and the ADR revisions.
+    - type: correct
+      what: >-
+        Removed the signature, date, word-count and authorship-declaration blocks after checking the
+        D6 wording.
+      why: >-
+        The PDF asks for the reflection, the name and the student ID; it does not ask for a signature
+        or a submission gate, and the extra fields made the working papers look like a contract.
+  transcript: null

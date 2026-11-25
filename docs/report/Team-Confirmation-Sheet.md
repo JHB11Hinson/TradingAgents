@@ -1,16 +1,15 @@
 # CS5351 — Team Confirmation Sheet
 
-**Purpose.** Every value in this sheet is filled in by the student it belongs to. The report cannot be
-submitted until the fields marked **REQUIRED** below are complete. Nothing here was inferred,
-estimated or copied from git history — where the repository proves something, it is named as
-*evidence*; where it cannot, the field is left blank.
+**Purpose.** Every value in this sheet is filled in by the student it belongs to. The fields below feed
+the report's D6 sections. Nothing here was inferred, estimated or copied from git history — where the
+repository proves something, it is named as *evidence*; where it cannot, the field is left blank.
 
-**How to use.** Each member fills their own block in §2, signs §3 and §4, then the team agrees §5
+**How to use.** Each member fills their own block in §2 and confirms §3; the team agrees §5
 together. Hand the completed sheet back; the values are copied verbatim into `Report.md` §10 and §11.
 
 ---
 
-## 1. Identity block (REQUIRED — D6 p. 6)
+## 1. Identity block (D6 p. 6)
 
 | Member | Full name | Student number | GitHub username | Course email |
 |---|---|---|---|---|
@@ -38,7 +37,7 @@ three-person contribution table looks incomplete.
 
 ---
 
-## 2. Contribution measure (REQUIRED — D6 p. 7, intro p. 22)
+## 2. Contribution measure (D6 p. 7; intro p. 22)
 
 The course lets the team choose the measure. **Tick one:**
 
@@ -117,31 +116,20 @@ matrix was built from git, review memos and the AI-use log and may miss work don
 
 ---
 
-## 4. Reflection confirmation (REQUIRED — D6 p. 6)
+## 4. Reflection status (D6 p. 6)
 
-Each member writes a 300–500 word reflection in their own words. The report will carry it with the
-member's **name and student number**.
+Each member writes a short reflection (the course's example is 300–500 words) in their own words. The
+report carries it with the member's **name and student number**.
 
-| Member | Worksheet file | Word count of finished reflection | Written by the student? |
-|---|---|---:|---|
-| 1 `@JHB11Hinson` | `Reflection-JHB11Hinson.md` | | [ ] yes |
-| 2 `@AKAScarlett` | `Reflection-60907770-ZhongJunqiong.md` | | [ ] yes |
-| 3 `@SY1433` | `Reflection-SY1433.md` | | [ ] yes |
-
-**Authorship statement** — each member signs that their reflection is their own account:
-
-> I confirm that the reflection submitted under my name and student number is written by me, describes
-> my own experience, and that any factual claims in it about the repository are accurate.
-
-| Member | Signature (typed name) | Date |
-|---|---|---|
-| 1 | | |
-| 2 | | |
-| 3 | | |
+| Member | Worksheet file |
+|---|---|
+| 1 `@JHB11Hinson` | `Reflection-HaobinJiang.md` |
+| 2 `@AKAScarlett` | `Reflection-60907770-ZhongJunqiong.md` |
+| 3 `@SY1433` | `Reflection-SY1433.md` |
 
 ---
 
-## 5. Transcript authorship and annotation (REQUIRED — D5, project.pdf p. 6)
+## 5. Transcript authorship and annotation (D5, project.pdf p. 6)
 
 The course requires **five annotated agent-session transcripts** that *collectively* demonstrate the
 six supervised stages, "annotated with the student team members' marked interventions".
@@ -188,12 +176,4 @@ The draft has `[OWNER TO CONFIRM]` markers. Tick each once resolved.
 
 ---
 
-## 7. Sign-off
-
-| Member | This sheet is accurate | Date |
-|---|---|---|
-| 1 | [ ] | |
-| 2 | [ ] | |
-| 3 | [ ] | |
-
-**Not submission-ready until §1, §2.1, §4 and §5 are complete.**
+**Open items:** §1 course email, §2.1 hours/story points, §4 two reflections, §5 transcript decision.

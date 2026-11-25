@@ -5,7 +5,7 @@
 > account. Do not copy the evidence summaries; they are there so your reflection can be specific.
 
 **Name:** WANG Songyan **Student number:** 60847491
-**Word target:** 300–500 **Written:** ☐
+**Length:** 300–500 words (the course's example)
 
 ---
 
@@ -79,5 +79,3 @@ about what was actually breaking.
 [WRITE HERE — 300–500 words. First person. Include at least one mistake, how you caught it, and what
 you changed afterwards. Do not claim anything the evidence contradicts.]
 ```
-
-**Word count of your text:** ______  **Signed:** ______________________  **Date:** __________

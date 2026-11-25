@@ -15,7 +15,7 @@
 | A3 | "at most **10,000 words** (excluding diagrams)" | whole file | **satisfied** | ~8,600 words (see measurement note). |
 | A4 | "contain **more than 15 pages** in Point 12 with single-line spacing" | whole file | **unverifiable** | Markdown has no pages. Must be rendered at 12 pt and counted. |
 | A5 | "present the team's **software engineering process** and **how the team optimizes it**" | §1–§6, §5.4 | **satisfied** | Gate-2's three-stage growth and the evaluation-method correction are the two optimisation narratives. |
-| A6 | "each member's **self-reflection** … **with name and student ID**" | §11.1–§11.3 | **blocked** | Three students must write 300–500 words each. Worksheets prepared. |
+| A6 | "each member's **self-reflection** … **with name and student ID**" | §11.1–§11.3 | **blocked** | Each student writes a short reflection (course example: 300–500 words). Worksheets prepared. |
 | A7 | "Cover process quality evidence (**requirement volatility**, **defect trends**, **ambiguity resolution**)" | §7.7 (new) | **satisfied** | Computed from git history, bug diary, review memos, ADR revision history. See §B. |
 | A8 | "how the team kept **artifacts co-evolving** when anything changed" | §8.2 (new) | **partial** | Three evidenced cases (CHG-029 schema split, CHG-032 deferral, CHG-055 validator). Honest about the gaps. |
 | A9 | "what **human oversight caught that the agent did not**" | §9 | **satisfied** | Three cases from the AI-use log; one flagged for owner confirmation. |
