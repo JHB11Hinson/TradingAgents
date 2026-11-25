@@ -190,3 +190,17 @@ def test_recording_a_run_writes_its_state_log(tmp_path):
     graph.record_decision("NVDA", "2026-09-23", state)
 
     assert list(tmp_path.glob("NVDA/TradingAgentsStrategy_logs/full_states_log_2026-09-23.json"))
+
+
+@pytest.mark.unit
+def test_evidence_failure_does_not_fail_the_run(tmp_path, monkeypatch, capsys):
+    """The panel is advisory: even a markup-hostile error degrades to one line."""
+    def explode(*a, **k):
+        raise RuntimeError("bad [/]")
+
+    monkeypatch.setattr(cli_run, "collect_evidence", explode)
+    _run_cli(monkeypatch, tmp_path, _FakeGraph())
+
+    out = capsys.readouterr().out
+    assert "Run evidence unavailable" in out
+    assert "Traceback" not in out

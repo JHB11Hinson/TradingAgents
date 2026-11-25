@@ -268,3 +268,20 @@ def test_an_old_state_log_without_the_new_fields_still_renders(tmp_path):
 
     assert "Hold" in output
     assert "not recorded" in output
+
+
+@pytest.mark.unit
+def test_find_state_log_uses_mtime_not_the_filename_date(tmp_path):
+    """A re-run of an older date is still the newest run: mtime decides."""
+    log_dir = tmp_path / "NVDA" / "TradingAgentsStrategy_logs"
+    log_dir.mkdir(parents=True)
+    older_name_newer_mtime = log_dir / "full_states_log_2026-11-19.json"
+    newer_name_older_mtime = log_dir / "full_states_log_2026-11-20.json"
+    older_name_newer_mtime.write_text("{}", encoding="utf-8")
+    newer_name_older_mtime.write_text("{}", encoding="utf-8")
+    os.utime(newer_name_older_mtime, (1_700_000_000, 1_700_000_000))
+    os.utime(older_name_newer_mtime, (1_700_100_000, 1_700_100_000))
+
+    found = find_state_log("NVDA", None, tmp_path)
+
+    assert Path(found.path) == older_name_newer_mtime

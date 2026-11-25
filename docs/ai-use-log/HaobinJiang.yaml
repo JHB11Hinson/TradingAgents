@@ -980,3 +980,32 @@
         D6 requires each student's own reflection; an agent-written one would undercut the evidence
         of authorship.
   transcript: null
+
+- id: AI-2026-11-25-005
+  date: 2026-11-25
+  members: ["HaobinJiang"]
+  agent: opencode
+  summary: >-
+    CHG-057: add a post-run Run Evidence panel and a read-only `tradingagents inspect` command,
+    with tests first. The change surfaces the context budget, structured debate, guardrail events,
+    memory source ids and telemetry trace/manifest without changing the inherited live layout.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved the A+B scope and the Task 1 tests before the first src commit.
+      why: >-
+        The change is presentation of existing evidence, not a new trading capability; the human
+        test gate had to precede implementation.
+    - type: constrain
+      what: >-
+        Required the inherited live layout, prompts and LangGraph wiring to stay unchanged, and
+        limited excerpts to short truncated lines.
+      why: >-
+        The front-end style and the orchestration are part of the inherited baseline.
+    - type: correct
+      what: >-
+        Required markup-safe error output after review found that raw exception text could raise
+        Rich MarkupError in the panel and inspect handlers.
+      why: >-
+        Evidence rendering must never fail a finished run or print a traceback for bad input.
+  transcript: transcripts/60198818-HaobinJiang.md

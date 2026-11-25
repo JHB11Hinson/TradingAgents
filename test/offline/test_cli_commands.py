@@ -227,3 +227,46 @@ def test_inspect_reports_a_missing_run_in_one_line(runner, tmp_path):
     assert result.exit_code == 1
     assert "full_states_log" in result.output
     assert "Traceback" not in result.output
+
+
+@pytest.mark.unit
+def test_inspect_does_not_run_an_analysis(runner, tmp_path):
+    """inspect is read-only: it must never start the interactive analysis."""
+    log_dir = tmp_path / "NVDA" / "TradingAgentsStrategy_logs"
+    log_dir.mkdir(parents=True)
+    (log_dir / "full_states_log_2026-11-20.json").write_text(
+        json.dumps({
+            "company_of_interest": "NVDA",
+            "trade_date": "2026-11-20",
+            "final_trade_decision": "**Rating**: Hold",
+            "final_rating": "Hold",
+            "final_decision_source": "structured",
+            "termination_reason": "",
+            "context_usage": {
+                "budget": 50000, "total_tokens": 12000,
+                "compacted_calls": 0, "max_call_tokens": 4000,
+            },
+            "memory_note": "",
+            "memory_sources": [],
+            "investment_debate_state": {"turn_records": []},
+            "risk_debate_state": {"turn_records": []},
+        }),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(m.app, ["inspect", "NVDA", "--results-dir", str(tmp_path)])
+
+    assert result.exit_code == 0, result.output
+    assert calls == []
+
+
+@pytest.mark.unit
+def test_inspect_rejects_a_markup_looking_date_without_a_traceback(runner, tmp_path):
+    """A crafted date must render as plain text, not break Rich markup."""
+    result = runner.invoke(
+        m.app, ["inspect", "NVDA", "[/red]", "--results-dir", str(tmp_path)]
+    )
+
+    assert result.exit_code == 1
+    assert "Traceback" not in result.output
+    assert "YYYY-MM-DD" in result.output
