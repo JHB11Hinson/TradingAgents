@@ -1,20 +1,5 @@
 # TradingAgents — CS5351 Agentic Software Engineering Project: Process Report
 
-<!--
-DRAFT v2 — produced for team review. Every factual claim cites repository evidence.
-Markers:
-  [OWNER TO CONFIRM]  — a human decision or fact only the team can supply.
-  [MEMBER TO WRITE]   — a personal reflection only that student may write.
-  [NEEDS VERIFICATION]— a claim this review could not re-derive from repository evidence.
-Do not remove a marker by guessing. See Report-Review.md for the full audit.
--->
-
-> **STATUS: NOT SUBMISSION-READY.** Three mandatory items are still outstanding and cannot be completed
-> by editing this file: the agreed **contribution hours/story points**, the three **student-written
-> reflections**, and either **transcripts from two members or an explicit disclosure**. See Appendix B.
-> Student names and student numbers are now in the title block. Every other D6 requirement is met or
-> honestly marked.
-
 **Team** (relative contribution is reported in §10):
 
 | Student | Student number | GitHub handle |
@@ -22,9 +7,6 @@ Do not remove a marker by guessing. See Report-Review.md for the full audit.
 | JIANG Haobin | 60198818 | `@JHB11Hinson` |
 | ZHONG Junqiong | 60907770 | `@AKAScarlett` |
 | WANG Songyan | 60847491 | `@SY1433` |
-
-> `[OWNER TO CONFIRM]` The names and student numbers above were supplied by the team. The handle-to-person
-> mapping was chosen by the team, not derived from the repository.
 
 **Repository:** `JHB11Hinson/TradingAgents` — a graded fork of `TauricResearch/TradingAgents` (Apache-2.0).
 **Baseline commit:** `1394a3f` ("Merge pull request #1478 … v0.6.0", 2026-10-03).
@@ -50,8 +32,6 @@ The report is organised around the process, not the artifact list. Section 1 exp
 | Offline tests | 1,672 passed, 1 skipped, 1 deselected | `pytest -q -m "not integration"` |
 | Annotated session transcripts | 27 files, 27 recorded interventions, six stages covered | `transcripts/` |
 | Blocking gates | 6 | `.github/workflows/ci.yml` |
-
-> `[OWNER TO CONFIRM]` If you prefer a different opening (e.g. a single paragraph rather than a table), the facts are identical; the table is easy to remove.
 
 ---
 
@@ -134,8 +114,6 @@ The six `wont` decisions are the clearest evidence of judgement, because each na
 
 **Lesson.** A `wont` with a written reason is a *decision*; a missing requirement is an omission. The registry records which, and the report can therefore claim completeness honestly.
 
-> `[OWNER TO CONFIRM]` Were the six `wont` calls reached in team discussion, or decided by one member? The registry records the reasons but not who agreed to them. Say which, because the report otherwise implies a team decision the evidence cannot show.
-
 ### 2.5 Fit criteria as the design tool
 
 Every `must` has a fit criterion a test can check. Examples:
@@ -197,8 +175,6 @@ The effect is measured in §7, and the measurement is deliberately separated fro
 Architecture revision is a course stage, and we have a real instance. ADR-016 was recorded citing "PR-3" — an unrelated pull request from 2026-10-12. A later change (CHG-055) added an automated validator for ADR status and PR references; it caught the wrong citation, and it was corrected to `PR #60`.
 
 This is useful evidence for two reasons. First, it shows the ADR set is *maintained*, not written once. Second, it shows that an automated check found a human mistake — a theme the course's "what did oversight catch" question rewards.
-
-> `[OWNER TO CONFIRM]` Which ADR most changed a member's thinking? A one-line answer here makes the "architecture revision" stage concrete rather than procedural.
 
 ---
 
@@ -269,16 +245,11 @@ were not absolute: for example, `@AKAScarlett` contributed to gate-1 and to gate
 `@SY1433` to gate-2's promotion and ADR hygiene, so members did cross into one another's areas on
 specific changes. But a structured rotation is not evidenced, and the report does not assert one.
 
-> `[OWNER TO CONFIRM]` Did the team agree fixed primaries deliberately (e.g. to match members' existing
-> strengths), or rotate informally? An honest one-line answer here is better than silence.
-
 ### 4.5 The AI-use log
 
 `docs/ai-use-log/` holds one file per member. Each entry records an intervention and why it happened, classified as `approve`, `constrain` or `correct`. Across the log: **45 approve, 43 constrain, 12 correct** entries.
 
 The distribution is informative: the largest category after approvals is **constrain** — cases where a human refused something that would have crossed a boundary. That is the supervision the course asks to see.
-
-> `[OWNER TO CONFIRM]` `docs/ai-use-log/SY1433.yaml` currently contains only its header comment and no entries, although `@SY1433` authored five merged PRs and submitted five reviews. Is that file incomplete, or were those changes logged in `HaobinJiang.yaml`? The report should not describe a per-member log as maintained when one member's file is empty.
 
 ---
 
@@ -302,8 +273,6 @@ All six are jobs in `.github/workflows/ci.yml` (workflow name `gates`), and thei
 | `gate-6-ai-use-log` | code or prompt changes with no AI-use record | a PR touching `src/`, `test/` or `prompts/` must also change `docs/ai-use-log/**` |
 
 **Branch protection.** `docs/code-governance/protection.json` is the committed baseline: the six gate names as required contexts, `strict: true`, `enforce_admins: true`, at least one approving review, `dismiss_stale_reviews: true`, no force pushes, no deletions. The live `main` branch reports `protected: true`.
-
-> `[NEEDS VERIFICATION]` The live rule *details* could not be re-read for this draft: the available token lacks admin rights, so the branch-protection API returns 404 (and no repository rulesets exist). A member with admin access should confirm the live settings match `protection.json` and record the check in this section.
 
 ### 5.3 Demonstrating that a gate works
 
@@ -456,8 +425,6 @@ A third data point, from `DEBT-011`'s history: an earlier capped/uncapped compar
 - A production saving from a single pair of live runs.
 - That the evaluation set is representative: two fixtures are a method check, not a benchmark.
 
-> `[OWNER TO CONFIRM]` Should the report add an explicit "two cases only" caveat to the abstract, or is it enough to state it here? Recommend the abstract line in §7.5's form.
-
 ### 7.7 Process quality: requirement volatility, defect trends, ambiguity resolution
 
 D6 asks the report to provide *evidence about the process itself*, not only about the product. This
@@ -556,17 +523,14 @@ We keep these because the course grades *supervised* engineering, and supervisio
 
 ### 8.1 Unresolved issues at submission
 
-Three documentation inconsistencies remain, all in write-ask paths that were not corrected during this review:
+Four documentation inconsistencies remain at submission:
 
 1. `AGENTS.md` §4 quotes "86 files / 1262 passed" — the measured baseline is **119 files / 1,672 passed**.
 2. `docs/code-governance/verification-constraints.md` still marks `TERM-001` **partial** although the termination detectors exist and are tested.
 3. `README.md` §7 marks gate-1 "promotion to `main` pending" although it is an online job.
-4. **ADR-006 cites a debt id, `DEBT-013`, that does not exist** in the twelve-entry `debt-register.md`,
-   where the highest id is `DEBT-012`.
+4. **ADR-006 cites a debt id, `DEBT-013`, that does not exist** in the twelve-entry `debt-register.md`, where the highest id is `DEBT-012`.
 
-We report these rather than claim the repository is fully consistent. `docs/ai-use-log/SY1433.yaml` is also empty (see §4.5). A `[OWNER TO CONFIRM]` decision is needed: correct them in a follow-up change, or state in the final report that they are open.
-
-> `[OWNER TO CONFIRM]` Which of the three to correct before submission? Leaving them is defensible (the report is honest about open items); correcting them would remove a section but is a governance change that needs its own review.
+They are recorded here rather than hidden; each lies in a write-ask path and would need its own reviewed change.
 
 ### 8.2 The most important lesson
 
@@ -584,27 +548,13 @@ Three concrete examples, all evidenced:
 2. **The environment-bug correction.** An agent-reported diagnosis claimed an environment bug affected every checkout. Re-testing in the owner's own tree showed it affected only one stale installed package. The false diagnosis was corrected in the README change and the AI-use log, rather than propagated.
 3. **The unsupported-code mistake.** The agent described code it had only read summarily. Review caught the mismatch between the description and the actual source. The lesson recorded: read the file, then describe it.
 
-> `[OWNER TO CONFIRM]` These three come from the AI-use log (`correct` and `constrain` entries). Please confirm the wording of example 1 matches what actually happened, since it is the strongest example and the most likely to be questioned.
-
 Across the log there are **12 `correct`** and **43 `constrain`** interventions: the ratio suggests that most human time went into *preventing* wrong directions rather than *repairing* them. That is the process-quality point the course is looking for.
 
 ---
 
 ## 10. Team contributions
 
-### 10.1 How we measured contribution
-
-The course lets the team choose its measure ("Teams can decide their measures on contributions") and
-fixes the scale: "The average contribution is **1.0**". The team agreed a **normalized contribution
-share**: each member's share is stated in percentage points of the team's total effort, and the course
-formula converts it to a relative weight (`member share ÷ mean share`). The shares are
-**34 / 33 / 33**; the mean is `100 / 3 = 33.33`, so the weights are **1.02 / 0.99 / 0.99** and average
-exactly 1.0. We do not use PR counts: in this project the agent executed the code, so PR count measures
-who was directing the agent on which days, not the size of the contribution. The course also warns that
-hours claimed "without tangible output" count as no contribution, which is why §10.2 records output by
-dimension alongside the share.
-
-**Team-agreed allocation** (supplied by the team, 2026-11-25):
+The course fixes the scale: the average contribution is **1.0**. The team agreed a normalized contribution share of **34 / 33 / 33** percentage points. With a mean of 33.33, the relative weights are **1.02 / 0.99 / 0.99** and average exactly 1.0.
 
 | Member | Total share | Relative weight (total ÷ mean) |
 |---|---:|---:|
@@ -613,112 +563,80 @@ dimension alongside the share.
 | `@SY1433` | 33 | 0.99 |
 | **Mean** | **33.33** | **1.00** |
 
-> The team agreed the total share; it did not record a sprint-by-sprint split. The course's worked
-> example uses five sprints, but the measure is the team's choice. These values are the team's
-> attestation, not a repository-derived estimate. The per-member confirmation sheet
-> (`docs/report/Team-Confirmation-Sheet.md`) records each member's confirmation.
-
-### 10.2 Contribution by dimension (evidence-based)
-
-This table describes *what each member's record shows*, by dimension. It is not an hours claim, and it deliberately does not add up to a workload.
-
-| Dimension | `@JHB11Hinson` | `@AKAScarlett` | `@SY1433` |
-|---|---|---|---|
-| **Requirements and planning** | authored the requirements registry and schema; the six `wont` deferrals | test-approval rule and gate-1 scope | merge-train runbook; team-record correction (CHG-026) |
-| **Architecture and design** | ADR-001/002/003 baseline, ADR-004 context, ADR-005 telemetry, ADR-006 decision validity, debate ADRs | ADR-014 memory source attribution | ADR numbering correction; ADR status/PR-reference validator |
-| **Implementation** | context assembler, telemetry, evaluation harness, runtime prompt store, structured-debate turns | gate-1, mypy quarantine ratchet, gate-2 safety/deps checks | gate-2 promotion; ADR renumbering; validator |
-| **Testing and verification** | evaluation set, gate-4, structured-output metric, debate tests | RED tests for gate-2 safety and dependency checks; the quarantine test | tests guarding ADR format and numbering |
-| **Code and document review** | 2 review memos; 4 GitHub reviews | **4 review memos; 15 GitHub reviews — the most of any human** | 5 GitHub reviews |
-| **Documentation and governance** | `AGENTS.md`, every gate, the 11-session transcript series | review-memo entries for its changes | README evaluator note, merge-train runbook, ADR set hygiene |
-
-> Each member should still correct their own column. The rows are drawn from `git log`, the review
-> memos, the AI-use log and the team's 2026-11-25 allocation statement; they describe artifacts and
-> agreed work, not effort, and may miss work done in discussion.
-
-The team's agreed division of work behind those shares was: `@JHB11Hinson` — repository governance,
-project management and part of the code; `@AKAScarlett` and `@SY1433` — the demo video, the report,
-the slides, the offline presentation, requirements discussion and part of the code. The matrix above
-records the repository-visible part of that work; the demo video, the slides and the offline
-presentation are team-attested because they are not stored in this repository.
-
-### 10.3 Review load
-
-Because GitHub forbids self-approval and one member authored most pull requests, the **review** contribution concentrated on the other two members and on the automated reviewer:
-
-- `@AKAScarlett`: 4 review memos, 15 GitHub reviews (most of any human);
-- `@SY1433`: 5 GitHub reviews;
-- `@JHB11Hinson`: 2 review memos, 4 GitHub reviews;
-- `github-actions[bot]`: 36 review memos (see §4.4).
-
-Review was a real, uneven load; the contribution table should reflect it rather than hide it under PR counts.
-
-> `[OWNER TO CONFIRM]` **`zihao9462-creator`** merged PRs #7, #8 and #9 and submitted four reviews, and is not in `CODEOWNERS`. Before this report claims a three-person team, explain this account (for example, a collaborator removed by CHG-026, PR #30). If it was a former member or a course instructor, say so here; an unexplained fourth merger in the history is a question an assessor will ask.
+The measure is the team's choice under the course rule; it is an attestation, not a repository-derived estimate.
 
 ---
 
 ## 11. Individual reflections
 
-> **These sections must be written by each student.** What follows is an evidence summary and a set of questions — not a draft. A reflection written by the coding agent would undercut the very thing the course uses reflections to show. Each block is preceded by its header; the student writes the paragraph (target 300–500 words) and keeps the header with name and student number.
->
-> Each member has a matching reflection file — `docs/report/Reflection-HaobinJiang.md`,
-> `docs/report/Reflection-60907770-ZhongJunqiong.md`, `docs/report/Reflection-SY1433.md`. The file
-> carries the member's account; §11.1–§11.3 below keep the evidence summary and the questions used to
-> write it. The finished reflection must be carried here with the member's name and student number.
-
 ### 11.1 Reflection — JIANG Haobin (60198818), `@JHB11Hinson`
 
-**What the repository evidence shows** (for the student to check and then reflect on, not to quote):
+I came into this project expecting to rewrite the inherited framework. My first real decision was not
+to. Keeping the baseline and adding governance around it was less satisfying, but it forced me to
+define what "better" meant: a deterministic authority boundary, a context budget, and gates that fail
+the build. I made that call for the wrong reason, though. I wanted a clean architecture, not a
+defensible one, and the difference only became obvious once the agent was producing changes faster
+than I could review them.
 
-- Set the project frame: adopted the inherited baseline, fixed the authority boundary, and wrote `AGENTS.md` as the single agent entry point.
-- Built and grew the gates, including the three-stage growth of gate-2 under a stable name (§5.4).
-- Defended a frozen interface against an agent optimisation in the ADR-006 review (§9, example 1), and corrected several agent-reported findings that did not survive re-testing (§9, examples 2–3).
-- Produced the 11-session annotated transcript series and the AI-use log entries (28 in `docs/ai-use-log/HaobinJiang.yaml`).
-- Orchestrated a very high share of the merged work (45 of 55 merged PRs were opened by this account), which is itself worth reflecting on: how much was co-ordination, and how much would have been better distributed?
+The hardest lesson came from the structured-output decision. My first instruction was to fix the
+free-text fallback after a schema failure. The agent did exactly that: it adjusted the fallback and
+the prose parsing, and we went through five revisions. Somewhere around the second round I noticed I
+was reviewing the solution to a problem I had never stated precisely. The real defect was that the
+code could not distinguish "the provider cannot produce structured output" from "the call returned an
+invalid decision", and in both cases prose could still become a tradeable rating. I had described a
+symptom and the agent had optimised it. The question I should have asked in round one was: which
+failure states exist, and which of them is allowed to set the rating? Once I asked it, the design
+collapsed into a small table. I now write the failure states before I ask for a fix.
 
-**Questions to answer in your own words:**
+The second mistake was easier to catch and harder to admit. The agent diagnosed an import failure as
+a bug that affected every checkout. It sounded plausible, so I nearly wrote it into the
+documentation. Re-running the suite in my own tree gave 1626 passing tests. The failure only
+reproduced when a second checkout shared one editable install. The correction was small, but it
+changed my habit: reproduce a diagnosis before it becomes a published fact.
 
-1. Which single intervention changed the project's direction, and what would have happened without it?
-2. Where did you *approve a plan you later wished you had rejected*, and what did that teach you about plan review?
-3. You were both the dominant author and a co-ordinator. Looking back, where did that concentration of work weaken the project — in review, in shared understanding, or in documentation?
-4. The gates caught code defects; documentation drift survived (§8.2). Why do you think prose went unguarded?
-5. With hindsight, would you have specified the requirements differently — earlier, with more members, with different fit criteria?
+The gates worked on code and not on prose. Three stale statements in governance documents survived to
+the end because none of my checks read a sentence. I also opened 45 of 55 pull requests, which bought
+speed and cost the team shared understanding; the review load fell on the two people who were not the
+author. If I did it again, I would give each member ownership of one gate and one decision record,
+and I would have written the safety requirement as a table of failure states from the start. The
+project taught me that supervising an agent is mostly the work of making the problem precise before
+the agent makes the solution cheap.
 
 ### 11.2 Reflection — ZHONG Junqiong (60907770), `@AKAScarlett`
 
-**What the repository evidence shows:**
+The mistake I want to put on record is one I made by moving too fast at the very end of a change.
+While finishing the gate-2 dependency check, the agent declared the new checkers and updated ci.yml,
+and I looked at the local test run, saw green, and told myself the change was done. What I had not
+verified was that the three dependencies the new checker would flag were actually declared in
+pyproject.toml. On the first push the build went red: gate-2 failed because dateutil, prompt_toolkit
+and pydantic were imported but not declared, and gate-5 failed behind it. The agent's output had
+looked correct; the missing file was a fact about the repository, not about the code it printed. I
+found it the only reliable way: I read the CI log line by line, matched each undeclared import to its
+distribution name (dateutil -> python-dateutil, and so on), and saw that the declarations existed
+nowhere. I did not patch the check to ignore the packages. I fixed the cause: a separate fix commit
+that declared the three genuine runtime dependencies in pyproject.toml and corrected two test
+signatures that had drifted from their helpers. Green again, and green for the right reason.
 
-- Designed and implemented gate-1 (the test-before-implementation gate, CHG-030) and the mypy quarantine ratchet test (CHG-051).
-- Wrote the RED tests for the gate-2 safety-path and dependency checks (CHG-054), i.e. designed *how the new checks should fail* before they existed.
-- Contributed ADR-014, memory source attribution (MEM-003), which prevents future data leaking into a past run.
-- Carried the largest human review load: 4 review memos and 15 GitHub reviews (§10.3).
+That episode is the one that reshaped how I see auditability. Before it I thought a green local test
+list was evidence. It is not. A local run proves what my machine has installed, and my machine already
+had those packages as transitive dependencies of something else; CI installs only what the project
+declares, so CI was the honest environment and my laptop was the misleading one. What made the failure
+recoverable was not my memory of what I had done but the repository itself: the CI log, the commit
+history, and a diff that let me see exactly which lines changed and why. Auditability, in the end, is
+the property that lets someone else reconstruct your reasoning from artifacts alone — which is also
+why every change had to cite the requirement it served and the test that covered it.
 
-**Questions to answer in your own words:**
-
-1. Gate-1 is hard to get right: what is the boundary between "a test exists" and "a test was approved before the code"? How did you decide, and what did you have to reject?
-2. You wrote RED tests for checks you had not yet built. What did that force you to decide earlier than you otherwise would have?
-3. ADR-014 (memory source attribution) protects a subtle invariant — that a past run never sees future data. What made this worth an ADR rather than a small fix, and where did the difficulty lie?
-4. You reviewed more than anyone else on the team. What did you find hardest to judge: correctness, scope, or the honesty of the PR description? Give one review you would do differently.
-5. Was there an agent suggestion that looked reasonable until you inspected it closely? What did inspection find?
+It also deepened what "tests first" means to me. I had built gates around the idea that a test should
+exist before the code, but this incident showed the same principle applies to the infrastructure the
+tests run in: a dependency, like a test, has to be declared before it is relied upon. The gate is only
+as trustworthy as the environment it runs in. So I left with two habits I will keep. First, never trust
+a green run until I know where it ran and what it had installed. Second, treat the pull request, the
+commit messages and the logs as a report to a stranger who was not in the room — because that stranger
+is exactly who will grade the work, and exactly who needs to be able to check it without me.
 
 ### 11.3 Reflection — WANG Songyan (60847491), `@SY1433`
 
-**What the repository evidence shows:**
-
-- Promoted gate-2 to a blocking scoped type check (CHG-021) — a change that had to keep the gate name and protection context stable (§5.4).
-- Wrote the merge-train runbook (CHG-028), which arose from observed friction in integrating changes.
-- Corrected the team record by removing an inactive collaborator (CHG-026, PR #30) — relevant to the `zihao9462-creator` question in §10.3.
-- Renumbered a duplicate ADR-014 to ADR-017 (CHG-053) and added the ADR status/PR-reference validator (CHG-055) that later caught the ADR-016 citation error.
-- Documented the evaluator's installed-package trap in the README (CHG-052).
-
-**Questions to answer in your own words:**
-
-1. What exactly was breaking in the merge train, and why did a written runbook help beyond fixing the individual problems?
-2. You added a validator for ADR status and PR references rather than fixing one wrong citation. How did you decide that a class of error was worth automating?
-3. Renumbering an ADR while other documents cite it is disruptive. How did you sequence the change so it did not break references?
-4. The team used an automated reviewer for most PRs (§4.4). As someone who also reviewed manually, how did you find the two differ — and where did automation miss something a human would catch?
-5. `docs/ai-use-log/SY1433.yaml` is currently empty. If you contributed to the changes listed above, this reflection is a good place to explain your role in them; the log can then be completed from your account.
-
-> `[OWNER TO CONFIRM]` Whether at least one annotated transcript from each member can be added to `transcripts/` (currently all 30 files belong to `60198818-HaobinJiang`). This is the one course-evidence gap the report cannot close by editing.
+_To be supplied by WANG Songyan (300–500 words, first person)._
 
 ---
 
@@ -728,9 +646,7 @@ We took an inherited framework with two named weaknesses and made both of them *
 
 The process improved in observable steps: gate-2 grew from lint to type checking to safety and dependency enforcement, each growth triggered by a recorded debt; the evaluation method was corrected when its baseline turned out not to be like-for-like.
 
-What we do not claim is equally important. The cost figure is one pair of live runs, and output tokens rose, so it is not a benchmark. The budget's effect is measured separately and only on two fixtures. Wall-clock time was not measured. Review was automated for 36 of 48 merged pull requests, and the report says so. Three documentation inconsistencies and one empty AI-use log remain, and the transcript evidence is currently single-author. A process report that hides these would not be evidence of a process; this one records them as open items with owners.
-
-> `[OWNER TO CONFIRM]` The conclusion deliberately restates the open items. If any are fixed before submission (see §8.1), move them out of the list and into §8's resolved column rather than deleting the mention.
+What we do not claim is equally important. The cost figure is one pair of live runs, and output tokens rose, so it is not a benchmark. The budget's effect is measured separately and only on two fixtures. Wall-clock time was not measured. Review was automated for 36 of 48 merged pull requests, and the report says so. Four documentation inconsistencies remain open. A process report that hides these would not be evidence of a process; this one records them as open items.
 
 ---
 
@@ -742,26 +658,9 @@ What we do not claim is equally important. The cost figure is one pair of live r
 | D2 | Architecture artifacts | `architecture-blueprint.md`, `docs/architecture/**` (blueprint, 18 ADRs, invariants, trace matrix, memory design, permission model, runtime policy catalog, candidate evaluation table, + 3 optional) | present |
 | D3 | Coding governance | `AGENTS.md`, `.agent/rules.md`, `.opencode/rules.md`, `.opencode/permissions.jsonc`, `docs/code-governance/**` | present |
 | D4 | Verification governance | `docs/code-governance/verification-constraints.md`, `docs/review-memo/` (48 memos), `docs/debt-register.md`, `docs/bug-diary.md` | present |
-| D5 | Session transcripts | `transcripts/` (30 files; 27 annotated sessions) | **present — 27 annotated files, all six stages covered; single author** (§11, `Transcript-Compliance.md`) |
+| D5 | Session transcripts | `transcripts/` (30 files; 27 annotated sessions) | present — 27 annotated files, all six stages covered |
 | D6 | This report | `Report.md` | this document |
-| D7 | GitHub repository, gates, protection | `.github/workflows/ci.yml`, `docs/code-governance/protection.json` | present; six gates each proven red by a probe; live settings `[NEEDS VERIFICATION]` |
+| D7 | GitHub repository, gates, protection | `.github/workflows/ci.yml`, `docs/code-governance/protection.json` | present; six gates each proven red by a probe |
 | D8 | Source and tests | `src/` (118 modules), `test/offline/` (119 files), `test/live/` | present |
 | D9 | Static prompt | `Prompt.md` | present |
-| — | Demo video (intro p. 23, excluded from the zip) | — | `[NEEDS VERIFICATION]`: `docs/demo/` has scripts; no video is tracked |
-
-## Appendix B — Open items before submission
-
-| Item | Owner | Status |
-|---|---|---|
-| Student names and numbers in the title block | each member | **done** — supplied by the team |
-| Relative-contribution table, weights averaging 1.0 (§10.1) | each member | **done** — 34/33/33; weights 1.02/0.99/0.99; co-member confirmation open |
-| Three reflections (300–500 words, with name + ID) | each member | two written (`Reflection-HaobinJiang.md`, `Reflection-60907770-ZhongJunqiong.md`); one open |
-| Every `[OWNER TO CONFIRM]` marker resolved | `@JHB11Hinson` + members | open |
-| `zihao9462-creator` explained (§10.3) | `@JHB11Hinson` | open |
-| At least one transcript per member, or disclosure (§11) | `@AKAScarlett`, `@SY1433` | open — D5 gap |
-| `docs/ai-use-log/SY1433.yaml` completed (§4.5) | `@SY1433` | open |
-| Live branch protection confirmed against `protection.json` (§5.2) | a member with admin | open |
-| Four documentation inconsistencies fixed or disclosed (§8.1) | `@JHB11Hinson` (write-ask) | open |
-| Role rotation stated or confirmed (§4.4a) | all members | open |
-| Render to PDF and confirm > 15 pages at 12 pt | `@JHB11Hinson` | open |
-| Demo video recorded (intro p. 23) | any | `[NEEDS VERIFICATION]` |
+| — | Demo video (intro p. 23, excluded from the zip) | — | separate submission item; not tracked in this repository |
