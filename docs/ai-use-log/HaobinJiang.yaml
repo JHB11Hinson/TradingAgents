@@ -897,7 +897,7 @@
       why: >-
         The report is clearer to review as a pull request than as a file outside version control,
         provided it does not present itself as submission-ready.
-  transcript: docs/report/Report-Review.md
+  transcript: docs/archive/Report-Review.md
 
 - id: AI-2026-11-25-002
   date: 2026-11-25
@@ -947,4 +947,36 @@
       why: >-
         The PDF asks for the reflection, the name and the student ID; it does not ask for a signature
         or a submission gate, and the extra fields made the working papers look like a contract.
+  transcript: null
+
+- id: AI-2026-11-25-004
+  date: 2026-11-25
+  members: ["HaobinJiang"]
+  agent: opencode
+  summary: >-
+    CHG-060: remove the docs/report working papers, keep only the two records that still carry
+    traceability value, merge the completed Haobin and Zhong reflections into Report.md, and reduce
+    the contribution section to the course-required ratio. The draft markers and the open-items
+    appendix are removed; the report stands alone at 7,637 words.
+  human_interventions:
+    - type: approve
+      what: >-
+        Approved deleting docs/report and merging the report content into Report.md.
+      why: >-
+        The course requires one report file; the working papers duplicated it and had begun to
+        disagree with it on word counts and status.
+    - type: constrain
+      what: >-
+        Kept the contribution section to the 34/33/33 ratio and removed the dimension matrix and
+        review-load ranking.
+      why: >-
+        The course asks for the relative contribution and the average of 1.0; the extra evidence
+        tables implied a differential that the agreed near-equal shares did not carry.
+    - type: correct
+      what: >-
+        Left §11.3 as a clearly marked placeholder for WANG Songyan's reflection instead of writing
+        it on the student's behalf.
+      why: >-
+        D6 requires each student's own reflection; an agent-written one would undercut the evidence
+        of authorship.
   transcript: null
