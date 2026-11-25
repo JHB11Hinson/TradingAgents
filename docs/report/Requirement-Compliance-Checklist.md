@@ -11,11 +11,11 @@
 | # | Requirement (verbatim anchor) | Location in draft | Status | What remains |
 |---|---|---|---|---|
 | A1 | "list all students' **names and student numbers**" | Title block | **satisfied** | Names and IDs supplied by the team (JIANG Haobin / ZHONG Junqiong / WANG Songyan). Handle-to-person mapping confirmed by the team. |
-| A2 | "the whole team's **relative contribution**" | §10.1 | **blocked** | Hour/story-point table + `total ÷ mean`. Formula transcribed below (§E). |
+| A2 | "the whole team's **relative contribution**" | §10.1 | **satisfied** | Team-agreed shares 34 / 33 / 33; weights 1.02 / 0.99 / 0.99, mean 1.0. No sprint split recorded. |
 | A3 | "at most **10,000 words** (excluding diagrams)" | whole file | **satisfied** | ~8,600 words (see measurement note). |
 | A4 | "contain **more than 15 pages** in Point 12 with single-line spacing" | whole file | **unverifiable** | Markdown has no pages. Must be rendered at 12 pt and counted. |
 | A5 | "present the team's **software engineering process** and **how the team optimizes it**" | §1–§6, §5.4 | **satisfied** | Gate-2's three-stage growth and the evaluation-method correction are the two optimisation narratives. |
-| A6 | "each member's **self-reflection** … **with name and student ID**" | §11.1–§11.3 | **blocked** | Each student writes a short reflection (course example: 300–500 words). Worksheets prepared. |
+| A6 | "each member's **self-reflection** … **with name and student ID**" | §11.1–§11.3 | **blocked** | Two reflections are written in `docs/report/`; the report still needs the final text, and `@SY1433`'s reflection is open. |
 | A7 | "Cover process quality evidence (**requirement volatility**, **defect trends**, **ambiguity resolution**)" | §7.7 (new) | **satisfied** | Computed from git history, bug diary, review memos, ADR revision history. See §B. |
 | A8 | "how the team kept **artifacts co-evolving** when anything changed" | §8.2 (new) | **partial** | Three evidenced cases (CHG-029 schema split, CHG-032 deferral, CHG-055 validator). Honest about the gaps. |
 | A9 | "what **human oversight caught that the agent did not**" | §9 | **satisfied** | Three cases from the AI-use log; one flagged for owner confirmation. |
@@ -24,10 +24,10 @@
 
 | # | Requirement | Status | Note |
 |---|---|---|---|
-| B1 | A relative-contribution section | **blocked** | Section exists (§10); values blank. |
-| B2 | "The **average contribution is 1.0**" (p. 4) | **blocked** | Weight column must average to 1.0 once filled. |
-| B3 | Measure = "productive hours … or **story points**"; teams choose | **blocked** | Team must pick one measure. |
-| B4 | "reward students who take up **difficult tasks and project management**" | **partial** | §10.2 dimension matrix records who took what; hours still blank. |
+| B1 | A relative-contribution section | **satisfied** | §10.1 has the team-agreed shares, totals and weights. |
+| B2 | "The **average contribution is 1.0**" (p. 4) | **satisfied** | (1.02 + 0.99 + 0.99) / 3 = 1.00. |
+| B3 | Measure = "productive hours … or **story points**"; teams choose | **partial** | Team chose a normalized contribution share (the course permits team-chosen measures); no sprint split recorded. |
+| B4 | "reward students who take up **difficult tasks and project management**" | **partial** | §10.2 records project management and difficult tasks; co-member confirmation is still pending. |
 | B5 | "A student saying … 100 hours … **without tangible output** … no contribution" (intro p. 22) | **satisfied** | §10.2 records tangible output per dimension, so hours cannot stand alone. |
 | B6 | Role **rotation** (p. 4: "rotate roles") | **partial** | README §10 assigns fixed primary responsibilities; rotation is not evidenced. Disclose as a limitation. |
 
@@ -68,16 +68,16 @@ Counted from the four tables above: **26 checked items.**
 
 | Status | Count | Items |
 |---|---:|---|
-| satisfied | 11 | A3, A5, A7, A9, B5, C1, C2, C3, C5, **A1 (Filled: names/IDs supplied)**, D4 |
-| partial | 7 | A8, B4, B6, D1, D2, D5, C4 |
-| blocked (student-supplied only) | 5 | A2, B1, B2, B3, A6 |
+| satisfied | 14 | A1, A2, A3, A5, A7, A9, B1, B2, B5, C1, C2, C3, C5, D4 |
+| partial | 8 | A8, B3, B4, B6, C4, D1, D2, D5 |
+| blocked (student-supplied only) | 1 | A6 |
 | unverifiable | 2 | A4, C6 |
 | missing | 1 | D3 |
 
-**The report is not submission-ready.** Six of the twenty-six checked items cannot be closed by
-editing the document: the agreed contribution hours, the three student-written reflections, and either
-two more members' transcripts or an explicit disclosure. Everything else is either satisfied or honestly
-marked.
+**The report is not submission-ready.** One blocked item remains student-supplied (the three
+reflections); the D5 transcript gap (C4), the demo video (D3) and the page-count check (A4) also remain
+open. Everything else is satisfied or honestly marked.
 
 *A1 was recorded as blocked in the first pass; the team supplied the three names and student numbers, so
-it is now satisfied.*
+it is now satisfied. A2/B1/B2 were also blocked until the team supplied the 34/33/33 share on
+2026-11-25.*

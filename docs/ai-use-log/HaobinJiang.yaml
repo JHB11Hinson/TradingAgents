@@ -899,6 +899,30 @@
         provided it does not present itself as submission-ready.
   transcript: docs/report/Report-Review.md
 
+- id: AI-2026-11-25-002
+  date: 2026-11-25
+  members: ["HaobinJiang"]
+  agent: opencode
+  summary: >-
+    Fill the D6 contribution section with the team-supplied allocation. The team agreed a normalized
+    contribution share of 34/33/33, which the course formula converts to weights 1.02/0.99/0.99
+    (mean 1.0), and supplied the division of work: repository governance, project management and
+    part of the code for @JHB11Hinson; demo video, report, slides, offline presentation, requirements
+    discussion and part of the code for the other two members.
+  human_interventions:
+    - type: approve
+      what: >-
+        Supplied the 34/33/33 split and the work division, replacing the blank contribution table.
+      why: >-
+        The course requires the team's relative contribution, and only the team can attest it.
+    - type: constrain
+      what: >-
+        Recorded the share as a normalized contribution share and converted it to course weights
+        instead of presenting 34/33/33 as weights or as hours.
+      why: >-
+        34/33/33 are shares; the course fixes the average weight at 1.0, so the weights must be
+        member total / mean.
+
 - id: AI-2026-11-25-003
   date: 2026-11-25
   members: ["HaobinJiang"]

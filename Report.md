@@ -594,26 +594,29 @@ Across the log there are **12 `correct`** and **43 `constrain`** interventions: 
 
 ### 10.1 How we measured contribution
 
-The course suggests a measure such as **productive hours or story points**, and states that marks
-are pro-rated by relative contribution using `member total ÷ team mean`. It also fixes the scale: "The
-average contribution is **1.0**", so the three weights must average to 1.0. We follow that method rather
-than counting pull requests, for a reason: in this project the agent executed the code, so the number of
-pull requests a member opened reflects *who was directing the agent on which days*, not the size of the
-contribution. Counting PRs would overstate the most active co-ordinator and understate the reviewers and
-designers. The course also warns that hours claimed "without tangible output" count as no contribution,
-which is why §10.2 records output by dimension alongside any hours.
+The course lets the team choose its measure ("Teams can decide their measures on contributions") and
+fixes the scale: "The average contribution is **1.0**". The team agreed a **normalized contribution
+share**: each member's share is stated in percentage points of the team's total effort, and the course
+formula converts it to a relative weight (`member share ÷ mean share`). The shares are
+**34 / 33 / 33**; the mean is `100 / 3 = 33.33`, so the weights are **1.02 / 0.99 / 0.99** and average
+exactly 1.0. We do not use PR counts: in this project the agent executed the code, so PR count measures
+who was directing the agent on which days, not the size of the contribution. The course also warns that
+hours claimed "without tangible output" count as no contribution, which is why §10.2 records output by
+dimension alongside the share.
 
-**The measure:** agreed productive hours per member, summed over five sprints, using the course's worked
-form `total ÷ mean` (the course's own example turns totals 60 / 55 / 35 into weights 1.2 / 1.1 / 0.7).
-`[OWNER TO CONFIRM]` — each member supplies their own hours. **This table is the one required number in
-the report that cannot come from the repository.** Do not fill it by inference.
+**Team-agreed allocation** (supplied by the team, 2026-11-25):
 
-| Member | S1 | S2 | S3 | S4 | S5 | Total | Relative weight (total ÷ mean) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| `@JHB11Hinson` | `[OWNER TO CONFIRM]` | | | | | — | — |
-| `@AKAScarlett` | `[OWNER TO CONFIRM]` | | | | | — | — |
-| `@SY1433` | `[OWNER TO CONFIRM]` | | | | | — | — |
-| **Mean** | | | | | | — | |
+| Member | Total share | Relative weight (total ÷ mean) |
+|---|---:|---:|
+| `@JHB11Hinson` | 34 | 1.02 |
+| `@AKAScarlett` | 33 | 0.99 |
+| `@SY1433` | 33 | 0.99 |
+| **Mean** | **33.33** | **1.00** |
+
+> The team agreed the total share; it did not record a sprint-by-sprint split. The course's worked
+> example uses five sprints, but the measure is the team's choice. These values are the team's
+> attestation, not a repository-derived estimate. The per-member confirmation sheet
+> (`docs/report/Team-Confirmation-Sheet.md`) records each member's confirmation.
 
 ### 10.2 Contribution by dimension (evidence-based)
 
@@ -628,7 +631,15 @@ This table describes *what each member's record shows*, by dimension. It is not 
 | **Code and document review** | 2 review memos; 4 GitHub reviews | **4 review memos; 15 GitHub reviews — the most of any human** | 5 GitHub reviews |
 | **Documentation and governance** | `AGENTS.md`, every gate, the 11-session transcript series | review-memo entries for its changes | README evaluator note, merge-train runbook, ADR set hygiene |
 
-> `[OWNER TO CONFIRM]` Each member should correct their own column. The rows are drawn from `git log`, the review memos and the AI-use log; they describe artifacts, not effort, and may miss work done in discussion.
+> Each member should still correct their own column. The rows are drawn from `git log`, the review
+> memos, the AI-use log and the team's 2026-11-25 allocation statement; they describe artifacts and
+> agreed work, not effort, and may miss work done in discussion.
+
+The team's agreed division of work behind those shares was: `@JHB11Hinson` — repository governance,
+project management and part of the code; `@AKAScarlett` and `@SY1433` — the demo video, the report,
+the slides, the offline presentation, requirements discussion and part of the code. The matrix above
+records the repository-visible part of that work; the demo video, the slides and the offline
+presentation are team-attested because they are not stored in this repository.
 
 ### 10.3 Review load
 
@@ -649,11 +660,10 @@ Review was a real, uneven load; the contribution table should reflect it rather 
 
 > **These sections must be written by each student.** What follows is an evidence summary and a set of questions — not a draft. A reflection written by the coding agent would undercut the very thing the course uses reflections to show. Each block is preceded by its header; the student writes the paragraph (target 300–500 words) and keeps the header with name and student number.
 >
-> Each member has a matching worksheet — `docs/report/Reflection-HaobinJiang.md`,
-> `docs/report/Reflection-60907770-ZhongJunqiong.md`, `docs/report/Reflection-SY1433.md` — that repeats this
-> evidence, adds two or three specific incidents with the file or commit that proves them, and leaves
-> space for the text. The worksheet is the working copy; this section is where the finished paragraph
-> is pasted.
+> Each member has a matching reflection file — `docs/report/Reflection-HaobinJiang.md`,
+> `docs/report/Reflection-60907770-ZhongJunqiong.md`, `docs/report/Reflection-SY1433.md`. The file
+> carries the member's account; §11.1–§11.3 below keep the evidence summary and the questions used to
+> write it. The finished reflection must be carried here with the member's name and student number.
 
 ### 11.1 Reflection — JIANG Haobin (60198818), `@JHB11Hinson`
 
@@ -744,8 +754,8 @@ What we do not claim is equally important. The cost figure is one pair of live r
 | Item | Owner | Status |
 |---|---|---|
 | Student names and numbers in the title block | each member | **done** — supplied by the team |
-| Relative-contribution hours table, weights averaging 1.0 (§10.1) | each member | **required (D6)** — blocker |
-| Three reflections (300–500 words, with name + ID) | each member | **not written** — blocker |
+| Relative-contribution table, weights averaging 1.0 (§10.1) | each member | **done** — 34/33/33; weights 1.02/0.99/0.99; co-member confirmation open |
+| Three reflections (300–500 words, with name + ID) | each member | two written (`Reflection-HaobinJiang.md`, `Reflection-60907770-ZhongJunqiong.md`); one open |
 | Every `[OWNER TO CONFIRM]` marker resolved | `@JHB11Hinson` + members | open |
 | `zihao9462-creator` explained (§10.3) | `@JHB11Hinson` | open |
 | At least one transcript per member, or disclosure (§11) | `@AKAScarlett`, `@SY1433` | open — D5 gap |

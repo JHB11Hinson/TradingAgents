@@ -43,25 +43,28 @@ The course lets the team choose the measure. **Tick one:**
 
 - [ ] **Actual productive hours** per sprint
 - [ ] **Story points** per sprint
-- [ ] **Other** (state it): ______________________________
+- [x] **Other** (state it): **normalized contribution share** (percentage points of total effort)
 
 **Team agreement on what counts as a contribution** (the course says "reward students who take up
 difficult tasks and project management", and that hours without tangible output count as no
 contribution). Write the team's rule here, in one or two sentences:
 
 ```
-______________________________________________________________________________
-______________________________________________________________________________
+A member's share counts only when it is backed by tangible output (repository artifacts, reviews,
+the demo/slides/presentation, or agreed project management); PR count alone is not used.
 ```
 
-### 2.1 Per-member table (fill every cell; do not estimate)
+### 2.1 Per-member table (team-supplied; no sprint split recorded)
 
-| Member | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | **Total** | **Relative weight** |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 `@JHB11Hinson` | | | | | | | |
-| 2 `@AKAScarlett` | | | | | | | |
-| 3 `@SY1433` | | | | | | | |
-| **Mean** | | | | | | | |
+| Member | **Total** | **Relative weight** |
+|---|---:|---:|
+| 1 `@JHB11Hinson` | 34 | 1.02 |
+| 2 `@AKAScarlett` | 33 | 0.99 |
+| 3 `@SY1433` | 33 | 0.99 |
+| **Mean** | **33.33** | **1.00** |
+
+> Supplied by `@JHB11Hinson` on 2026-11-25 as the team's agreed total share. Each member must still
+> confirm their own row with the team before submission.
 
 **Formula** (from the course's worked example, totals 60 / 55 / 35):
 
@@ -73,7 +76,9 @@ weightᵢ = totalᵢ / Mean
 The three weights must **average to 1.0** (project.pdf p. 4: "The average contribution is 1.0").
 Check: `(w₁ + w₂ + w₃) / 3 = 1.000`.
 
-**Sprint dates.** The course example uses five sprints. Our team's sprint boundaries are:
+**Sprint dates.** The course example uses five sprints, but the team agreed a total share rather than a
+sprint-by-sprint split, so this table is not used. If the team later records a sprint split, add the
+boundaries here:
 
 | Sprint | From | To |
 |---|---|---|
@@ -83,7 +88,7 @@ Check: `(w₁ + w₂ + w₃) / 3 = 1.000`.
 | 4 | | |
 | 5 | | |
 
-*Who confirms:* each member supplies their own row; the team agrees the measure and the sprint dates.
+*Who confirms:* each member confirms their own row; the team agrees the measure.
 
 > **Do not** substitute merged-PR counts. The repository shows `@JHB11Hinson` opened 45 of 55 merged
 > PRs, but the agent executed the code, so PR count measures who was directing the agent, not effort.
@@ -105,6 +110,7 @@ matrix was built from git, review memos and the AI-use log and may miss work don
 | Code and document review | [ ] | [ ] | [ ] |
 | Documentation and governance | [ ] | [ ] | [ ] |
 | Project management / co-ordination | [ ] | [ ] | [ ] |
+| Demo / presentation (video, slides, offline pre) | [ ] | [ ] | [ ] |
 
 **Corrections to the draft's §10.2 matrix** (state what is wrong or missing):
 
@@ -176,4 +182,5 @@ The draft has `[OWNER TO CONFIRM]` markers. Tick each once resolved.
 
 ---
 
-**Open items:** §1 course email, §2.1 hours/story points, §4 two reflections, §5 transcript decision.
+**Open items:** §1 course email, §2.1 co-member confirmation, §4 one reflection (`@SY1433`), §5
+transcript decision.
